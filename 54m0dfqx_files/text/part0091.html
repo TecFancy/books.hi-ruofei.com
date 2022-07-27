@@ -1,0 +1,852 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0090.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0092.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_268" class="calibre9">11.3 异步函数</h2>
+        <p class="calibre1">异步函数，也称为“async/await”（语法关键字），是ES6期约模式在ECMAScript函数中的应用。async/await是ES8规范新增的。这个特性从行为和语法上都增强了JavaScript，让以同步方式写的代码能够异步执行。下面来看一个最简单的例子，这个期约在超时之后会解决为一个值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000, 3));</code></pre>
+        <p class="calibre1">这个期约在1000毫秒之后解决为数值3。如果程序中的其他代码要在这个值可用时访问它，则需要写一个解决处理程序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000, 3));
+
+p.then((x) =&gt; console.log(x));  // 3</code></pre>
+        <p class="calibre1">这其实是很不方便的，因为其他代码都必须塞到期约处理程序中。不过可以把处理程序定义为一个函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function handler(x) { console.log(x); }
+
+let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000, 3));
+
+p.then(handler); // 3</code></pre>
+        <p class="calibre1">这个改进其实也不大。这是因为任何需要访问这个期约所产生值的代码，都需要以处理程序的形式来接收这个值。也就是说，代码照样还是要放到处理程序里。ES8为此提供了async/await关键字。</p>
+        <h3 id="nav_point_269" class="calibre15">11.3.1 异步函数</h3>
+        <p class="calibre1">ES8的async/await旨在解决利用异步结构组织代码的问题。为此，ECMAScript对函数进行了扩展，为其增加了两个新关键字：<code class="calibre11">async</code>和<code class="calibre11">await</code>。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">async</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">async</code>关键字用于声明异步函数。这个关键字可以用在函数声明、函数表达式、箭头函数和方法上：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {}
+
+let bar = async function() {};
+
+let baz = async () =&gt; {};
+
+class qux {
+  async qux() {}
+}</code></pre>
+            <p class="calibre1">使用<code class="calibre11">async</code>关键字可以让函数具有异步特征，但总体上其代码仍然是同步求值的。而在参数或闭包方面，异步函数仍然具有普通JavaScript函数的正常行为。正如下面的例子所示，<code class="calibre11">foo()</code>函数仍然会在后面的指令之前被求值：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+}
+
+foo();
+console.log(2);
+
+// 1
+// 2</code></pre>
+            <p class="calibre1">不过，异步函数如果使用<code class="calibre11">return</code>关键字返回了值（如果没有<code class="calibre11">return</code>则会返回<code class="calibre11">undefined</code>），这个值会被<code class="calibre11">Promise.resolve()</code>包装成一个期约对象。异步函数始终返回期约对象。在函数外部调用这个函数可以得到它返回的期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  return 3;
+}
+
+// 给返回的期约添加一个解决处理程序
+foo().then(console.log);
+
+console.log(2);
+
+// 1
+// 2
+// 3</code></pre>
+            <p class="calibre1">当然，直接返回一个期约对象也是一样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  return promise.resolve(3);
+}
+
+// 给返回的期约添加一个解决处理程序
+foo().then(console.log);
+
+console.log(2);
+
+// 1
+// 2
+// 3</code></pre>
+            <p class="calibre1">异步函数的返回值期待（但实际上并不要求）一个实现<code class="calibre11">thenable</code>接口的对象，但常规的值也可以。如果返回的是实现<code class="calibre11">thenable</code>接口的对象，则这个对象可以由提供给<code class="calibre11">then()</code>的处理程序“解包”。如果不是，则返回值就被当作已经解决的期约。下面的代码演示了这些情况：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 返回一个原始值
+async function foo() {
+  return 'foo';
+}
+foo().then(console.log);
+// foo
+
+// 返回一个没有实现thenable接口的对象
+async function bar() {
+  return ['bar'];
+}
+bar().then(console.log);
+// ['bar']
+
+// 返回一个实现了thenable接口的非期约对象
+async function baz() {
+  const thenable = {
+    then(callback) { callback('baz'); }
+  };
+  return thenable;
+}
+baz().then(console.log);
+// baz
+
+// 返回一个期约
+async function qux() {
+  return promise.resolve('qux');
+}
+qux().then(console.log);
+// qux</code></pre>
+            <p class="calibre1">与在期约处理程序中一样，在异步函数中抛出错误会返回拒绝的期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  throw 3;
+}
+
+// 给返回的期约添加一个拒绝处理程序
+foo().catch(console.log);
+console.log(2);
+
+// 1
+// 2
+// 3</code></pre>
+            <p class="calibre1">不过，拒绝期约的错误不会被异步函数捕获：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  promise.reject(3);
+}
+
+// attach a rejected handler to the returned promise
+foo().catch(console.log);
+console.log(2);
+
+// 1
+// 2
+// uncaught (in promise): 3</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">await</code>
+              </strong>
+            </p>
+            <p class="calibre1">因为异步函数主要针对不会马上完成的任务，所以自然需要一种暂停和恢复执行的能力。使用<code class="calibre11">await</code>关键字可以暂停异步函数代码的执行，等待期约解决。来看下面这个本章开始就出现过的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000, 3));
+
+p.then((x) =&gt; console.log(x)); // 3</code></pre>
+            <p class="calibre1">使用async/await可以写成这样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000, 3));
+  console.log(await p);
+}
+
+foo();
+// 3</code></pre>
+            <p class="calibre1">注意，<code class="calibre11">await</code>关键字会暂停执行异步函数后面的代码，让出JavaScript运行时的执行线程。这个行为与生成器函数中的<code class="calibre11">yield</code>关键字是一样的。<code class="calibre11">await</code>关键字同样是尝试“解包”对象的值，然后将这个值传给表达式，再异步恢复异步函数的执行。</p>
+            <p class="calibre1">
+              <code class="calibre11">await</code>关键字的用法与JavaScript的一元操作一样。它可以单独使用，也可以在表达式中使用，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 异步打印"foo"
+async function foo() {
+  console.log(await promise.resolve('foo'));
+}
+foo();
+// foo
+　
+　
+// 异步打印"bar"
+async function bar() {
+  return await promise.resolve('bar');
+}
+bar().then(console.log);
+// bar
+
+// 1000毫秒后异步打印"baz"
+async function baz() {
+  await new promise((resolve, reject) =&gt; settimeout(resolve, 1000));
+  console.log('baz');
+}
+baz();
+// baz（1000毫秒后）</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">await</code>关键字期待（但实际上并不要求）一个实现<code class="calibre11">thenable</code>接口的对象，但常规的值也可以。如果是实现<code class="calibre11">thenable</code>接口的对象，则这个对象可以由<code class="calibre11">await</code>来“解包”。如果不是，则这个值就被当作已经解决的期约。下面的代码演示了这些情况：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 等待一个原始值
+async function foo() {
+  console.log(await 'foo');
+}
+foo();
+// foo
+
+// 等待一个没有实现thenable接口的对象
+async function bar() {
+  console.log(await ['bar']);
+}
+bar();
+// ['bar']
+
+// 等待一个实现了thenable接口的非期约对象
+async function baz() {
+  const thenable = {
+    then(callback) { callback('baz'); }
+  };
+  console.log(await thenable);
+}
+baz();
+// baz
+
+// 等待一个期约
+async function qux() {
+  console.log(await promise.resolve('qux'));
+}
+qux();
+// qux</code></pre>
+            <p class="calibre1">等待会抛出错误的同步操作，会返回拒绝的期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  await (() =&gt; { throw 3; })();
+}
+
+// 给返回的期约添加一个拒绝处理程序
+foo().catch(console.log);
+console.log(2);
+
+// 1
+// 2
+// 3</code></pre>
+            <p class="calibre1">如前面的例子所示，单独的<code class="calibre11">Promise.reject()</code>不会被异步函数捕获，而会抛出未捕获错误。不过，对拒绝的期约使用<code class="calibre11">await</code>则会释放（unwrap）错误值（将拒绝期约返回）：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(1);
+  await promise.reject(3);
+  console.log(4); // 这行代码不会执行
+}
+
+// 给返回的期约添加一个拒绝处理程序
+foo().catch(console.log);
+console.log(2);
+
+// 1
+// 2
+// 3</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">await</code>的限制</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">await</code>关键字必须在异步函数中使用，不能在顶级上下文如<code class="calibre11">&lt;script&gt;</code>标签或模块中使用。不过，定义并立即调用异步函数是没问题的。下面两段代码实际是相同的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(await promise.resolve(3));
+}
+foo();
+// 3
+
+// 立即调用的异步函数表达式
+(async function() {
+  console.log(await promise.resolve(3));
+})();
+// 3</code></pre>
+            <p class="calibre1">此外，异步函数的特质不会扩展到嵌套函数。因此，<code class="calibre11">await</code>关键字也只能直接出现在异步函数的定义中。在同步函数内部使用<code class="calibre11">await</code>会抛出<code class="calibre11">SyntaxError</code>。</p>
+            <p class="calibre1">下面展示了一些会出错的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不允许：await出现在了箭头函数中
+function foo() {
+  const syncfn = () =&gt; {
+    return await promise.resolve('foo');
+  };
+  console.log(syncfn());
+}
+
+// 不允许：await出现在了同步函数声明中
+function bar() {
+  function syncfn() {
+    return await promise.resolve('bar');
+  }
+  console.log(syncfn());
+}
+
+// 不允许：await出现在了同步函数表达式中
+function baz() {
+  const syncfn = function() {
+    return await promise.resolve('baz');
+  };
+  console.log(syncfn());
+}
+
+// 不允许：iife使用同步函数表达式或箭头函数
+function qux() {
+  (function () { console.log(await promise.resolve('qux')); })();
+  (() =&gt; console.log(await promise.resolve('qux')))();
+}</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_270" class="calibre15">11.3.2 停止和恢复执行</h3>
+        <p class="calibre1">使用<code class="calibre11">await</code>关键字之后的区别其实比看上去的还要微妙一些。比如，下面的例子中按顺序调用了3个函数，但它们的输出结果顺序是相反的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(await promise.resolve('foo'));
+}
+
+async function bar() {
+  console.log(await 'bar');
+}
+
+async function baz() {
+  console.log('baz');
+}
+
+foo();
+bar();
+baz();
+
+// baz
+// bar
+// foo</code></pre>
+        <p class="calibre1">async/await中真正起作用的是<code class="calibre11">await</code>。<code class="calibre11">async</code>关键字，无论从哪方面来看，都不过是一个标识符。毕竟，异步函数如果不包含<code class="calibre11">await</code>关键字，其执行基本上跟普通函数没有什么区别：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(2);
+}
+
+console.log(1);
+foo();
+console.log(3);
+
+// 1
+// 2
+// 3</code></pre>
+        <p class="calibre1">要完全理解<code class="calibre11">await</code>关键字，必须知道它并非只是等待一个值可用那么简单。JavaScript运行时在碰到<code class="calibre11">await</code>关键字时，会记录在哪里暂停执行。等到<code class="calibre11">await</code>右边的值可用了，JavaScript运行时会向消息队列中推送一个任务，这个任务会恢复异步函数的执行。</p>
+        <p class="calibre1">因此，即使<code class="calibre11">await</code>后面跟着一个立即可用的值，函数的其余部分也会被<strong class="calibre2">异步</strong>求值。下面的例子演示了这一点：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(2);
+  await null;
+  console.log(4);
+}
+
+console.log(1);
+foo();
+console.log(3);
+
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <p class="calibre1">控制台中输出结果的顺序很好地解释了运行时的工作过程：</p>
+        <p class="calibre1">(1) 打印1；</p>
+        <p class="calibre1">(2) 调用异步函数<code class="calibre11">foo()</code>；</p>
+        <p class="calibre1">(3)（在<code class="calibre11">foo()</code>中）打印2；</p>
+        <p class="calibre1">(4)（在<code class="calibre11">foo()</code>中）<code class="calibre11">await</code>关键字暂停执行，为立即可用的值<code class="calibre11">null</code>向消息队列中添加一个任务；</p>
+        <p class="calibre1">(5) foo()退出；</p>
+        <p class="calibre1">(6) 打印3；</p>
+        <p class="calibre1">(7) 同步线程的代码执行完毕；</p>
+        <p class="calibre1">(8) JavaScript运行时从消息队列中取出任务，恢复异步函数执行；</p>
+        <p class="calibre1">(9)（在<code class="calibre11">foo()</code>中）恢复执行，<code class="calibre11">await</code>取得<code class="calibre11">null</code>值（这里并没有使用）；</p>
+        <p class="calibre1">(10)（在<code class="calibre11">foo()</code>中）打印4；</p>
+        <p class="calibre1">(11)
+          <code class="calibre11">foo()</code>返回。</p>
+        <p class="calibre1">如果<code class="calibre11">await</code>后面是一个期约，则问题会稍微复杂一些。此时，为了执行异步函数，实际上会有两个任务被添加到消息队列并被异步求值。下面的例子虽然看起来很反直觉，但它演示了真正的执行顺序：<span class="zhu_shi_bian_hao">1</span></p>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">1</span>TC39 对<code class="calibre11">await</code>后面是期约的情况如何处理做过一次修改。修改后，本例中的<code class="calibre11">Promise.resolve(8)</code>只会生成一个异步任务。因此在新版浏览器中，这个示例的输出结果为<code class="calibre11">123458967</code>。实际开发中，对于并行的异步操作我们通常更关注结果，而不依赖执行顺序。——译者注</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function foo() {
+  console.log(2);
+  console.log(await promise.resolve(8));
+  console.log(9);
+}
+
+async function bar() {
+  console.log(4);
+  console.log(await 6);
+  console.log(7);
+}
+
+console.log(1);
+foo();
+console.log(3);
+bar();
+console.log(5);
+
+// 1
+// 2
+// 3
+// 4
+// 5
+// 6
+// 7
+// 8
+// 9</code></pre>
+        <p class="calibre1">运行时会像这样执行上面的例子：</p>
+        <p class="calibre1">(1) 打印1；</p>
+        <p class="calibre1">(2) 调用异步函数<code class="calibre11">foo()</code>；</p>
+        <p class="calibre1">(3)（在<code class="calibre11">foo()</code>中）打印2；</p>
+        <p class="calibre1">(4)（在<code class="calibre11">foo()</code>中）<code class="calibre11">await</code>关键字暂停执行，向消息队列中添加一个期约在落定之后执行的任务；</p>
+        <p class="calibre1">(5) 期约立即落定，把给<code class="calibre11">await</code>提供值的任务添加到消息队列；</p>
+        <p class="calibre1">(6)
+          <code class="calibre11">foo()</code>退出；</p>
+        <p class="calibre1">(7) 打印3；</p>
+        <p class="calibre1">(8) 调用异步函数<code class="calibre11">bar()</code>；</p>
+        <p class="calibre1">(9)（在<code class="calibre11">bar()</code>中）打印4；</p>
+        <p class="calibre1">(10)（在<code class="calibre11">bar()</code>中）<code class="calibre11">await</code>关键字暂停执行，为立即可用的值6向消息队列中添加一个任务；</p>
+        <p class="calibre1">(11)
+          <code class="calibre11">bar()</code>退出；</p>
+        <p class="calibre1">(12) 打印5；</p>
+        <p class="calibre1">(13) 顶级线程执行完毕；</p>
+        <p class="calibre1">(14) JavaScript运行时从消息队列中取出解决<code class="calibre11">await</code>期约的处理程序，并将解决的值8提供给它；</p>
+        <p class="calibre1">(15) JavaScript运行时向消息队列中添加一个恢复执行<code class="calibre11">foo()</code>函数的任务；</p>
+        <p class="calibre1">(16) JavaScript运行时从消息队列中取出恢复执行<code class="calibre11">bar()</code>的任务及值6；</p>
+        <p class="calibre1">(17)（在<code class="calibre11">bar()</code>中）恢复执行，<code class="calibre11">await</code>取得值6；</p>
+        <p class="calibre1">(18)（在<code class="calibre11">bar()</code>中）打印6；</p>
+        <p class="calibre1">(19)（在<code class="calibre11">bar()</code>中）打印7；</p>
+        <p class="calibre1">(20)
+          <code class="calibre11">bar()</code>返回；</p>
+        <p class="calibre1">(21) 异步任务完成，JavaScript从消息队列中取出恢复执行<code class="calibre11">foo()</code>的任务及值8；</p>
+        <p class="calibre1">(22)（在<code class="calibre11">foo()</code>中）打印8；</p>
+        <p class="calibre1">(23)（在<code class="calibre11">foo()</code>中）打印9；</p>
+        <p class="calibre1">(24)
+          <code class="calibre11">foo()</code>返回。</p>
+        <h3 id="nav_point_271" class="calibre15">11.3.3 异步函数策略</h3>
+        <p class="calibre1">因为简单实用，所以异步函数很快成为JavaScript项目使用最广泛的特性之一。不过，在使用异步函数时，还是有些问题要注意。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">实现<code class="calibre11">sleep()</code>
+              </strong>
+            </p>
+            <p class="calibre1">很多人在刚开始学习JavaScript时，想找到一个类似Java中<code class="calibre11">Thread.sleep()</code>之类的函数，好在程序中加入非阻塞的暂停。以前，这个需求基本上都通过<code class="calibre11">setTimeout()</code>利用JavaScript运行时的行为来实现的。</p>
+            <p class="calibre1">有了异步函数之后，就不一样了。一个简单的箭头函数就可以实现sleep()：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function sleep(delay) {
+  return new promise((resolve) =&gt; settimeout(resolve, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+  await sleep(1500); // 暂停约1500毫秒
+  console.log(date.now() - t0);
+}
+foo();
+// 1502</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">利用平行执行</strong>
+            </p>
+            <p class="calibre1">如果使用<code class="calibre11">await</code>时不留心，则很可能错过平行加速的机会。来看下面的例子，其中顺序等待了5个随机的超时：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function randomdelay(id) {
+  // 延迟0~1000毫秒
+  const delay = math.random() * 1000;
+  return new promise((resolve) =&gt; settimeout(() =&gt; {
+    console.log(`${id} finished`);
+    resolve();
+  }, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+  await randomdelay(0);
+  await randomdelay(1);
+  await randomdelay(2);
+  await randomdelay(3);
+  await randomdelay(4);
+  console.log(`${date.now() - t0}ms elapsed`);
+}
+foo();
+
+// 0 finished
+// 1 finished
+// 2 finished
+// 3 finished
+// 4 finished
+// 877ms elapsed</code></pre>
+            <p class="calibre1">用一个<code class="calibre11">for</code>循环重写，就是：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function randomdelay(id) {
+  // 延迟0~1000毫秒
+  const delay = math.random() * 1000;
+  return new promise((resolve) =&gt; settimeout(() =&gt; {
+    console.log(`${id} finished`);
+    resolve();
+  }, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+  for (let i = 0; i &lt; 5; ++i) {
+    await randomdelay(i);
+  }
+
+  console.log(`${date.now() - t0}ms elapsed`);
+}
+foo();
+
+// 0 finished
+// 1 finished
+// 2 finished
+// 3 finished
+// 4 finished
+// 877ms elapsed</code></pre>
+            <p class="calibre1">就算这些期约之间没有依赖，异步函数也会依次暂停，等待每个超时完成。这样可以保证执行顺序，但总执行时间会变长。</p>
+            <p class="calibre1">如果顺序不是必需保证的，那么可以先一次性初始化所有期约，然后再分别等待它们的结果。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function randomdelay(id) {
+  // 延迟0~1000毫秒
+  const delay = math.random() * 1000;
+  return new promise((resolve) =&gt; settimeout(() =&gt; {
+    settimeout(console.log, 0, `${id} finished`);
+    resolve();
+  }, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+
+  const p0 = randomdelay(0);
+  const p1 = randomdelay(1);
+  const p2 = randomdelay(2);
+  const p3 = randomdelay(3);
+  const p4 = randomdelay(4);
+
+  await p0;
+  await p1;
+  await p2;
+  await p3;
+  await p4;
+
+  settimeout(console.log, 0, `${date.now() - t0}ms elapsed`);
+}
+foo();
+
+// 1 finished
+// 4 finished
+// 3 finished
+// 0 finished
+// 2 finished
+// 877ms elapsed</code></pre>
+            <p class="calibre1">用数组和<code class="calibre11">for</code>循环再包装一下就是：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function randomdelay(id) {
+  // 延迟0~1000毫秒
+  const delay = math.random() * 1000;
+  return new promise((resolve) =&gt; settimeout(() =&gt; {
+    console.log(`${id} finished`);
+    resolve();
+  }, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+
+  const promises = array(5).fill(null).map((_, i) =&gt; randomdelay(i));
+
+  for (const p of promises) {
+    await p;
+  }
+
+  console.log(`${date.now() - t0}ms elapsed`);
+}
+foo();
+
+// 4 finished
+// 2 finished
+// 1 finished
+// 0 finished
+// 3 finished
+// 877ms elapsed</code></pre>
+            <p class="calibre1">注意，虽然期约没有按照顺序执行，但<code class="calibre11">await</code>
+              <strong class="calibre2">按顺序</strong>收到了每个期约的值：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function randomdelay(id) {
+  // 延迟0~1000毫秒
+  const delay = math.random() * 1000;
+  return new promise((resolve) =&gt; settimeout(() =&gt; {
+    console.log(`${id} finished`);
+    resolve(id);
+  }, delay));
+}
+
+async function foo() {
+  const t0 = date.now();
+
+  const promises = array(5).fill(null).map((_, i) =&gt; randomdelay(i));
+
+  for (const p of promises) {
+    console.log(`awaited ${await p}`);
+  }
+
+  console.log(`${date.now() - t0}ms elapsed`);
+}
+foo();
+
+// 1 finished
+// 2 finished
+// 4 finished
+// 3 finished
+// 0 finished
+// awaited 0
+// awaited 1
+// awaited 2
+// awaited 3
+// awaited 4
+// 645ms elapsed</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">串行执行期约</strong>
+            </p>
+            <p class="calibre1">在11.2节，我们讨论过如何串行执行期约并把值传给后续的期约。使用async/await，期约连锁会变得很简单：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addtwo(x) {return x + 2;}
+function addthree(x) {return x + 3;}
+function addfive(x) {return x + 5;}
+
+async function addten(x) {
+  for (const fn of [addtwo, addthree, addfive]) {
+    x = await fn(x);
+  }
+  return x;
+}
+
+addten(9).then(console.log); // 19</code></pre>
+            <p class="calibre1">这里，<code class="calibre11">await</code>直接传递了每个函数的返回值，结果通过迭代产生。当然，这个例子并没有使用期约，如果要使用期约，则可以把所有函数都改成异步函数。这样它们就都返回期约了：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function addtwo(x) {return x + 2;}
+async function addthree(x) {return x + 3;}
+async function addfive(x) {return x + 5;}
+
+async function addten(x) {
+  for (const fn of [addtwo, addthree, addfive]) {
+    x = await fn(x);
+  }
+  return x;
+}
+
+addten(9).then(console.log); // 19</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">栈追踪与内存管理</strong>
+            </p>
+            <p class="calibre1">期约与异步函数的功能有相当程度的重叠，但它们在内存中的表示则差别很大。看看下面的例子，它展示了拒绝期约的栈追踪信息：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function foopromiseexecutor(resolve, reject) {
+  settimeout(reject, 1000, 'bar');
+}
+
+function foo() {
+  new promise(foopromiseexecutor);
+}
+
+foo();
+// uncaught (in promise) bar
+//   settimeout
+//   settimeout (async)
+//   foopromiseexecutor
+//   foo</code></pre>
+            <p class="calibre1">根据对期约的不同理解程度，以上栈追踪信息可能会让某些读者不解。栈追踪信息应该相当直接地表现JavaScript引擎当前栈内存中函数调用之间的嵌套关系。在超时处理程序执行时和拒绝期约时，我们看到的错误信息包含嵌套函数的标识符，那是被调用以创建最初期约实例的函数。可是，我们知道这些函数<strong class="calibre2">已经返回</strong>了，因此栈追踪信息中不应该看到它们。</p>
+            <p class="calibre1">答案很简单，这是因为JavaScript引擎会在创建期约时尽可能保留完整的调用栈。在抛出错误时，调用栈可以由运行时的错误处理逻辑获取，因而就会出现在栈追踪信息中。当然，这意味着栈追踪信息会占用内存，从而带来一些计算和存储成本。</p>
+            <p class="calibre1">如果在前面的例子中使用的是异步函数，那又会怎样呢？比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function foopromiseexecutor(resolve, reject) {
+  settimeout(reject, 1000, 'bar');
+}
+
+async function foo() {
+  await new promise(foopromiseexecutor);
+}
+foo();
+
+// uncaught (in promise) bar
+//   foo
+//   async function (async)
+//   foo</code></pre>
+            <p class="calibre1">这样一改，栈追踪信息就准确地反映了当前的调用栈。<code class="calibre11">fooPromiseExecutor()</code>已经返回，所以它不在错误信息中。但<code class="calibre11">foo()</code>此时被挂起了，并没有退出。JavaScript运行时可以简单地在嵌套函数中存储指向包含函数的指针，就跟对待同步函数调用栈一样。这个指针实际上存储在内存中，可用于在出错时生成栈追踪信息。这样就不会像之前的例子那样带来额外的消耗，因此在重视性能的应用中是可以优先考虑的。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0090.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0092.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

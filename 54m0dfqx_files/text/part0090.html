@@ -1,0 +1,1307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0089.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0091.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_262" class="calibre9">11.2 期约</h2>
+        <p class="calibre1">期约是对尚不存在结果的一个替身。期约（promise）这个名字最早是由Daniel Friedman和David Wise在他们于1976年发表的论文“The Impact of Applicative Programming on Multiprocessing”中提出来的。但直到十几年以后，Barbara Liskov和Liuba Shrira在1988年发表了论文“Promises—Linguistic Support for Efficient Asynchronous Procedure Calls in Distributed Systems”，这个概念才真正确立下来。同一时期的计算机科学家还使用了“终局”（eventual）、“期许”（future）、“延迟”（delay）和“迟付”（deferred）等术语指代同样的概念。所有这些概念描述的都是一种异步程序执行的机制。</p>
+        <h3 id="nav_point_263" class="calibre15">11.2.1 Promises/A+规范</h3>
+        <p class="calibre1">早期的期约机制在jQuery和Dojo中是以Deferred API的形式出现的。到了2010年，CommonJS项目实现的Promises/A规范日益流行起来。Q和Bluebird等第三方JavaScript期约库也越来越得到社区认可，虽然这些库的实现多少都有些不同。为弥合现有实现之间的差异，2012年Promises/A+组织分叉（fork）了CommonJS的Promises/A建议，并以相同的名字制定了Promises/A+规范。这个规范最终成为了ECMAScript 6规范实现的范本。</p>
+        <p class="calibre1">ECMAScript 6增加了对Promises/A+规范的完善支持，即<code class="calibre11">Promise</code>类型。一经推出，<code class="calibre11">Promise</code>就大受欢迎，成为了主导性的异步编程机制。所有现代浏览器都支持ES6期约，很多其他浏览器API（如<code class="calibre11">fetch()</code>和Battery Status API）也以期约为基础。</p>
+        <h3 id="nav_point_264" class="calibre15">11.2.2 期约基础</h3>
+        <p class="calibre1">ECMAScript 6新增的引用类型<code class="calibre11">Promise</code>，可以通过<code class="calibre11">new</code>操作符来实例化。创建新期约时需要传入执行器（executor）函数作为参数（后面马上会介绍），下面的例子使用了一个空函数对象来应付一下解释器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise(() =&gt; {});
+settimeout(console.log, 0, p);  // promise &lt;pending&gt;</code></pre>
+        <p class="calibre1">之所以说是应付解释器，是因为如果不提供执行器函数，就会抛出<code class="calibre11">SyntaxError</code>。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">期约状态机</strong>
+            </p>
+            <p class="calibre1">在把一个期约实例传给<code class="calibre11">console.log()</code>时，控制台输出（可能因浏览器不同而略有差异）表明该实例处于<strong class="calibre2">待定</strong>（pending）状态。如前所述，期约是一个有状态的对象，可能处于如下3种状态之一：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">待定（pending）</li>
+              <li class="di_1ji_wu_xu_lie_biao">兑现（fulfilled，有时候也称为“解决”，resolved）</li>
+              <li class="di_1ji_wu_xu_lie_biao">拒绝（rejected）</li>
+            </ul>
+            <p class="calibre1">
+              <strong class="calibre2">待定</strong>（pending）是期约的最初始状态。在待定状态下，期约可以<strong class="calibre2">落定</strong>（settled）为代表成功的<strong class="calibre2">兑现</strong>（fulfilled）状态，或者代表失败的<strong class="calibre2">拒绝</strong>（rejected）状态。无论落定为哪种状态都是不可逆的。只要从待定转换为兑现或拒绝，期约的状态就不再改变。而且，也不能保证期约必然会脱离待定状态。因此，组织合理的代码无论期约解决（resolve）还是拒绝（reject），甚至永远处于待定（pending）状态，都应该具有恰当的行为。</p>
+            <p class="calibre1">重要的是，期约的状态是私有的，不能直接通过JavaScript检测到。这主要是为了避免根据读取到的期约状态，以同步方式处理期约对象。另外，期约的状态也不能被外部JavaScript代码修改。这与不能读取该状态的原因是一样的：期约故意将异步行为封装起来，从而隔离外部的同步代码。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">解决值、拒绝理由及期约用例</strong>
+            </p>
+            <p class="calibre1">期约主要有两大用途。首先是抽象地表示一个异步操作。期约的状态代表期约是否完成。“待定”表示尚未开始或者正在执行中。“兑现”表示已经成功完成，而“拒绝”则表示没有成功完成。</p>
+            <p class="calibre1">某些情况下，这个状态机就是期约可以提供的最有用的信息。知道一段异步代码已经完成，对于其他代码而言已经足够了。比如，假设期约要向服务器发送一个HTTP请求。请求返回200~299范围内的状态码就足以让期约的状态变为“兑现”。类似地，如果请求返回的状态码不在200~299这个范围内，那么就会把期约状态切换为“拒绝”。</p>
+            <p class="calibre1">在另外一些情况下，期约封装的异步操作会实际生成某个值，而程序期待期约状态改变时可以访问这个值。相应地，如果期约被拒绝，程序就会期待期约状态改变时可以拿到拒绝的理由。比如，假设期约向服务器发送一个HTTP请求并预定会返回一个JSON。如果请求返回范围在200~299的状态码，则足以让期约的状态变为兑现。此时期约内部就可以收到一个JSON字符串。类似地，如果请求返回的状态码不在200~299这个范围内，那么就会把期约状态切换为拒绝。此时拒绝的理由可能是一个<code class="calibre11">Error</code>对象，包含着HTTP状态码及相关错误消息。</p>
+            <p class="calibre1">为了支持这两种用例，每个期约只要状态切换为兑现，就会有一个私有的内部<strong class="calibre2">值</strong>（value）。类似地，每个期约只要状态切换为拒绝，就会有一个私有的内部<strong class="calibre2">理由</strong>（reason）。无论是值还是理由，都是包含原始值或对象的不可修改的引用。二者都是可选的，而且默认值为<code class="calibre11">undefined</code>。在期约到达某个落定状态时执行的异步代码始终会收到这个值或理由。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">通过执行函数控制期约状态</strong>
+            </p>
+            <p class="calibre1">由于期约的状态是私有的，所以只能在内部进行操作。内部操作在期约的执行器函数中完成。执行器函数主要有两项职责：初始化期约的异步行为和控制状态的最终转换。其中，控制期约状态的转换是通过调用它的两个函数参数实现的。这两个函数参数通常都命名为<code class="calibre11">resolve()</code>和<code class="calibre11">reject()</code>。调用<code class="calibre11">resolve()</code>会把状态切换为兑现，调用<code class="calibre11">reject()</code>会把状态切换为拒绝。另外，调用<code class="calibre11">reject()</code>也会抛出错误（后面会讨论这个错误）。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; resolve());
+settimeout(console.log, 0, p1); // promise &lt;resolved&gt;
+
+let p2 = new promise((resolve, reject) =&gt; reject());
+settimeout(console.log, 0, p2); // promise &lt;rejected&gt;
+// uncaught error (in promise)</code></pre>
+            <p class="calibre1">在前面的例子中，并没有什么异步操作，因为在初始化期约时，执行器函数已经改变了每个期约的状态。这里的关键在于，执行器函数是<strong class="calibre2">同步</strong>执行的。这是因为执行器函数是期约的初始化程序。通过下面的例子可以看出上面代码的执行顺序：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">new promise(() =&gt; settimeout(console.log, 0, 'executor'));
+settimeout(console.log, 0, 'promise initialized');
+
+// executor
+// promise initialized</code></pre>
+            <p class="calibre1">添加<code class="calibre11">setTimeout</code>可以推迟切换状态：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; settimeout(resolve, 1000));
+
+// 在console.log打印期约实例的时候，还不会执行超时回调（即resolve()）
+settimeout(console.log, 0, p);  // promise &lt;pending&gt;</code></pre>
+            <p class="calibre1">无论<code class="calibre11">resolve()</code>和<code class="calibre11">reject()</code>中的哪个被调用，状态转换都不可撤销了。于是继续修改状态会静默失败，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; {
+  resolve();
+  reject(); // 没有效果
+});
+
+settimeout(console.log, 0, p); // promise &lt;resolved&gt;</code></pre>
+            <p class="calibre1">为避免期约卡在待定状态，可以添加一个定时退出功能。比如，可以通过<code class="calibre11">setTimeout</code>设置一个10秒钟后无论如何都会拒绝期约的回调：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; {
+  settimeout(reject, 10000);  // 10秒后调用reject()
+  // 执行函数的逻辑
+});
+
+settimeout(console.log, 0, p);      // promise &lt;pending&gt;
+settimeout(console.log, 11000, p);  // 11秒后再检查状态
+
+// (after 10 seconds) uncaught error
+// (after 11 seconds) promise &lt;rejected&gt;</code></pre>
+            <p class="calibre1">因为期约的状态只能改变一次，所以这里的超时拒绝逻辑中可以放心地设置让期约处于待定状态的最长时间。如果执行器中的代码在超时之前已经解决或拒绝，那么超时回调再尝试拒绝也会静默失败。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.resolve()</code>
+              </strong>
+            </p>
+            <p class="calibre1">期约并非一开始就必须处于待定状态，然后通过执行器函数才能转换为落定状态。通过调用<code class="calibre11">Promise.resolve()</code>静态方法，可以实例化一个解决的期约。下面两个期约实例实际上是一样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; resolve());
+let p2 = promise.resolve();</code></pre>
+            <p class="calibre1">这个解决的期约的值对应着传给<code class="calibre11">Promise.resolve()</code>的第一个参数。使用这个静态方法，实际上可以把任何值都转换为一个期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">settimeout(console.log, 0, promise.resolve());
+// promise &lt;resolved&gt;: undefined
+
+settimeout(console.log, 0, promise.resolve(3));
+// promise &lt;resolved&gt;: 3
+
+// 多余的参数会忽略
+settimeout(console.log, 0, promise.resolve(4, 5, 6));
+// promise &lt;resolved&gt;: 4</code></pre>
+            <p class="calibre1">对这个静态方法而言，如果传入的参数本身是一个期约，那它的行为就类似于一个空包装。因此，<code class="calibre11">Promise.resolve()</code>可以说是一个幂等方法，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.resolve(7);
+
+settimeout(console.log, 0, p === promise.resolve(p));
+// true
+
+settimeout(console.log, 0, p === promise.resolve(promise.resolve(p)));
+// true</code></pre>
+            <p class="calibre1">这个幂等性会保留传入期约的状态：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise(() =&gt; {});
+
+settimeout(console.log, 0, p);                   // promise &lt;pending&gt;
+settimeout(console.log, 0, promise.resolve(p));  // promise &lt;pending&gt;
+
+settimeout(console.log, 0, p === promise.resolve(p)); // true</code></pre>
+            <p class="calibre1">注意，这个静态方法能够包装任何非期约值，包括错误对象，并将其转换为解决的期约。因此，也可能导致不符合预期的行为：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.resolve(new error('foo'));
+
+settimeout(console.log, 0, p);
+// promise &lt;resolved&gt;: error: foo</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.reject()</code>
+              </strong>
+            </p>
+            <p class="calibre1">与<code class="calibre11">Promise.resolve()</code>类似，<code class="calibre11">Promise.reject()</code>会实例化一个拒绝的期约并抛出一个异步错误（这个错误不能通过<code class="calibre11">try</code>/<code class="calibre11">catch</code>捕获，而只能通过拒绝处理程序捕获）。下面的两个期约实例实际上是一样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; reject());
+let p2 = promise.reject();</code></pre>
+            <p class="calibre1">这个拒绝的期约的理由就是传给<code class="calibre11">Promise.reject()</code>的第一个参数。这个参数也会传给后续的拒绝处理程序：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.reject(3);
+settimeout(console.log, 0, p); // promise &lt;rejected&gt;: 3
+
+p.then(null, (e) =&gt; settimeout(console.log, 0, e)); // 3</code></pre>
+            <p class="calibre1">关键在于，<code class="calibre11">Promise.reject()</code>并没有照搬<code class="calibre11">Promise.resolve()</code>的幂等逻辑。如果给它传一个期约对象，则这个期约会成为它返回的拒绝期约的理由：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">settimeout(console.log, 0, promise.reject(promise.resolve()));
+// promise &lt;rejected&gt;: promise &lt;resolved&gt;</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">同步/异步执行的二元性</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Promise</code>的设计很大程度上会导致一种完全不同于JavaScript的计算模式。下面的例子完美地展示了这一点，其中包含了两种模式下抛出错误的情形：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  throw new error('foo');
+} catch(e) {
+  console.log(e); // error: foo
+}
+
+try {
+  promise.reject(new error('bar'));
+} catch(e) {
+  console.log(e);
+}
+// uncaught (in promise) error: bar</code></pre>
+            <p class="calibre1">第一个<code class="calibre11">try</code>/<code class="calibre11">catch</code>抛出并捕获了错误，第二个<code class="calibre11">try</code>/<code class="calibre11">catch</code>抛出错误却<strong class="calibre2">没有</strong>捕获到。乍一看这可能有点违反直觉，因为代码中确实是同步创建了一个拒绝的期约实例，而这个实例也抛出了包含拒绝理由的错误。这里的同步代码之所以没有捕获期约抛出的错误，是因为它没有通过<strong class="calibre2">异步模式</strong>捕获错误。从这里就可以看出期约真正的异步特性：它们是同步对象（在同步执行模式中使用），但也是<strong class="calibre2">异步</strong>执行模式的媒介。</p>
+            <p class="calibre1">在前面的例子中，拒绝期约的错误并没有抛到执行同步代码的线程里，而是通过浏览器异步消息队列来处理的。因此，<code class="calibre11">try</code>/<code class="calibre11">catch</code>块并不能捕获该错误。代码一旦开始以异步模式执行，则唯一与之交互的方式就是使用异步结构——更具体地说，就是期约的方法。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_265" class="calibre15">11.2.3 期约的实例方法</h3>
+        <p class="calibre1">期约实例的方法是连接外部同步代码与内部异步代码之间的桥梁。这些方法可以访问异步操作返回的数据，处理期约成功和失败的结果，连续对期约求值，或者添加只有期约进入终止状态时才会执行的代码。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">实现<code class="calibre11">Thenable</code>接口</strong>
+            </p>
+            <p class="calibre1">在ECMAScript暴露的异步结构中，任何对象都有一个<code class="calibre11">then()</code>方法。这个方法被认为实现了<code class="calibre11">Thenable</code>接口。下面的例子展示了实现这一接口的最简单的类：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class mythenable {
+  then() {}
+}</code></pre>
+            <p class="calibre1">ECMAScript的<code class="calibre11">Promise</code>类型实现了<code class="calibre11">Thenable</code>接口。这个简化的接口跟TypeScript或其他包中的接口或类型定义不同，它们都设定了<code class="calibre11">Thenable</code>接口更具体的形式。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                本章后面再介绍异步函数时还会再谈到<code class="calibre11">Thenable</code>接口的用途和目的。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.prototype.then()</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.then()</code>是为期约实例添加处理程序的主要方法。这个<code class="calibre11">then()</code>方法接收最多两个参数：<code class="calibre11">onResolved</code>处理程序和<code class="calibre11">onRejected</code>处理程序。这两个参数都是可选的，如果提供的话，则会在期约分别进入“兑现”和“拒绝”状态时执行。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function onresolved(id) {
+  settimeout(console.log, 0, id, 'resolved');
+}
+function onrejected(id) {
+  settimeout(console.log, 0, id, 'rejected');
+}
+
+let p1 = new promise((resolve, reject) =&gt; settimeout(resolve, 3000));
+let p2 = new promise((resolve, reject) =&gt; settimeout(reject, 3000));
+
+p1.then(() =&gt; onresolved('p1'),
+        () =&gt; onrejected('p1'));
+p2.then(() =&gt; onresolved('p2'),
+        () =&gt; onrejected('p2'));
+
+//（3秒后）
+// p1 resolved
+// p2 rejected</code></pre>
+            <p class="calibre1">因为期约只能转换为最终状态一次，所以这两个操作一定是互斥的。</p>
+            <p class="calibre1">如前所述，两个处理程序参数都是可选的。而且，传给<code class="calibre11">then()</code>的任何非函数类型的参数都会被静默忽略。如果想只提供<code class="calibre11">onRejected</code>参数，那就要在<code class="calibre11">onResolved</code>参数的位置上传入<code class="calibre11">undefined</code>。这样有助于避免在内存中创建多余的对象，对期待函数参数的类型系统也是一个交代。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function onresolved(id) {
+  settimeout(console.log, 0, id, 'resolved');
+}
+function onrejected(id) {
+  settimeout(console.log, 0, id, 'rejected');
+}
+
+let p1 = new promise((resolve, reject) =&gt; settimeout(resolve, 3000));
+let p2 = new promise((resolve, reject) =&gt; settimeout(reject, 3000));
+
+// 非函数处理程序会被静默忽略，不推荐
+p1.then('gobbeltygook');
+
+// 不传onresolved处理程序的规范写法
+p2.then(null, () =&gt; onrejected('p2'));
+
+// p2 rejected（3秒后）</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.then()</code>方法返回一个新的期约实例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise(() =&gt; {});
+let p2 = p1.then();
+settimeout(console.log, 0, p1);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p2);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p1 === p2);  // false</code></pre>
+            <p class="calibre1">这个新期约实例基于<code class="calibre11">onResovled</code>处理程序的返回值构建。换句话说，该处理程序的返回值会通过<code class="calibre11">Promise.resolve()</code>包装来生成新期约。如果没有提供这个处理程序，则<code class="calibre11">Promise.resolve()</code>就会包装上一个期约解决之后的值。如果没有显式的返回语句，则<code class="calibre11">Promise.resolve()</code>会包装默认的返回值<code class="calibre11">undefined</code>。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve('foo');
+
+// 若调用then()时不传处理程序，则原样向后传
+let p2 = p1.then();
+settimeout(console.log, 0, p2); // promise &lt;resolved&gt;: foo
+
+// 这些都一样
+let p3 = p1.then(() =&gt; undefined);
+let p4 = p1.then(() =&gt; {});
+let p5 = p1.then(() =&gt; promise.resolve());
+
+settimeout(console.log, 0, p3);  // promise &lt;resolved&gt;: undefined
+settimeout(console.log, 0, p4);  // promise &lt;resolved&gt;: undefined
+settimeout(console.log, 0, p5);  // promise &lt;resolved&gt;: undefined</code></pre>
+            <p class="calibre1">如果有显式的返回值，则<code class="calibre11">Promise.resolve()</code>会包装这个值：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+// 这些都一样
+let p6 = p1.then(() =&gt; 'bar');
+let p7 = p1.then(() =&gt; promise.resolve('bar'));
+
+settimeout(console.log, 0, p6);  // promise &lt;resolved&gt;: bar
+settimeout(console.log, 0, p7);  // promise &lt;resolved&gt;: bar
+
+// promise.resolve()保留返回的期约
+let p8 = p1.then(() =&gt; new promise(() =&gt; {}));
+let p9 = p1.then(() =&gt; promise.reject());
+// uncaught (in promise): undefined
+
+settimeout(console.log, 0, p8);  // promise &lt;pending&gt;
+settimeout(console.log, 0, p9);  // promise &lt;rejected&gt;: undefined</code></pre>
+            <p class="calibre1">抛出异常会返回拒绝的期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+let p10 = p1.then(() =&gt; { throw 'baz'; });
+// uncaught (in promise) baz
+
+settimeout(console.log, 0, p10);  // promise &lt;rejected&gt; baz</code></pre>
+            <p class="calibre1">注意，返回错误值不会触发上面的拒绝行为，而会把错误对象包装在一个解决的期约中：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+let p11 = p1.then(() =&gt; error('qux'));
+
+settimeout(console.log, 0, p11); // promise &lt;resolved&gt;: error: qux</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">onRejected</code>处理程序也与之类似：<code class="calibre11">onRejected</code>处理程序返回的值也会被<code class="calibre11">Promise.resolve()</code>包装。乍一看这可能有点违反直觉，但是想一想，<code class="calibre11">onRejected</code>处理程序的任务不就是捕获异步错误吗？因此，拒绝处理程序在捕获错误后不抛出异常是符合期约的行为，应该返回一个解决期约。</p>
+            <p class="calibre1">下面的代码片段展示了用<code class="calibre11">Promise.reject()</code>替代之前例子中的<code class="calibre11">Promise.resolve()</code>之后的结果：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.reject('foo');
+
+// 调用then()时不传处理程序则原样向后传
+let p2 = p1.then();
+// uncaught (in promise) foo
+
+settimeout(console.log, 0, p2);  // promise &lt;rejected&gt;: foo
+
+// 这些都一样
+let p3 = p1.then(null, () =&gt; undefined);
+let p4 = p1.then(null, () =&gt; {});
+let p5 = p1.then(null, () =&gt; promise.resolve());
+
+settimeout(console.log, 0, p3); // promise &lt;resolved&gt;: undefined
+settimeout(console.log, 0, p4); // promise &lt;resolved&gt;: undefined
+settimeout(console.log, 0, p5); // promise &lt;resolved&gt;: undefined
+　
+　
+　
+// 这些都一样
+let p6 = p1.then(null, () =&gt; 'bar');
+let p7 = p1.then(null, () =&gt; promise.resolve('bar'));
+
+settimeout(console.log, 0, p6); // promise &lt;resolved&gt;: bar
+settimeout(console.log, 0, p7); // promise &lt;resolved&gt;: bar
+
+// promise.resolve()保留返回的期约
+let p8 = p1.then(null, () =&gt; new promise(() =&gt; {}));
+let p9 = p1.then(null, () =&gt; promise.reject());
+// uncaught (in promise): undefined
+
+settimeout(console.log, 0, p8); // promise &lt;pending&gt;
+settimeout(console.log, 0, p9); // promise &lt;rejected&gt;: undefined
+　
+　
+　
+let p10 = p1.then(null, () =&gt; { throw 'baz'; });
+// uncaught (in promise) baz
+
+settimeout(console.log, 0, p10); // promise &lt;rejected&gt;: baz
+　
+　
+　
+let p11 = p1.then(null, () =&gt; error('qux'));
+
+settimeout(console.log, 0, p11); // promise &lt;resolved&gt;: error: qux</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.prototype.catch()</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.catch()</code>方法用于给期约添加拒绝处理程序。这个方法只接收一个参数：<code class="calibre11">onRejected</code>处理程序。事实上，这个方法就是一个语法糖，调用它就相当于调用<code class="calibre11">Promise.prototype.then(null, onRejected)</code>。</p>
+            <p class="calibre1">下面的代码展示了这两种同样的情况：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.reject();
+let onrejected = function(e) {
+  settimeout(console.log, 0, 'rejected');
+};
+
+// 这两种添加拒绝处理程序的方式是一样的：
+p.then(null, onrejected);  // rejected
+p.catch(onrejected);       // rejected</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.catch()</code>返回一个新的期约实例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise(() =&gt; {});
+let p2 = p1.catch();
+settimeout(console.log, 0, p1);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p2);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p1 === p2);  // false</code></pre>
+            <p class="calibre1">在返回新期约实例方面，<code class="calibre11">Promise.prototype.catch()</code>的行为与<code class="calibre11">Promise.prototype.then()</code>的<code class="calibre11">onRejected</code>处理程序是一样的。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.prototype.finally()</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.finally()</code>方法用于给期约添加<code class="calibre11">onFinally</code>处理程序，这个处理程序在期约转换为解决<strong class="calibre2">或</strong>拒绝状态时都会执行。这个方法可以避免<code class="calibre11">onResolved</code>和<code class="calibre11">onRejected</code>处理程序中出现冗余代码。但<code class="calibre11">onFinally</code>处理程序没有办法知道期约的状态是解决还是拒绝，所以这个方法主要用于添加清理代码。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve();
+let p2 = promise.reject();
+let onfinally = function() {
+  settimeout(console.log, 0, 'finally!')
+}
+
+p1.finally(onfinally); // finally
+p2.finally(onfinally); // finally</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Promise.prototype.finally()</code>方法返回一个新的期约实例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise(() =&gt; {});
+let p2 = p1.finally();
+settimeout(console.log, 0, p1);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p2);         // promise &lt;pending&gt;
+settimeout(console.log, 0, p1 === p2);  // false</code></pre>
+            <p class="calibre1">这个新期约实例不同于<code class="calibre11">then()</code>或<code class="calibre11">catch()</code>方式返回的实例。因为<code class="calibre11">onFinally</code>被设计为一个状态无关的方法，所以在大多数情况下它将表现为父期约的传递。对于已解决状态和被拒绝状态都是如此。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve('foo');
+
+// 这里都会原样后传
+let p2 = p1.finally();
+let p3 = p1.finally(() =&gt; undefined);
+let p4 = p1.finally(() =&gt; {});
+let p5 = p1.finally(() =&gt; promise.resolve());
+let p6 = p1.finally(() =&gt; 'bar');
+let p7 = p1.finally(() =&gt; promise.resolve('bar'));
+let p8 = p1.finally(() =&gt; error('qux'));
+
+settimeout(console.log, 0, p2);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p3);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p4);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p5);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p6);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p7);  // promise &lt;resolved&gt;: foo
+settimeout(console.log, 0, p8);  // promise &lt;resolved&gt;: foo</code></pre>
+            <p class="calibre1">如果返回的是一个待定的期约，或者<code class="calibre11">onFinally</code>处理程序抛出了错误（显式抛出或返回了一个拒绝期约），则会返回相应的期约（待定或拒绝），如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+// promise.resolve()保留返回的期约
+let p9 = p1.finally(() =&gt; new promise(() =&gt; {}));
+let p10 = p1.finally(() =&gt; promise.reject());
+// uncaught (in promise): undefined
+
+settimeout(console.log, 0, p9);  // promise &lt;pending&gt;
+settimeout(console.log, 0, p10); // promise &lt;rejected&gt;: undefined
+
+let p11 = p1.finally(() =&gt; { throw 'baz'; });
+// uncaught (in promise) baz
+
+settimeout(console.log, 0, p11); // promise &lt;rejected&gt;: baz</code></pre>
+            <p class="calibre1">返回待定期约的情形并不常见，这是因为只要期约一解决，新期约仍然会原样后传初始的期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve('foo');
+
+// 忽略解决的值
+let p2 = p1.finally(
+  () =&gt; new promise((resolve, reject) =&gt; settimeout(() =&gt; resolve('bar'), 100)));
+
+settimeout(console.log, 0, p2); // promise &lt;pending&gt;
+
+settimeout(() =&gt; settimeout(console.log, 0, p2), 200);
+
+// 200毫秒后：
+// promise &lt;resolved&gt;: foo</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">非重入期约方法</strong>
+            </p>
+            <p class="calibre1">当期约进入落定状态时，与该状态相关的处理程序仅仅会被<strong class="calibre2">排期</strong>，而非立即执行。跟在添加这个处理程序的代码之后的同步代码一定会在处理程序之前先执行。即使期约一开始就是与附加处理程序关联的状态，执行顺序也是这样的。这个特性由JavaScript运行时保证，被称为“非重入”（non-reentrancy）特性。下面的例子演示了这个特性：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建解决的期约
+let p = promise.resolve();
+
+// 添加解决处理程序
+// 直觉上，这个处理程序会等期约一解决就执行
+p.then(() =&gt; console.log('onresolved handler'));
+
+// 同步输出，证明then()已经返回
+console.log('then() returns');
+
+// 实际的输出：
+// then() returns
+// onresolved handler</code></pre>
+            <p class="calibre1">在这个例子中，在一个解决期约上调用<code class="calibre11">then()</code>会把<code class="calibre11">onResolved</code>处理程序推进消息队列。但这个处理程序在当前线程上的同步代码执行完成前不会执行。因此，跟在<code class="calibre11">then()</code>后面的同步代码一定先于处理程序执行。</p>
+            <p class="calibre1">先添加处理程序后解决期约也是一样的。如果添加处理程序后，同步代码才改变期约状态，那么处理程序仍然会基于该状态变化表现出非重入特性。下面的例子展示了即使先添加了<code class="calibre11">onResolved</code>处理程序，再同步调用<code class="calibre11">resolve()</code>，处理程序也不会进入同步线程执行：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let synchronousresolve;
+
+// 创建一个期约并将解决函数保存在一个局部变量中
+let p = new promise((resolve) =&gt; {
+  synchronousresolve = function() {
+    console.log('1: invoking resolve()');
+    resolve();
+    console.log('2: resolve() returns');
+  };
+});
+
+p.then(() =&gt; console.log('4: then() handler executes'));
+
+synchronousresolve();
+console.log('3: synchronousresolve() returns');
+
+// 实际的输出：
+// 1: invoking resolve()
+// 2: resolve() returns
+// 3: synchronousresolve() returns
+// 4: then() handler executes</code></pre>
+            <p class="calibre1">在这个例子中，即使期约状态变化发生在添加处理程序之后，处理程序也会等到运行的消息队列让它出列时才会执行。</p>
+            <p class="calibre1">非重入适用于<code class="calibre11">onResolved</code>/<code class="calibre11">onRejected</code>处理程序、<code class="calibre11">catch()</code>处理程序和<code class="calibre11">finally()</code>处理程序。下面的例子演示了这些处理程序都只能异步执行：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve();
+p1.then(() =&gt; console.log('p1.then() onresolved'));
+console.log('p1.then() returns');
+
+let p2 = promise.reject();
+p2.then(null, () =&gt; console.log('p2.then() onrejected'));
+console.log('p2.then() returns');
+
+let p3 = promise.reject();
+p3.catch(() =&gt; console.log('p3.catch() onrejected'));
+console.log('p3.catch() returns');
+
+let p4 = promise.resolve();
+p4.finally(() =&gt; console.log('p4.finally() onfinally'));
+
+console.log('p4.finally() returns');
+
+// p1.then() returns
+// p2.then() returns
+// p3.catch() returns
+// p4.finally() returns
+// p1.then() onresolved
+// p2.then() onrejected
+// p3.catch() onrejected
+// p4.finally() onfinally</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">邻近处理程序的执行顺序</strong>
+            </p>
+            <p class="calibre1">如果给期约添加了多个处理程序，当期约状态变化时，相关处理程序会按照添加它们的顺序依次执行。无论是<code class="calibre11">then()</code>、<code class="calibre11">catch()</code>还是<code class="calibre11">finally()</code>添加的处理程序都是如此。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve();
+let p2 = promise.reject();
+
+p1.then(() =&gt; settimeout(console.log, 0, 1));
+p1.then(() =&gt; settimeout(console.log, 0, 2));
+// 1
+// 2
+
+p2.then(null, () =&gt; settimeout(console.log, 0, 3));
+p2.then(null, () =&gt; settimeout(console.log, 0, 4));
+// 3
+// 4
+
+p2.catch(() =&gt; settimeout(console.log, 0, 5));
+p2.catch(() =&gt; settimeout(console.log, 0, 6));
+// 5
+// 6
+
+p1.finally(() =&gt; settimeout(console.log, 0, 7));
+p1.finally(() =&gt; settimeout(console.log, 0, 8));
+// 7
+// 8</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="7" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">传递解决值和拒绝理由</strong>
+            </p>
+            <p class="calibre1">到了落定状态后，期约会提供其解决值（如果兑现）或其拒绝理由（如果拒绝）给相关状态的处理程序。拿到返回值后，就可以进一步对这个值进行操作。比如，第一次网络请求返回的JSON是发送第二次请求必需的数据，那么第一次请求返回的值就应该传给<code class="calibre11">onResolved</code>处理程序继续处理。当然，失败的网络请求也应该把HTTP状态码传给<code class="calibre11">onRejected</code>处理程序。</p>
+            <p class="calibre1">在执行函数中，解决的值和拒绝的理由是分别作为<code class="calibre11">resolve()</code>和<code class="calibre11">reject()</code>的第一个参数往后传的。然后，这些值又会传给它们各自的处理程序，作为<code class="calibre11">onResolved</code>或<code class="calibre11">onRejected</code>处理程序的唯一参数。下面的例子展示了上述传递过程：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; resolve('foo'));
+p1.then((value) =&gt; console.log(value));    // foo
+
+let p2 = new promise((resolve, reject) =&gt; reject('bar'));
+p2.catch((reason) =&gt; console.log(reason));  // bar</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Promise.resolve()</code>和<code class="calibre11">Promise.reject()</code>在被调用时就会接收解决值和拒绝理由。同样地，它们返回的期约也会像执行器一样把这些值传给<code class="calibre11">onResolved</code>或<code class="calibre11">onRejected</code>处理程序：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.resolve('foo');
+p1.then((value) =&gt; console.log(value));   // foo
+
+let p2 = promise.reject('bar');
+p2.catch((reason) =&gt; console.log(reason)); // bar</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="8" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拒绝期约与拒绝错误处理</strong>
+            </p>
+            <p class="calibre1">拒绝期约类似于<code class="calibre11">throw()</code>表达式，因为它们都代表一种程序状态，即需要中断或者特殊处理。在期约的执行函数或处理程序中抛出错误会导致拒绝，对应的错误对象会成为拒绝的理由。因此以下这些期约都会以一个错误对象为由被拒绝：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; reject(error('foo')));
+let p2 = new promise((resolve, reject) =&gt; { throw error('foo'); });
+let p3 = promise.resolve().then(() =&gt; { throw error('foo'); });
+let p4 = promise.reject(error('foo'));
+
+settimeout(console.log, 0, p1);  // promise &lt;rejected&gt;: error: foo
+settimeout(console.log, 0, p2);  // promise &lt;rejected&gt;: error: foo
+settimeout(console.log, 0, p3);  // promise &lt;rejected&gt;: error: foo
+settimeout(console.log, 0, p4);  // promise &lt;rejected&gt;: error: foo
+　
+　
+// 也会抛出4个未捕获错误</code></pre>
+            <p class="calibre1">期约可以以任何理由拒绝，包括<code class="calibre11">undefined</code>，但最好统一使用错误对象。这样做主要是因为创建错误对象可以让浏览器捕获错误对象中的栈追踪信息，而这些信息对调试是非常关键的。例如，前面例子中抛出的4个错误的栈追踪信息如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">uncaught (in promise) error: foo
+    at promise (test.html:5)
+    at new promise (&lt;anonymous&gt;)
+    at test.html:5
+uncaught (in promise) error: foo
+    at promise (test.html:6)
+    at new promise (&lt;anonymous&gt;)
+    at test.html:6
+uncaught (in promise) error: foo
+    at test.html:8
+uncaught (in promise) error: foo
+    at promise.resolve.then (test.html:7)</code></pre>
+            <p class="calibre1">所有错误都是异步抛出且未处理的，通过错误对象捕获的栈追踪信息展示了错误发生的路径。注意错误的顺序：<code class="calibre11">Promise.resolve().then()</code>的错误最后才出现，这是因为它需要在运行时消息队列中<strong class="calibre2">添加</strong>处理程序；也就是说，在最终抛出未捕获错误之前它还会创建另一个期约。</p>
+            <p class="calibre1">这个例子同样揭示了异步错误有意思的副作用。正常情况下，在通过<code class="calibre11">throw()</code>关键字抛出错误时，JavaScript运行时的错误处理机制会停止执行抛出错误之后的任何指令：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw error('foo');
+console.log('bar'); // 这一行不会执行
+
+// uncaught error: foo</code></pre>
+            <p class="calibre1">但是，在期约中抛出错误时，因为错误实际上是从消息队列中异步抛出的，所以并不会阻止运行时继续执行同步指令：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">promise.reject(error('foo'));
+console.log('bar');
+// bar
+
+// uncaught (in promise) error: foo</code></pre>
+            <p class="calibre1">如本章前面的<code class="calibre11">Promise.reject()</code>示例所示，异步错误只能通过异步的<code class="calibre11">onRejected</code>处理程序捕获：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 正确
+promise.reject(error('foo')).catch((e) =&gt; {});
+
+// 不正确
+try {
+  promise.reject(error('foo'));
+} catch(e) {}</code></pre>
+            <p class="calibre1">这不包括捕获执行函数中的错误，在解决或拒绝期约之前，仍然可以使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>在执行函数中捕获错误：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; {
+  try {
+    throw error('foo');
+  } catch(e) {}
+
+  resolve('bar');
+});
+
+settimeout(console.log, 0, p); // promise &lt;resolved&gt;: bar</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">then()</code>和<code class="calibre11">catch()</code>的<code class="calibre11">onRejected</code>处理程序在语义上相当于<code class="calibre11">try</code>/<code class="calibre11">catch</code>。出发点都是捕获错误之后将其隔离，同时不影响正常逻辑执行。为此，<code class="calibre11">onRejected</code>处理程序的任务应该是在捕获异步错误之后返回一个<strong class="calibre2">解决</strong>的期约。下面的例子中对比了同步错误处理与异步错误处理：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('begin synchronous execution');
+try {
+  throw error('foo');
+} catch(e) {
+  console.log('caught error', e);
+}
+console.log('continue synchronous execution');
+
+// begin synchronous execution
+// caught error error: foo
+// continue synchronous execution
+　
+　
+　
+new promise((resolve, reject) =&gt; {
+  console.log('begin asynchronous execution');
+  reject(error('bar'));
+}).catch((e) =&gt; {
+  console.log('caught error', e);
+}).then(() =&gt; {
+  console.log('continue asynchronous execution');
+});
+
+// begin asynchronous execution
+// caught error error: bar
+// continue asynchronous execution</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_266" class="calibre15">11.2.4 期约连锁与期约合成</h3>
+        <p class="calibre1">多个期约组合在一起可以构成强大的代码逻辑。这种组合可以通过两种方式实现：期约连锁与期约合成。前者就是一个期约接一个期约地拼接，后者则是将多个期约组合为一个期约。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">期约连锁</strong>
+            </p>
+            <p class="calibre1">把期约逐个地串联起来是一种非常有用的编程模式。之所以可以这样做，是因为每个期约实例的方法（<code class="calibre11">then()</code>、<code class="calibre11">catch()</code>和<code class="calibre11">finally()</code>）都会返回一个<strong class="calibre2">新的</strong>期约对象，而这个新期约又有自己的实例方法。这样连缀方法调用就可以构成所谓的“期约连锁”。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; {
+  console.log('first');
+  resolve();
+});
+p.then(() =&gt; console.log('second'))
+ .then(() =&gt; console.log('third'))
+ .then(() =&gt; console.log('fourth'));
+
+// first
+// second
+// third
+// fourth</code></pre>
+            <p class="calibre1">这个实现最终执行了一连串<strong class="calibre2">同步</strong>任务。正因为如此，这种方式执行的任务没有那么有用，毕竟分别使用4个同步函数也可以做到：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(() =&gt; console.log('first'))();
+(() =&gt; console.log('second'))();
+(() =&gt; console.log('third'))();
+(() =&gt; console.log('fourth'))();</code></pre>
+            <p class="calibre1">要真正执行<strong class="calibre2">异步</strong>任务，可以改写前面的例子，让每个执行器都返回一个期约实例。这样就可以让每个后续期约都等待之前的期约，也就是串行化异步任务。比如，可以像下面这样让每个期约在一定时间后解决：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = new promise((resolve, reject) =&gt; {
+  console.log('p1 executor');
+  settimeout(resolve, 1000);
+});
+
+p1.then(() =&gt; new promise((resolve, reject) =&gt; {
+    console.log('p2 executor');
+    settimeout(resolve, 1000);
+  }))
+  .then(() =&gt; new promise((resolve, reject) =&gt; {
+    console.log('p3 executor');
+    settimeout(resolve, 1000);
+  }))
+  .then(() =&gt; new promise((resolve, reject) =&gt; {
+    console.log('p4 executor');
+    settimeout(resolve, 1000);
+  }));
+
+// p1 executor（1秒后）
+// p2 executor（2秒后）
+// p3 executor（3秒后）
+// p4 executor（4秒后）</code></pre>
+            <p class="calibre1">把生成期约的代码提取到一个工厂函数中，就可以写成这样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function delayedresolve(str) {
+  return new promise((resolve, reject) =&gt; {
+    console.log(str);
+    settimeout(resolve, 1000);
+  });
+}
+
+delayedresolve('p1 executor')
+  .then(() =&gt; delayedresolve('p2 executor'))
+  .then(() =&gt; delayedresolve('p3 executor'))
+  .then(() =&gt; delayedresolve('p4 executor'))
+
+// p1 executor（1秒后）
+// p2 executor（2秒后）
+// p3 executor（3秒后）
+// p4 executor（4秒后）</code></pre>
+            <p class="calibre1">每个后续的处理程序都会等待前一个期约解决，然后实例化一个新期约并返回它。这种结构可以简洁地将异步任务串行化，解决之前依赖回调的难题。假如这种情况下不使用期约，那么前面的代码可能就要这样写了：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function delayedexecute(str, callback = null) {
+  settimeout(() =&gt; {
+    console.log(str);
+    callback &amp;&amp; callback();
+  }, 1000)
+}
+
+delayedexecute('p1 callback', () =&gt; {
+  delayedexecute('p2 callback', () =&gt; {
+    delayedexecute('p3 callback', () =&gt; {
+      delayedexecute('p4 callback');
+    });
+  });
+});
+
+// p1 callback（1秒后）
+// p2 callback（2秒后）
+// p3 callback（3秒后）
+// p4 callback（4秒后）</code></pre>
+            <p class="calibre1">心明眼亮的开发者会发现，这不正是期约所要解决的回调地狱问题吗？</p>
+            <p class="calibre1">因为<code class="calibre11">then()</code>、<code class="calibre11">catch()</code>和<code class="calibre11">finally()</code>都返回期约，所以串联这些方法也很直观。下面的例子同时使用这3个实例方法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new promise((resolve, reject) =&gt; {
+  console.log('initial promise rejects');
+  reject();
+});
+
+p.catch(() =&gt; console.log('reject handler'))
+ .then(() =&gt; console.log('resolve handler'))
+ .finally(() =&gt; console.log('finally handler'));
+
+// initial promise rejects
+// reject handler
+// resolve handler
+// finally handler</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">期约图</strong>
+            </p>
+            <p class="calibre1">因为一个期约可以有任意多个处理程序，所以期约连锁可以构建<strong class="calibre2">有向非循环图</strong>的结构。这样，每个期约都是图中的一个节点，而使用实例方法添加的处理程序则是有向顶点。因为图中的每个节点都会等待前一个节点落定，所以图的方向就是期约的解决或拒绝顺序。</p>
+            <p class="calibre1">下面的例子展示了一种期约有向图，也就是二叉树：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">//     a
+//    / \
+//   b   c
+//   /\  /\
+//  d  e   f  g
+
+let a = new promise((resolve, reject) =&gt; {
+  console.log('a');
+  resolve();
+});
+
+let b = a.then(() =&gt; console.log('b'));
+let c = a.then(() =&gt; console.log('c'));
+
+b.then(() =&gt; console.log('d'));
+b.then(() =&gt; console.log('e'));
+c.then(() =&gt; console.log('f'));
+c.then(() =&gt; console.log('g'));
+
+// a
+// b
+// c
+// d
+// e
+// f
+// g</code></pre>
+            <p class="calibre1">注意，日志的输出语句是对二叉树的层序遍历。如前所述，期约的处理程序是按照它们添加的顺序执行的。由于期约的处理程序是<strong class="calibre2">先</strong>添加到消息队列，<strong class="calibre2">然后</strong>才逐个执行，因此构成了层序遍历。</p>
+            <p class="calibre1">树只是期约图的一种形式。考虑到根节点不一定唯一，且多个期约也可以组合成一个期约（通过下一节介绍的<code class="calibre11">Promise.all()</code>和<code class="calibre11">Promise.race()</code>），所以有向非循环图是体现期约连锁可能性的最准确表达。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Promise.all()</code>和<code class="calibre11">Promise.race()</code>
+              </strong>
+            </p>
+            <p class="calibre1">Promise类提供两个将多个期约实例组合成一个期约的静态方法：<code class="calibre11">Promise.all()</code>和<code class="calibre11">Promise.race()</code>。而合成后期约的行为取决于内部期约的行为。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">
+                    <code class="calibre11">Promise.all()</code>
+                  </strong>
+                </p>
+                <p class="calibre1">
+                  <code class="calibre11">Promise.all()</code>静态方法创建的期约会在一组期约全部解决之后再解决。这个静态方法接收一个可迭代对象，返回一个新期约：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.all([
+  promise.resolve(),
+  promise.resolve()
+]);
+
+// 可迭代对象中的元素会通过promise.resolve()转换为期约
+let p2 = promise.all([3, 4]);
+
+// 空的可迭代对象等价于promise.resolve()
+let p3 = promise.all([]);
+
+// 无效的语法
+let p4 = promise.all();
+// typeerror: cannot read symbol.iterator of undefined</code></pre>
+                <p class="calibre1">合成的期约只会在每个包含的期约都解决之后才解决：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.all([
+  promise.resolve(),
+  new promise((resolve, reject) =&gt; settimeout(resolve, 1000))
+]);
+settimeout(console.log, 0, p); // promise &lt;pending&gt;
+
+p.then(() =&gt; settimeout(console.log, 0, 'all() resolved!'));
+
+// all() resolved!（大约1秒后）</code></pre>
+                <p class="calibre1">如果至少有一个包含的期约待定，则合成的期约也会待定。如果有一个包含的期约拒绝，则合成的期约也会拒绝：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 永远待定
+let p1 = promise.all([new promise(() =&gt; {})]);
+settimeout(console.log, 0, p1); // promise &lt;pending&gt;
+
+// 一次拒绝会导致最终期约拒绝
+let p2 = promise.all([
+  promise.resolve(),
+  promise.reject(),
+  promise.resolve()
+]);
+settimeout(console.log, 0, p2); // promise &lt;rejected&gt;
+
+// uncaught (in promise) undefined</code></pre>
+                <p class="calibre1">如果所有期约都成功解决，则合成期约的解决值就是所有包含期约解决值的数组，按照迭代器顺序：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = promise.all([
+  promise.resolve(3),
+  promise.resolve(),
+  promise.resolve(4)
+]);
+
+p.then((values) =&gt; settimeout(console.log, 0, values)); // [3, undefined, 4]</code></pre>
+                <p class="calibre1">如果有期约拒绝，则第一个拒绝的期约会将自己的理由作为合成期约的拒绝理由。之后再拒绝的期约不会影响最终期约的拒绝理由。不过，这并不影响所有包含期约正常的拒绝操作。合成的期约<strong class="calibre2">会</strong>静默处理所有包含期约的拒绝操作，如下所示：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 虽然只有第一个期约的拒绝理由会进入
+// 拒绝处理程序，第二个期约的拒绝也
+// 会被静默处理，不会有错误跑掉
+let p = promise.all([
+  promise.reject(3),
+  new promise((resolve, reject) =&gt; settimeout(reject, 1000))
+]);
+
+p.catch((reason) =&gt; settimeout(console.log, 0, reason)); // 3
+
+// 没有未处理的错误</code></pre>
+                <p class="calibre1"></p>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">
+                    <code class="calibre11">Promise.race()</code>
+                  </strong>
+                </p>
+                <p class="calibre1">
+                  <code class="calibre11">Promise.race()</code>静态方法返回一个包装期约，是一组集合中最先解决或拒绝的期约的镜像。这个方法接收一个可迭代对象，返回一个新期约：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p1 = promise.race([
+  promise.resolve(),
+  promise.resolve()
+]);
+
+// 可迭代对象中的元素会通过promise.resolve()转换为期约
+let p2 = promise.race([3, 4]);
+
+// 空的可迭代对象等价于new promise(() =&gt; {})
+let p3 = promise.race([]);
+
+// 无效的语法
+let p4 = promise.race();
+// typeerror: cannot read symbol.iterator of undefined</code></pre>
+                <p class="calibre1">
+                  <code class="calibre11">Promise.race()</code>不会对解决或拒绝的期约区别对待。无论是解决还是拒绝，只要是第一个落定的期约，<code class="calibre11">Promise.race()</code>就会包装其解决值或拒绝理由并返回新期约：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 解决先发生，超时后的拒绝被忽略
+let p1 = promise.race([
+  promise.resolve(3),
+  new promise((resolve, reject) =&gt; settimeout(reject, 1000))
+]);
+settimeout(console.log, 0, p1); // promise &lt;resolved&gt;: 3
+
+// 拒绝先发生，超时后的解决被忽略
+let p2 = promise.race([
+  promise.reject(4),
+  new promise((resolve, reject) =&gt; settimeout(resolve, 1000))
+]);
+settimeout(console.log, 0, p2); // promise &lt;rejected&gt;: 4
+
+// 迭代顺序决定了落定顺序
+let p3 = promise.race([
+  promise.resolve(5),
+  promise.resolve(6),
+  promise.resolve(7)
+]);
+settimeout(console.log, 0, p3); // promise &lt;resolved&gt;: 5</code></pre>
+                <p class="calibre1">如果有一个期约拒绝，只要它是第一个落定的，就会成为拒绝合成期约的理由。之后再拒绝的期约不会影响最终期约的拒绝理由。不过，这并不影响所有包含期约正常的拒绝操作。与<code class="calibre11">Promise.all()</code>类似，合成的期约<strong class="calibre2">会</strong>静默处理所有包含期约的拒绝操作，如下所示：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 虽然只有第一个期约的拒绝理由会进入
+// 拒绝处理程序，第二个期约的拒绝也
+// 会被静默处理，不会有错误跑掉
+let p = promise.race([
+  promise.reject(3),
+  new promise((resolve, reject) =&gt; settimeout(reject, 1000))
+]);
+
+p.catch((reason) =&gt; settimeout(console.log, 0, reason)); // 3
+
+// 没有未处理的错误</code></pre>
+                <p class="calibre1"></p>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">串行期约合成</strong>
+            </p>
+            <p class="calibre1">到目前为止，我们讨论期约连锁一直围绕期约的串行执行，忽略了期约的另一个主要特性：异步产生值并将其传给处理程序。基于后续期约使用之前期约的返回值来串联期约是期约的基本功能。这很像<strong class="calibre2">函数合成</strong>，即将多个函数合成为一个函数，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addtwo(x) {return x + 2;}
+function addthree(x) {return x + 3;}
+function addfive(x) {return x + 5;}
+
+function addten(x) {
+  return addfive(addtwo(addthree(x)));
+}
+
+console.log(addten(7)); // 17</code></pre>
+            <p class="calibre1">在这个例子中，有3个函数基于一个值合成为一个函数。类似地，期约也可以像这样合成起来，渐进地消费一个值，并返回一个结果：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addtwo(x) {return x + 2;}
+function addthree(x) {return x + 3;}
+function addfive(x) {return x + 5;}
+
+function addten(x) {
+  return promise.resolve(x)
+    .then(addtwo)
+    .then(addthree)
+    .then(addfive);
+}
+
+addten(8).then(console.log); // 18</code></pre>
+            <p class="calibre1">使用<code class="calibre11">Array.prototype.reduce()</code>可以写成更简洁的形式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addtwo(x) {return x + 2;}
+function addthree(x) {return x + 3;}
+function addfive(x) {return x + 5;}
+
+function addten(x) {
+  return [addtwo, addthree, addfive]
+      .reduce((promise, fn) =&gt; promise.then(fn), promise.resolve(x));
+}
+
+addten(8).then(console.log); // 18</code></pre>
+            <p class="calibre1">这种模式可以提炼出一个通用函数，可以把任意多个函数作为处理程序合成一个连续传值的期约连锁。这个通用的合成函数可以这样实现：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addtwo(x) {return x + 2;}
+function addthree(x) {return x + 3;}
+function addfive(x) {return x + 5;}
+
+function compose(...fns) {
+  return (x) =&gt; fns.reduce((promise, fn) =&gt; promise.then(fn), promise.resolve(x))
+}
+
+let addten = compose(addtwo, addthree, addfive);
+
+addten(8).then(console.log); // 18</code></pre>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                本章后面的11.3节在讨论异步函数时还会涉及这个概念。</p>
+            </blockquote>
+          </li>
+        </ol>
+        <h3 id="nav_point_267" class="calibre15">11.2.5 期约扩展</h3>
+        <p class="calibre1">ES6期约实现是很可靠的，但它也有不足之处。比如，很多第三方期约库实现中具备而ECMAScript规范却未涉及的两个特性：期约取消和进度追踪。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">期约取消</strong>
+            </p>
+            <p class="calibre1">我们经常会遇到期约正在处理过程中，程序却不再需要其结果的情形。这时候如果能够取消期约就好了。某些第三方库，比如Bluebird，就提供了这个特性。实际上，TC39委员会也曾准备增加这个特性，但相关提案最终被撤回了。结果，ES6期约被认为是“激进的”：只要期约的逻辑开始执行，就没有办法阻止它执行到完成。</p>
+            <p class="calibre1">实际上，可以在现有实现基础上提供一种临时性的封装，以实现取消期约的功能。这可以用到Kevin Smith提到的“取消令牌”（cancel token）。生成的令牌实例提供了一个接口，利用这个接口可以取消期约；同时也提供了一个期约的实例，可以用来触发取消后的操作并求值取消状态。</p>
+            <p class="calibre1">下面是<code class="calibre11">CancelToken</code>类的一个基本实例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class canceltoken {
+  constructor(cancelfn) {
+    this.promise = new promise((resolve, reject) =&gt; {
+      cancelfn(resolve);
+    });
+  }
+}</code></pre>
+            <p class="calibre1">这个类包装了一个期约，把解决方法暴露给了<code class="calibre11">cancelFn</code>参数。这样，外部代码就可以向构造函数中传入一个函数，从而控制什么情况下可以取消期约。这里期约是令牌类的公共成员，因此可以给它添加处理程序以取消期约。</p>
+            <p class="calibre1">这个类大概可以这样使用：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;button id="首页"&gt;首页&lt;/button&gt;
+&lt;button id="cancel"&gt;cancel&lt;/button&gt;
+
+&lt;script&gt;
+class canceltoken {
+  constructor(cancelfn) {
+    this.promise = new promise((resolve, reject) =&gt; {
+      cancelfn(() =&gt; {
+        settimeout(console.log, 0, "delay cancelled");
+        resolve();
+      });
+    });
+  }
+}
+
+const startbutton = document.queryselector('#首页');
+const cancelbutton = document.queryselector('#cancel');
+
+function cancellabledelayedresolve(delay) {
+  settimeout(console.log, 0, "set delay");
+
+  return new promise((resolve, reject) =&gt; {
+    const id = settimeout((() =&gt; {
+      settimeout(console.log, 0, "delayed resolve");
+      resolve();
+    }), delay);
+
+    const canceltoken = new canceltoken((cancelcallback) =&gt;
+      cancelbutton.addeventlistener("click", cancelcallback));
+
+    canceltoken.promise.then(() =&gt; cleartimeout(id));
+  });
+}
+
+startbutton.addeventlistener("click", () =&gt; cancellabledelayedresolve(1000));
+&lt;/script&gt;</code></pre>
+            <p class="calibre1">每次单击“Start”按钮都会开始计时，并实例化一个新的<code class="calibre11">CancelToken</code>的实例。此时，“Cancel”按钮一旦被点击，就会触发令牌实例中的期约解决。而解决之后，单击“Start”按钮设置的超时也会被取消。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">期约进度通知</strong>
+            </p>
+            <p class="calibre1">执行中的期约可能会有不少离散的“阶段”，在最终解决之前必须依次经过。某些情况下，监控期约的执行进度会很有用。ECMAScript 6期约并不支持进度追踪，但是可以通过扩展来实现。</p>
+            <p class="calibre1">一种实现方式是扩展<code class="calibre11">Promise</code>类，为它添加<code class="calibre11">notify()</code>方法，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class trackablepromise extends promise {
+  constructor(executor) {
+    const notifyhandlers = [];
+
+      super((resolve, reject) =&gt; {
+      return executor(resolve, reject, (status) =&gt; {
+        notifyhandlers.map((handler) =&gt; handler(status));
+      });
+    });
+
+    this.notifyhandlers = notifyhandlers;
+  }
+
+  notify(notifyhandler) {
+    this.notifyhandlers.push(notifyhandler);
+    return this;
+  }
+}</code></pre>
+            <p class="calibre1">这样，<code class="calibre11">TrackablePromise</code>就可以在执行函数中使用<code class="calibre11">notify()</code>函数了。可以像下面这样使用这个函数来实例化一个期约：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = new trackablepromise((resolve, reject, notify) =&gt; {
+  function countdown(x) {
+    if (x &gt; 0) {
+      notify(`${20 * x}% remaining`);
+      settimeout(() =&gt; countdown(x - 1), 1000);
+    } else {
+      resolve();
+    }
+  }
+
+  countdown(5);
+});</code></pre>
+            <p class="calibre1">这个期约会连续5次递归地设置1000毫秒的超时。每个超时回调都会调用<code class="calibre11">notify()</code>并传入状态值。假设通知处理程序简单地这样写：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+let p = new trackablepromise((resolve, reject, notify) =&gt; {
+  function countdown(x) {
+    if (x &gt; 0) {
+      notify(`${20 * x}% remaining`);
+      settimeout(() =&gt; countdown(x - 1), 1000);
+    } else {
+      resolve();
+    }
+  }
+
+  countdown(5);
+});
+
+p.notify((x) =&gt; settimeout(console.log, 0, 'progress:', x));
+
+p.then(() =&gt; settimeout(console.log, 0, 'completed'));
+
+// （约1秒后）80% remaining
+// （约2秒后）60% remaining
+// （约3秒后）40% remaining
+// （约4秒后）20% remaining
+// （约5秒后）completed</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">notify()</code>函数会返回期约，所以可以连缀调用，连续添加处理程序。多个处理程序会针对收到的每条消息分别执行一遍，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">...
+
+p.notify((x) =&gt; settimeout(console.log, 0, 'a:', x))
+ .notify((x) =&gt; settimeout(console.log, 0, 'b:', x));
+
+p.then(() =&gt; settimeout(console.log, 0, 'completed'));
+
+// （约1秒后） a: 80% remaining
+// （约1秒后） b: 80% remaining
+// （约2秒后） a: 60% remaining
+// （约2秒后） b: 60% remaining
+// （约3秒后） a: 40% remaining
+// （约3秒后） b: 40% remaining
+// （约4秒后） a: 20% remaining
+// （约4秒后） b: 20% remaining
+// （约5秒后） completed</code></pre>
+            <p class="calibre1">总体来看，这还是一个比较粗糙的实现，但应该可以演示出如何使用通知报告进度了。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                ES6不支持取消期约和进度通知，一个主要原因就是这样会导致期约连锁和期约合成过度复杂化。比如在一个期约连锁中，如果某个被其他期约依赖的期约被取消了或者发出了通知，那么接下来应该发生什么完全说不清楚。毕竟，如果取消了<code class="calibre11">Promise.all()</code>中的一个期约，或者期约连锁中前面的期约发送了一个通知，那么接下来应该怎么办才比较合理呢？</p>
+            </blockquote>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0089.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0091.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

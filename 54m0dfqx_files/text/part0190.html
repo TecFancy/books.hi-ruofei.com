@@ -1,0 +1,321 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0189.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0191.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_618" class="calibre9">26.3 使用ES6之前的模块加载器</h2>
+        <p class="calibre1">在ES6原生支持模块之前，使用模块的JavaScript代码本质上是希望使用默认没有的语言特性。因此，必须按照符合某种规范的模块语法来编写代码，另外还需要单独的模块工具把这些模块语法与JavaScript运行时连接起来。这里的模块语法和连接方式有不同的表现形式，通常需要在浏览器中额外加载库或者在构建时完成预处理。</p>
+        <h3 id="nav_point_619" class="calibre15">26.3.1 CommonJS</h3>
+        <p class="calibre1">CommonJS规范概述了同步声明依赖的模块定义。这个规范主要用于在服务器端实现模块化代码组织，但也可用于定义在浏览器中使用的模块依赖。CommonJS模块语法不能在浏览器中直接运行。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            一般认为，Node.js的模块系统使用了CommonJS规范，实际上并不完全正确。Node.js使用了轻微修改版本的CommonJS，因为Node.js主要在服务器环境下使用，所以不需要考虑网络延迟问题。考虑到一致性，本节使用Node.js风格的模块定义语法。</p>
+        </blockquote>
+        <p class="calibre1">CommonJS模块定义需要使用<code class="calibre11">require()</code>指定依赖，而使用<code class="calibre11">exports</code>对象定义自己的公共API。下面的代码展示了简单的模块定义：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var moduleb = require('./moduleb');
+
+module.exports = {
+  stuff: moduleb.dostuff();
+};</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">moduleA</code>通过使用模块定义的相对路径来指定自己对<code class="calibre11">moduleB</code>的依赖。什么是“模块定义”，以及如何将字符串解析为模块，完全取决于模块系统的实现。比如在Node.js中，模块标识符可能指向文件，也可能指向包含index.js文件的目录。</p>
+        <p class="calibre1">请求模块会加载相应模块，而把模块赋值给变量也非常常见，但赋值给变量不是必需的。调用<code class="calibre11">require()</code>意味着模块会原封不动地加载进来：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('modulea');
+require('./modulea'); // "modulea"</code></pre>
+        <p class="calibre1">无论一个模块在<code class="calibre11">require()</code>中被引用多少次，模块永远是单例。在下面的例子中，<code class="calibre11">moduleA</code>只会被打印一次。这是因为无论请求多少次，<code class="calibre11">moduleA</code>只会被加载一次。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('modulea');
+var a1 = require('./modulea');
+var a2 = require('./modulea');
+
+console.log(a1 === a2); // true</code></pre>
+        <p class="calibre1">模块第一次加载后会被缓存，后续加载会取得缓存的模块（如下代码所示）。模块加载顺序由依赖图决定。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('modulea');
+require('./modulea');
+require('./moduleb'); // "modulea"
+require('./modulea');</code></pre>
+        <p class="calibre1">在CommonJS中，模块加载是模块系统执行的同步操作。因此<code class="calibre11">require()</code>可以像下面这样以编程方式嵌入在模块中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('modulea');
+if (loadcondition) {
+  require('./modulea');
+}</code></pre>
+        <p class="calibre1">这里，<code class="calibre11">moduleA</code>只会在<code class="calibre11">loadCondition</code>求值为<code class="calibre11">true</code>时才会加载。这个加载是同步的，因此<code class="calibre11">if()</code>块之前的任何代码都会在加载<code class="calibre11">moduleA</code>之前执行，而<code class="calibre11">if()</code>块之后的任何代码都会在加载<code class="calibre11">moduleA</code>之后执行。同样，加载顺序规则也会适用。因此，如果<code class="calibre11">moduleA</code>已经在前面某个地方加载过了，这个条件<code class="calibre11">require()</code>就意味着只暴露<code class="calibre11">moduleA</code>这个命名空间而已。</p>
+        <p class="calibre1">在上面的例子中，模块系统是Node.js实现的，因此<code class="calibre11">./moduleB</code>是相对路径，指向与当前模块位于同一目录中的模块目标。Node.js会使用<code class="calibre11">require()</code>调用中的模块标识符字符串去解析模块引用。在<code class="calibre11">Node.js</code>中可以使用绝对或相对路径，也可以使用安装在node_modules目录中依赖的模块标识符。我们并不关心这些细节，重要的是知道在不同的CommonJS实现中模块字符串引用的含义可能不同。不过，所有CommonJS风格的实现共同之处是模块不会指定自己的标识符，它们的标识符由其在模块文件层级中的位置决定。</p>
+        <p class="calibre1">指向模块定义的路径可能引用一个目录，也可能是一个JavaScript文件。无论是什么，这与本地模块实现无关，而<code class="calibre11">moduleB</code>被加载到本地变量中。<code class="calibre11">moduleA</code>在<code class="calibre11">module.exports</code>对象上定义自己的公共接口，即<code class="calibre11">foo</code>属性。</p>
+        <p class="calibre1">如果有模块想使用这个接口，可以像下面这样导入它：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var modulea = require('./modulea');
+
+console.log(modulea.stuff);</code></pre>
+        <p class="calibre1">注意，此模块不导出任何内容。即使它没有公共接口，如果应用程序请求了这个模块，那也会在加载时执行这个模块体。</p>
+        <p class="calibre1">
+          <code class="calibre11">module.exports</code>对象非常灵活，有多种使用方式。如果只想导出一个实体，可以直接给<code class="calibre11">module.exports</code>赋值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">module.exports = 'foo';</code></pre>
+        <p class="calibre1">这样，整个模块就导出一个字符串，可以像下面这样使用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var modulea = require('./moduleb');
+
+console.log(moduleb); // 'foo'</code></pre>
+        <p class="calibre1">导出多个值也很常见，可以使用对象字面量赋值或每个属性赋一次值来实现：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 等价操作：
+
+module.exports = {
+  a: 'a',
+  b: 'b'
+};
+
+module.exports.a = 'a';
+module.exports.b = 'b';</code></pre>
+        <p class="calibre1">模块的一个主要用途是托管类定义（这里使用ES6风格的类定义，不过ES5风格也兼容）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class a {}
+
+module.exports = a;
+var a = require('./modulea');
+
+var a = new a();</code></pre>
+        <p class="calibre1">也可以将类实例作为导出值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class a {}
+
+module.exports = new a();</code></pre>
+        <p class="calibre1">此外，CommonJS也支持动态依赖：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (condition) {
+  var a = require('./modulea');
+}</code></pre>
+        <p class="calibre1">CommonJS依赖几个全局属性如<code class="calibre11">require</code>和<code class="calibre11">module.exports</code>。如果想在浏览器中使用CommonJS模块，就需要与其非原生的模块语法之间构筑“桥梁”。模块级代码与浏览器运行时之间也需要某种“屏障”，因为没有封装的CommonJS代码在浏览器中执行会创建全局变量。这显然与模块模式的初衷相悖。</p>
+        <p class="calibre1">常见的解决方案是提前把模块文件打包好，把全局属性转换为原生JavaScript结构，将模块代码封装在函数闭包中，最终只提供一个文件。为了以正确的顺序打包模块，需要事先生成全面的依赖图。</p>
+        <h3 id="nav_point_620" class="calibre15">26.3.2 异步模块定义</h3>
+        <p class="calibre1">CommonJS以服务器端为目标环境，能够一次性把所有模块都加载到内存，而异步模块定义（AMD，Asynchronous Module Definition）的模块定义系统则以浏览器为目标执行环境，这需要考虑网络延迟的问题。AMD的一般策略是让模块声明自己的依赖，而运行在浏览器中的模块系统会按需获取依赖，并在依赖加载完成后立即执行依赖它们的模块。</p>
+        <p class="calibre1">AMD模块实现的核心是用函数包装模块定义。这样可以防止声明全局变量，并允许加载器库控制何时加载模块。包装函数也便于模块代码的移植，因为包装函数内部的所有模块代码使用的都是原生JavaScript结构。包装模块的函数是全局<code class="calibre11">define</code>的参数，它是由AMD加载器库的实现定义的。</p>
+        <p class="calibre1">AMD模块可以使用字符串标识符指定自己的依赖，而AMD加载器会在所有依赖模块加载完毕后立即调用模块工厂函数。与CommonJS不同，AMD支持可选地为模块指定字符串标识符。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// id为'modulea'的模块定义。modulea依赖moduleb，
+// moduleb会异步加载
+define('modulea', ['moduleb'], function(moduleb) {
+  return {
+    stuff: moduleb.dostuff();
+  };
+});</code></pre>
+        <p class="calibre1">AMD也支持<code class="calibre11">require</code>和<code class="calibre11">exports</code>对象，通过它们可以在AMD模块工厂函数内部定义CommonJS风格的模块。这样可以像请求模块一样请求它们，但AMD加载器会将它们识别为原生AMD结构，而不是模块定义：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">define('modulea', ['require', 'exports'], function(require, exports) {
+  var moduleb = require('moduleb');
+
+  exports.stuff = moduleb.dostuff();
+});</code></pre>
+        <p class="calibre1">动态依赖也是通过这种方式支持的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">define('modulea', ['require'], function(require) {
+  if (condition) {
+    var moduleb = require('moduleb');
+  }
+});</code></pre>
+        <h3 id="nav_point_621" class="calibre15">26.3.3 通用模块定义</h3>
+        <p class="calibre1">为了统一CommonJS和AMD生态系统，通用模块定义（UMD，Universal Module Definition）规范应运而生。UMD可用于创建这两个系统都可以使用的模块代码。本质上，UMD定义的模块会在启动时检测要使用哪个模块系统，然后进行适当配置，并把所有逻辑包装在一个立即调用的函数表达式（IIFE）中。虽然这种组合并不完美，但在很多场景下足以实现两个生态的共存。</p>
+        <p class="calibre1">下面是只包含一个依赖的UMD模块定义的示例（来源为GitHub上的UMD仓库）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">   (function (root, factory) {
+    if (typeof define === 'function' &amp;&amp; define.amd) {
+      // amd。注册为匿名模块
+      define(['moduleb'], factory);
+    } else if (typeof module === 'object' &amp;&amp; module.exports) {
+    // node。不支持严格commonjs
+    // 但可以在node这样支持module.exports的
+    // 类commonjs环境下使用
+    module.exports = factory(require(' moduleb '));
+  } else {
+    // 浏览器全局上下文（root是window）
+    root.returnexports = factory(root. moduleb);
+  }
+}(this, function (moduleb) {
+  // 以某种方式使用moduleb
+
+  // 将返回值作为模块的导出
+  // 这个例子返回了一个对象
+  // 但是模块也可以返回函数作为导出值
+  return {};
+}));</code></pre>
+        <p class="calibre1">此模式有支持严格CommonJS和浏览器全局上下文的变体。不应该期望手写这个包装函数，它应该由构建工具自动生成。开发者只需专注于模块的内由容，而不必关心这些样板代码。</p>
+        <h3 id="nav_point_622" class="calibre15">26.3.4 模块加载器终将没落</h3>
+        <p class="calibre1">随着ECMAScript 6模块规范得到越来越广泛的支持，本节展示的模式最终会走向没落。尽管如此，为了了解为什么选择设计决策，了解ES6模块规范的由来仍是非常有用的。CommonJS与AMD之间的冲突正是我们现在享用的ECMAScript 6模块规范诞生的温床。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0189.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0191.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

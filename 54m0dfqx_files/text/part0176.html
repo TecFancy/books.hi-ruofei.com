@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0175.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0177.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_565" class="calibre9">24.4 替代性跨源技术</h2>
+        <p class="calibre1">CORS出现之前，实现跨源Ajax通信是有点麻烦的。开发者需要依赖能够执行跨源请求的DOM特性，在不使用XHR对象情况下发送某种类型的请求。虽然CORS目前已经得到广泛支持，但这些技术仍然没有过时，因为它们不需要修改服务器。</p>
+        <h3 id="nav_point_566" class="calibre15">24.4.1 图片探测</h3>
+        <p class="calibre1">图片探测是利用<code class="calibre11">&lt;img&gt;</code>标签实现跨域通信的最早的一种技术。任何页面都可以跨域加载图片而不必担心限制，因此这也是在线广告跟踪的主要方式。可以动态创建图片，然后通过它们的<code class="calibre11">onload</code>和<code class="calibre11">onerror</code>事件处理程序得知何时收到响应。</p>
+        <p class="calibre1">这种动态创建图片的技术经常用于<strong class="calibre2">图片探测</strong>（image pings）。图片探测是与服务器之间简单、跨域、单向的通信。数据通过查询字符串发送，响应可以随意设置，不过一般是位图图片或值为204的状态码。浏览器通过图片探测拿不到任何数据，但可以通过监听<code class="calibre11">onload</code>和<code class="calibre11">onerror</code>事件知道什么时候能接收到响应。下面看一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let img = new image();
+img.onload = img.onerror = function() {
+  alert("done!");
+};
+img.src = "http://www.example.com/test?name=nicholas";</code></pre>
+        <p class="calibre1">这个例子创建了一个新的<code class="calibre11">Image</code>实例，然后为它的<code class="calibre11">onload</code>和<code class="calibre11">onerror</code>事件处理程序添加了同一个函数。这样可以确保请求完成时无论什么响应都会收到通知。设置完<code class="calibre11">src</code>属性之后请求就开始了，这个例子向服务器发送了一个<code class="calibre11">name</code>值。</p>
+        <p class="calibre1">图片探测频繁用于跟踪用户在页面上的点击操作或动态显示广告。当然，图片探测的缺点是只能发送GET请求和无法获取服务器响应的内容。这也是只能利用图片探测实现浏览器与服务器单向通信的原因。</p>
+        <h3 id="nav_point_567" class="calibre15">24.4.2 JSONP</h3>
+        <p class="calibre1">JSONP是“JSON with padding”的简写，是在Web服务上流行的一种JSON变体。JSONP看起来跟JSON一样，只是会被包在一个函数调用里，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">callback({ "name": "nicholas" });</code></pre>
+        <p class="calibre1">JSONP格式包含两个部分：回调和数据。回调是在页面接收到响应之后应该调用的函数，通常回调函数的名称是通过请求来动态指定的。而数据就是作为参数传给回调函数的JSON数据。下面是一个典型的JSONP请求：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http://freegeoip.net/json/?callback=handleresponse</code></pre>
+        <p class="calibre1">这个JSONP请求的URL是一个地理位置服务。JSONP服务通常支持以查询字符串形式指定回调函数的名称。比如这个例子就把回调函数的名字指定为<code class="calibre11">handleResponse()</code>。</p>
+        <p class="calibre1">JSONP调用是通过动态创建<code class="calibre11">&lt;script&gt;</code>元素并为<code class="calibre11">src</code>属性指定跨域URL实现的。此时的<code class="calibre11">&lt;script&gt;</code>与<code class="calibre11">&lt;img&gt;</code>元素类似，能够不受限制地从其他域加载资源。因为JSONP是有效的JavaScript，所以JSONP响应在被加载完成之后会立即执行。比如下面这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function handleresponse(response) {
+  console.log(`
+      you're at ip address ${response.ip}, which is in
+      ${response.city}, ${response.region_name}`);
+}
+let script = document.createelement("script");
+script.src = "http://freegeoip.net/json/?callback=handleresponse";
+document.body.insertbefore(script, document.body.firstchild);</code></pre>
+<p class="calibre1">这个例子会显示从地理位置服务获取的ip地址及位置信息。</p>
+<p class="calibre1">jsonp由于其简单易用，在开发者中非常流行。相比于图片探测，使用jsonp可以直接访问响应，实现浏览器与服务器的双向通信。不过jsonp也有一些缺点。</p>
+<p class="calibre1">首先，jsonp是从不同的域拉取可执行代码。如果这个域并不可信，则可能在响应中加入恶意内容。此时除了完全删除jsonp没有其他办法。在使用不受控的web服务时，一定要保证是可以信任的。</p>
+<p class="calibre1">第二个缺点是不好确定jsonp请求是否失败。虽然html5规定了<code class="calibre11">&lt;script&gt;</code>元素的<code class="calibre11">onerror</code>事件处理程序，但还没有被任何浏览器实现。为此，开发者经常使用计时器来决定是否放弃等待响应。这种方式并不准确，毕竟不同用户的网络连接速度和带宽是不一样的。</p>
+
+
+
+  </div>
+
+  
+  <div class="calibretoc">
+    <h2><a href="../../54m0dfqx.html">table of contents
+</a></h2>
+    <div>
+  <ul>
+    <li>
+      <a href="part0002.html#nav_point_0">版权声明</a>
+    </li>
+    <li>
+      <a href="part0003.html#nav_point_1">献词</a>
+    </li>
+    <li>
+      <a href="part0004.html#nav_point_2">译者序</a>
+    </li>
+    <li>
+      <a href="part0005.html#nav_point_3">序</a>
+    </li>
+    <li>
+      <a href="part0006.html#nav_point_4">前言</a>
+    </li>
+    <li>
+      <a href="part0012.html#nav_point_10">致谢</a>
+    </li>
+    <li>
+      <a href="part0013.html#nav_point_11">第 1 章 什么是javascript</a>
+    </li>
+    <li>
+      <a href="part0018.html#nav_point_19">第 2 章 html中的javascript</a>
+    </li>
+    <li>
+      <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+    </li>
+    <li>
+      <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+    </li>
+    <li>
+      <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+    </li>
+    <li>
+      <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+    </li>
+    <li>
+      <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+    </li>
+    <li>
+      <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+    </li>
+    <li>
+      <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+    </li>
+    <li>
+      <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+    </li>
+    <li>
+      <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+    </li>
+    <li>
+      <a href="part0093.html#nav_point_273">第 12 章 bom</a>
+    </li>
+    <li>
+      <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+    </li>
+    <li>
+      <a href="part0105.html#nav_point_306">第 14 章 dom</a>
+    </li>
+    <li>
+      <a href="part0110.html#nav_point_328">第 15 章 dom扩展</a>
+    </li>
+    <li>
+      <a href="part0116.html#nav_point_348">第 16 章 dom2和dom3</a>
+    </li>
+    <li>
+      <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+    </li>
+    <li>
+      <a href="part0130.html#nav_point_403">第 18 章 动画与canvas图形</a>
+    </li>
+    <li>
+      <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+    </li>
+    <li>
+      <a href="part0143.html#nav_point_450">第 20 章 javascript api</a>
+    </li>
+    <li>
+      <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+    </li>
+    <li>
+      <a href="part0163.html#nav_point_526">第 22 章 处理xml</a>
+    </li>
+    <li>
+      <a href="part0168.html#nav_point_542">第 23 章 json</a>
+    </li>
+    <li>
+      <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+    </li>
+    <li>
+      <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+    </li>
+    <li>
+      <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+    </li>
+    <li>
+      <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+    </li>
+    <li>
+      <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+    </li>
+    <li>
+      <a href="part0204.html#nav_point_683">附录 a es2018和es2019</a>
+    </li>
+    <li>
+      <a href="part0215.html#nav_point_708">附录 b 严格模式</a>
+    </li>
+    <li>
+      <a href="part0223.html#nav_point_719">附录 c javascript库和框架</a>
+    </li>
+    <li>
+      <a href="part0227.html#nav_point_741">附录 d javascript工具</a>
+    </li>
+    <li>
+      <a href="part0239.html#nav_point_800">作者简介</a>
+    </li>
+  </ul>
+</div>
+
+
+  </div>
+  
+
+  <div class="calibreebnav">
+    
+      <a href="part0175.html" class="calibreaprev">上一页
+</a>
+    
+
+    <a href="../../54m0dfqx.html" class="calibreahome">首页
+</a>
+
+    
+      <a href="part0177.html" class="calibreanext">下一页
+</a>
+    
+  </div>
+
+</div>
+
+</body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-6487844781006261"
+     data-ad-slot="3432081921"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</html>

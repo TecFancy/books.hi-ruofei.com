@@ -1,0 +1,322 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0148.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0150.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_471" class="calibre9">20.6 原生拖放</h2>
+        <p class="calibre1">IE4最早在网页中为JavaScript引入了对拖放功能的支持。当时，网页中只有两样东西可以触发拖放：图片和文本。拖动图片就是简单地在图片上按住鼠标不放然后移动鼠标。而对于文本，必须先选中，然后再以同样的方式拖动。在IE4中，唯一有效的放置目标是文本框。IE5扩展了拖放能力，添加了新的事件，让网页中几乎一切都可以成为放置目标。IE5.5又进一步，允许几乎一切都可以拖动（IE6也支持这个功能）。HTML5在IE的拖放实现基础上标准化了拖放功能。所有主流浏览器都根据HTML5规范实现了原生的拖放。</p>
+        <p class="calibre1">关于拖放最有意思的可能就是可以跨窗格、跨浏览器容器，有时候甚至可以跨应用程序拖动元素。浏览器对拖放的支持可以让我们实现这些功能。</p>
+        <h3 id="nav_point_472" class="calibre15">20.6.1 拖放事件</h3>
+        <p class="calibre1">拖放事件几乎可以让开发者控制拖放操作的方方面面。关键的部分是确定每个事件是在哪里触发的。有的事件在被拖放元素上触发，有的事件则在放置目标上触发。在某个元素被拖动时，会（按顺序）触发以下事件：</p>
+        <p class="calibre1">(1)
+          <code class="calibre11">dragstart</code>
+        </p>
+        <p class="calibre1">(2)
+          <code class="calibre11">drag</code>
+        </p>
+        <p class="calibre1">(3)
+          <code class="calibre11">dragend</code>
+        </p>
+        <p class="calibre1">在按住鼠标键不放并开始移动鼠标的那一刻，被拖动元素上会触发<code class="calibre11">dragstart</code>事件。此时光标会变成非放置符号（圆环中间一条斜杠），表示元素不能放到自身上。拖动开始时，可以在<code class="calibre11">ondragstart</code>事件处理程序中通过JavaScript执行某些操作。</p>
+        <p class="calibre1">
+          <code class="calibre11">dragstart</code>事件触发后，只要目标还被拖动就会持续触发<code class="calibre11">drag</code>事件。这个事件类似于<code class="calibre11">mousemove</code>，即随着鼠标移动而不断触发。当拖动停止时（把元素放到有效或无效的放置目标上），会触发<code class="calibre11">dragend</code>事件。</p>
+        <p class="calibre1">所有这3个事件的目标都是被拖动的元素。默认情况下，浏览器在拖动开始后不会改变被拖动元素的外观，因此是否改变外观由你来决定。不过，大多数浏览器此时会创建元素的一个半透明副本，始终跟随在光标下方。</p>
+        <p class="calibre1">在把元素拖动到一个有效的放置目标上时，会依次触发以下事件：</p>
+        <p class="calibre1">(1)
+          <code class="calibre11">dragenter</code>
+        </p>
+        <p class="calibre1">(2)
+          <code class="calibre11">dragover</code>
+        </p>
+        <p class="calibre1">(3)
+          <code class="calibre11">dragleave</code>或<code class="calibre11">drop</code>
+        </p>
+        <p class="calibre1">只要一把元素拖动到放置目标上，<code class="calibre11">dragenter</code>事件（类似于<code class="calibre11">mouseover</code>事件）就会触发。<code class="calibre11">dragenter</code>事件触发之后，会立即触发<code class="calibre11">dragover</code>事件，并且元素在放置目标范围内被拖动期间此事件会持续触发。当元素被拖动到放置目标之外，<code class="calibre11">dragover</code>事件停止触发，<code class="calibre11">dragleave</code>事件触发（类似于<code class="calibre11">mouseout</code>事件）。如果被拖动元素被放到了目标上，则会触发<code class="calibre11">drop</code>事件而不是<code class="calibre11">dragleave</code>事件。这些事件的目标是放置目标元素。</p>
+        <h3 id="nav_point_473" class="calibre15">20.6.2 自定义放置目标</h3>
+        <p class="calibre1">在把某个元素拖动到无效放置目标上时，会看到一个特殊光标（圆环中间一条斜杠）表示不能放下。即使所有元素都支持放置目标事件，这些元素默认也是不允许放置的。如果把元素拖动到不允许放置的目标上，无论用户动作是什么都不会触发<code class="calibre11">drop</code>事件。不过，通过覆盖<code class="calibre11">dragenter</code>和<code class="calibre11">dragover</code>事件的默认行为，可以把任何元素转换为有效的放置目标。例如，如果有一个ID为<code class="calibre11">"droptarget"</code>的<code class="calibre11">&lt;div&gt;</code>元素，那么可以使用以下代码把它转换成一个放置目标：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let droptarget = document.getelementbyid("droptarget");
+
+droptarget.addeventlistener("dragover", (event) =&gt; {
+  event.preventdefault();
+});
+
+droptarget.addeventlistener("dragenter", (event) =&gt; {
+  event.preventdefault();
+});</code></pre>
+        <p class="calibre1">执行上面的代码之后，把元素拖动到这个<code class="calibre11">&lt;div&gt;</code>上应该可以看到光标变成了允许放置的样子。另外，<code class="calibre11">drop</code>事件也会触发。</p>
+        <p class="calibre1">在Firefox中，放置事件的默认行为是导航到放在放置目标上的URL。这意味着把图片拖动到放置目标上会导致页面导航到图片文件，把文本拖动到放置目标上会导致无效URL错误。为阻止这个行为，在Firefox中必须取消<code class="calibre11">drop</code>事件的默认行为：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">droptarget.addeventlistener("drop", (event) =&gt; {
+  event.preventdefault();
+});</code></pre>
+        <h3 id="nav_point_474" class="calibre15">20.6.3
+          <code class="calibre26">dataTransfer</code>对象</h3>
+        <p class="calibre1">除非数据受影响，否则简单的拖放并没有实际意义。为实现拖动操作中的数据传输，IE5在<code class="calibre11">event</code>对象上暴露了<code class="calibre11">dataTransfer</code>对象，用于从被拖动元素向放置目标传递字符串数据。因为这个对象是<code class="calibre11">event</code>的属性，所以在拖放事件的事件处理程序外部无法访问<code class="calibre11">dataTransfer</code>。在事件处理程序内部，可以使用这个对象的属性和方法实现拖放功能。<code class="calibre11">dataTransfer</code>对象现在已经纳入了HTML5工作草案。</p>
+        <p class="calibre1">
+          <code class="calibre11">dataTransfer</code>对象有两个主要方法：<code class="calibre11">getData()</code>和<code class="calibre11">setData()</code>。顾名思义，<code class="calibre11">getData()</code>用于获取<code class="calibre11">setData()</code>存储的值。<code class="calibre11">setData()</code>的第一个参数以及<code class="calibre11">getData()</code>的唯一参数是一个字符串，表示要设置的数据类型：<code class="calibre11">"text"</code>或<code class="calibre11">"URL"</code>，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 传递文本
+event.datatransfer.setdata("text", "some text");
+let text = event.datatransfer.getdata("text");
+
+// 传递url
+event.datatransfer.setdata("url", "http://www.wrox.com/");
+let url = event.datatransfer.getdata("url");</code></pre>
+        <p class="calibre1">虽然这两种数据类型是IE最初引入的，但HTML5已经将其扩展为允许任何MIME类型。为向后兼容，HTML5还会继续支持<code class="calibre11">"text"</code>和<code class="calibre11">"URL"</code>，但它们会分别被映射到<code class="calibre11">"text/plain"</code>和<code class="calibre11">"text/uri-list"</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">dataTransfer</code>对象实际上可以包含每种MIME类型的一个值，也就是说可以同时保存文本和URL，两者不会相互覆盖。存储在<code class="calibre11">dataTransfer</code>对象中的数据只能在放置事件中读取。如果没有在<code class="calibre11">ondrop</code>事件处理程序中取得这些数据，<code class="calibre11">dataTransfer</code>对象就会被销毁，数据也会丢失。</p>
+        <p class="calibre1">在从文本框拖动文本时，浏览器会调用<code class="calibre11">setData()</code>并将拖动的文本以<code class="calibre11">"text"</code>格式存储起来。类似地，在拖动链接或图片时，浏览器会调用<code class="calibre11">setData()</code>并把URL存储起来。当数据被放置在目标上时，可以使用<code class="calibre11">getData()</code>获取这些数据。当然，可以在<code class="calibre11">dragstart</code>事件中手动调用<code class="calibre11">setData()</code>存储自定义数据，以便将来使用。</p>
+        <p class="calibre1">作为文本的数据和作为URL的数据有一个区别。当把数据作为文本存储时，数据不会被特殊对待。而当把数据作为URL存储时，数据会被作为网页中的一个链接，意味着如果把它放到另一个浏览器窗口，浏览器会导航到该URL。</p>
+        <p class="calibre1">直到版本5，Firefox都不能正确地把<code class="calibre11">"url"</code>映射为<code class="calibre11">"text/uri-list"</code>或把<code class="calibre11">"text"</code>映射为<code class="calibre11">"text/plain"</code>。不过，它可以把<code class="calibre11">"Text"</code>（第一个字母大写）正确映射为<code class="calibre11">"text/plain"</code>。在通过<code class="calibre11">dataTransfer</code>获取数据时，为保持最大兼容性，需要对URL检测两个值并对文本使用<code class="calibre11">"Text"</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let datatransfer = event.datatransfer;
+// 读取url
+let url = datatransfer.getdata("url") || datatransfer.getdata("text/uri-list");
+// 读取文本
+let text = datatransfer.getdata("text");</code></pre>
+        <p class="calibre1">这里要注意，首先应该尝试短数据名。这是因为直到版本10，IE都不支持扩展的类型名，而且会在遇到无法识别的类型名时抛出错误。</p>
+        <h3 id="nav_point_475" class="calibre15">20.6.4
+          <code class="calibre26">dropEffect</code>与<code class="calibre26">effectAllowed</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">dataTransfer</code>对象不仅可以用于实现简单的数据传输，还可以用于确定能够对被拖动元素和放置目标执行什么操作。为此，可以使用两个属性：<code class="calibre11">dropEffect</code>与<code class="calibre11">effectAllowed</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">dropEffect</code>属性可以告诉浏览器允许哪种放置行为。这个属性有以下4种可能的值。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"none"</code>：被拖动元素不能放到这里。这是除文本框之外所有元素的默认值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"move"</code>：被拖动元素应该移动到放置目标。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"copy"</code>：被拖动元素应该复制到放置目标。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"link"</code>：表示放置目标会导航到被拖动元素（仅在它是URL的情况下）。</li>
+        </ul>
+        <p class="calibre1">在把元素拖动到放置目标上时，上述每种值都会导致显示一种不同的光标。不过，是否导致光标示意的动作还要取决于开发者。换句话说，如果没有代码参与，则没有什么会自动移动、复制或链接。唯一不用考虑的就是光标自己会变。为了使用<code class="calibre11">dropEffect</code>属性，必须在放置目标的<code class="calibre11">ondragenter</code>事件处理程序中设置它。</p>
+        <p class="calibre1">除非同时设置<code class="calibre11">effectAllowed</code>，否则<code class="calibre11">dropEffect</code>属性也没有用。<code class="calibre11">effectAllowed</code>属性表示对被拖动元素是否允许<code class="calibre11">dropEffect</code>。这个属性有如下几个可能的值。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"uninitialized"</code>：没有给被拖动元素设置动作。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"none"</code>：被拖动元素上没有允许的操作。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"copy"</code>：只允许<code class="calibre11">"copy"</code>这种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"link"</code>：只允许<code class="calibre11">"link"</code>这种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"move"</code>：只允许<code class="calibre11">"move"</code>这种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"copyLink"</code>：允许<code class="calibre11">"copy"</code>和<code class="calibre11">"link"</code>两种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"copyMove"</code>：允许<code class="calibre11">"copy"</code>和<code class="calibre11">"move"</code>两种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"linkMove"</code>：允许<code class="calibre11">"link"</code>和<code class="calibre11">"move"</code>两种<code class="calibre11">dropEffect</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"all"</code>：允许所有<code class="calibre11">dropEffect</code>。</li>
+        </ul>
+        <p class="calibre1">必须在<code class="calibre11">ondragstart</code>事件处理程序中设置这个属性。</p>
+        <p class="calibre1">假设我们想允许用户把文本从一个文本框拖动到一个<code class="calibre11">&lt;div&gt;</code>元素。那么必须同时把<code class="calibre11">dropEffect</code>和<code class="calibre11">effectAllowed</code>属性设置为<code class="calibre11">"move"</code>。因为<code class="calibre11">&lt;div&gt;</code>元素上放置事件的默认行为是什么也不做，所以文本不会自动地移动自己。如果覆盖这个默认行为，文本就会自动从文本框中被移除。然后是否把文本插入<code class="calibre11">&lt;div&gt;</code>元素就取决于你了。如果是把<code class="calibre11">dropEffect</code>和<code class="calibre11">effectAllowed</code>属性设置为<code class="calibre11">"copy"</code>，那么文本框中的文本不会自动被移除。</p>
+        <h3 id="nav_point_476" class="calibre15">20.6.5 可拖动能力</h3>
+        <p class="calibre1">默认情况下，图片、链接和文本是可拖动的，这意味着无须额外代码用户便可以拖动它们。文本只有在被选中后才可以拖动，而图片和链接在任意时候都是可以拖动的。</p>
+        <p class="calibre1">我们也可以让其他元素变得可以拖动。HTML5在所有HTML元素上规定了一个<code class="calibre11">draggable</code>属性，表示元素是否可以拖动。图片和链接的<code class="calibre11">draggable</code>属性自动被设置为<code class="calibre11">true</code>，而其他所有元素此属性的默认值为<code class="calibre11">false</code>。如果想让其他元素可拖动，或者不允许图片和链接被拖动，都可以设置这个属性。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 禁止拖动图片 --&gt;
+&lt;img src="smile.gif" draggable="false" alt="smiley face"&gt;
+&lt;!-- 让元素可以拖动 --&gt;
+&lt;div draggable="true"&gt;...&lt;/div&gt;</code></pre>
+        <h3 id="nav_point_477" class="calibre15">20.6.6 其他成员</h3>
+        <p class="calibre1">HTML5规范还为<code class="calibre11">dataTransfer</code>对象定义了下列方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">addElement(<i class="calibre6">element</i>)</code>：为拖动操作添加元素。这纯粹是为了传输数据，不会影响拖动操作的外观。在本书写作时，还没有浏览器实现这个方法。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">clearData(<i class="calibre6">format</i>)</code>：清除以特定格式存储的数据。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">setDragImage(<i class="calibre6">element, x, y</i>)</code>：允许指定拖动发生时显示在光标下面的图片。这个方法接收3个参数：要显示的HTML元素及标识光标位置的图片上的<img src="../images/00080.gif" alt="x" class="calibre12"/>和<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标。这里的HTML元素可以是一张图片，此时显示图片；也可以是其他任何元素，此时显示渲染后的元素。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">types</code>：当前存储的数据类型列表。这个集合类似数组，以字符串形式保存数据类型，比如<code class="calibre11">"text"</code>。</li>
+        </ul>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0148.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0150.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

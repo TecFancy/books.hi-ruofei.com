@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0081.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0083.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_245" class="calibre9">10.12 递归</h2>
+        <p class="calibre1">
+          <strong class="calibre2">递归函数</strong>通常的形式是一个函数通过名称调用自己，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function factorial(num) {
+  if (num &lt;= 1) {
+    return 1;
+  } else {
+    return num * factorial(num - 1);
+  }
+}</code></pre>
+        <p class="calibre1">这是经典的递归阶乘函数。虽然这样写是可以的，但如果把这个函数赋值给其他变量，就会出问题：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let anotherfactorial = factorial;
+factorial = null;
+console.log(anotherfactorial(4));  // 报错</code></pre>
+        <p class="calibre1">这里把<code class="calibre11">factorial()</code>函数保存在了另一个变量<code class="calibre11">anotherFactorial</code>中，然后将<code class="calibre11">factorial</code>设置为<code class="calibre11">null</code>，于是只保留了一个对原始函数的引用。而在调用<code class="calibre11">anotherFactorial()</code>时，要递归调用<code class="calibre11">factorial()</code>，但因为它已经不是函数了，所以会出错。在写递归函数时使用<code class="calibre11">arguments.callee</code>可以避免这个问题。</p>
+        <p class="calibre1">
+          <code class="calibre11">arguments.callee</code>就是一个指向正在执行的函数的指针，因此可以在函数内部递归调用，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function factorial(num) {
+  if (num &lt;= 1) {
+    return 1;
+  } else {
+    return num * arguments.callee(num - 1);
+  }
+}</code></pre>
+        <p class="calibre1">像这里加粗的这一行一样，把函数名称替换成<code class="calibre11">arguments.callee</code>，可以确保无论通过什么变量调用这个函数都不会出问题。因此在编写递归函数时，<code class="calibre11">arguments.callee</code>是引用当前函数的首选。</p>
+        <p class="calibre1">不过，在严格模式下运行的代码是不能访问<code class="calibre11">arguments.callee</code>的，因为访问会出错。此时，可以使用命名函数表达式（named function expression）达到目的。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const factorial = (function f(num) {
+  if (num &lt;= 1) {
+    return 1;
+  } else {
+    return num * f(num - 1);
+  }
+});</code></pre>
+        <p class="calibre1">这里创建了一个命名函数表达式<code class="calibre11">f()</code>，然后将它赋值给了变量<code class="calibre11">factorial</code>。即使把函数赋值给另一个变量，函数表达式的名称<code class="calibre11">f</code>也不变，因此递归调用不会有问题。这个模式在严格模式和非严格模式下都可以使用。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0081.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0083.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

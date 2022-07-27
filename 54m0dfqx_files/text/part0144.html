@@ -1,0 +1,526 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0143.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0145.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_451" class="calibre9">20.1 Atomics与<code class="calibre26">SharedArrayBuffer</code>
+        </h2>
+        <p class="calibre1">多个上下文访问<code class="calibre11">SharedArrayBuffer</code>时，如果同时对缓冲区执行操作，就可能出现资源争用问题。Atomics API通过强制同一时刻只能对缓冲区执行一个操作，可以让多个上下文安全地读写一个<code class="calibre11">SharedArrayBuffer</code>。Atomics API是ES2017中定义的。</p>
+        <p class="calibre1">仔细研究会发现Atomics API非常像一个简化版的指令集架构（ISA），这并非意外。原子操作的本质会排斥操作系统或计算机硬件通常会自动执行的优化（比如指令重新排序）。原子操作也让并发访问内存变得不可能，如果应用不当就可能导致程序执行变慢。为此，Atomics API的设计初衷是在最少但很稳定的原子行为基础之上，构建复杂的多线程JavaScript程序。</p>
+        <h3 id="nav_point_452" class="calibre15">20.1.1
+          <code class="calibre26">SharedArrayBuffer</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">SharedArrayBuffer</code>与<code class="calibre11">ArrayBuffer</code>具有同样的API。二者的主要区别是<code class="calibre11">ArrayBuffer</code>必须在不同执行上下文间切换，<code class="calibre11">SharedArrayBuffer</code>则可以被任意多个执行上下文同时使用。</p>
+        <p class="calibre1">在多个执行上下文间共享内存意味着并发线程操作成为了可能。传统JavaScript操作对于并发内存访问导致的资源争用没有提供保护。下面的例子演示了4个专用工作线程访问同一个<code class="calibre11">SharedArrayBuffer</code>导致的资源争用问题：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const workerscript = `
+self.onmessage = ({data}) =&gt; {
+  const view = new uint32array(data);
+
+  // 执行1 000 000次加操作
+  for (let i = 0; i &lt; 1e6; ++i) {
+    // 线程不安全加操作会导致资源争用
+    view[0] += 1;
+  }
+
+  self.postmessage(null);
+};
+`;
+
+const workerscriptbloburl = url.createobjecturl(new blob([workerscript]));
+
+// 创建容量为4的工作线程池
+const workers = [];
+for (let i = 0; i &lt; 4; ++i) {
+  workers.push(new worker(workerscriptbloburl));
+}
+
+// 在最后一个工作线程完成后打印出最终值
+let responsecount = 0;
+for (const worker of workers) {
+  worker.onmessage = () =&gt; {
+    if (++responsecount == workers.length) {
+      console.log(`final buffer value: ${view[0]}`);
+    }
+  };
+}
+
+// 初始化sharedarraybuffer
+const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+view[0] = 1;
+
+// 把sharedarraybuffer发送到每个工作线程
+for (const worker of workers) {
+  worker.postmessage(sharedarraybuffer);
+}
+
+//（期待结果为4000001。实际输出可能类似这样：）
+// final buffer value: 2145106</code></pre>
+        <p class="calibre1">为解决这个问题，Atomics API应运而生。Atomics API可以保证<code class="calibre11">SharedArrayBuffer</code>上的JavaScript操作是线程安全的。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">SharedArrayBuffer</code>
+            API等同于<code class="calibre11">ArrayBuffer</code>
+            API，后者在第6章介绍过。关于如何在多个上下文中使用SharedArray<code class="calibre11">B</code>uffer，可以参考第27章。</p>
+        </blockquote>
+        <h3 id="nav_point_453" class="calibre15">20.1.2 原子操作基础</h3>
+        <p class="calibre1">任何全局上下文中都有<code class="calibre11">Atomics</code>对象，这个对象上暴露了用于执行线程安全操作的一套静态方法，其中多数方法以一个<code class="calibre11">TypedArray</code>实例（一个<code class="calibre11">SharedArrayBuffer</code>的引用）作为第一个参数，以相关操作数作为后续参数。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">算术及位操作方法</strong>
+            </p>
+            <p class="calibre1">Atomics API提供了一套简单的方法用以执行就地修改操作。在ECMA规范中，这些方法被定义为<code class="calibre11">AtomicReadModifyWrite</code>操作。在底层，这些方法都会从<code class="calibre11">SharedArrayBuffer</code>中某个位置读取值，然后执行算术或位操作，最后再把计算结果写回相同的位置。这些操作的原子本质意味着上述读取、修改、写回操作会按照顺序执行，不会被其他线程中断。</p>
+            <p class="calibre1">以下代码演示了所有算术方法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建大小为1的缓冲区
+let sharedarraybuffer = new sharedarraybuffer(1);
+
+// 基于缓冲创建uint8array
+let typedarray = new uint8array(sharedarraybuffer);
+
+// 所有arraybuffer全部初始化为0
+console.log(typedarray); // uint8array[0]
+
+const index = 0;
+const increment = 5;
+
+// 对索引0处的值执行原子加5
+atomics.add(typedarray, index, increment);
+
+console.log(typedarray); // uint8array[5]
+
+// 对索引0处的值执行原子减5
+atomics.sub(typedarray, index, increment);
+
+console.log(typedarray); // uint8array[0]</code></pre>
+            <p class="calibre1">以下代码演示了所有位方法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建大小为1的缓冲区
+let sharedarraybuffer = new sharedarraybuffer(1);
+
+// 基于缓冲创建uint8array
+let typedarray = new uint8array(sharedarraybuffer);
+
+// 所有arraybuffer全部初始化为0
+console.log(typedarray); // uint8array[0]
+
+const index = 0;
+
+// 对索引0处的值执行原子或0b1111
+atomics.or(typedarray, index, 0b1111);
+
+console.log(typedarray); // uint8array[15]
+
+// 对索引0处的值执行原子与0b1111
+atomics.and(typedarray, index, 0b1100);
+
+console.log(typedarray); // uint8array[12]
+
+// 对索引0处的值执行原子异或0b1111
+atomics.xor(typedarray, index, 0b1111);
+
+console.log(typedarray); // uint8array[3]</code></pre>
+            <p class="calibre1">前面线程不安全的例子可以改写为下面这样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">  const workerscript = `
+  self.onmessage = ({data}) =&gt; {
+
+  const view = new uint32array(data);
+
+  // 执行1 000 000次加操作
+  for (let i = 0; i &lt; 1e6; ++i) {
+    // 线程安全的加操作
+    atomics.add(view, 0, 1);
+  }
+
+  self.postmessage(null);
+};
+`;
+
+const workerscriptbloburl = url.createobjecturl(new blob([workerscript]));
+
+// 创建容量为4的工作线程池
+const workers = [];
+for (let i = 0; i &lt; 4; ++i) {
+  workers.push(new worker(workerscriptbloburl));
+}
+
+// 在最后一个工作线程完成后打印出最终值
+let responsecount = 0;
+for (const worker of workers) {
+  worker.onmessage = () =&gt; {
+    if (++responsecount == workers.length) {
+      console.log(`final buffer value: ${view[0]}`);
+    }
+  };
+}
+
+// 初始化sharedarraybuffer
+const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+view[0] = 1;
+
+// 把sharedarraybuffer发送到每个工作线程
+for (const worker of workers) {
+  worker.postmessage(sharedarraybuffer);
+}
+
+//（期待结果为4000001）
+// final buffer value: 4000001</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">原子读和写</strong>
+            </p>
+            <p class="calibre1">浏览器的JavaScript编译器和CPU架构本身都有权限重排指令以提升程序执行效率。正常情况下，JavaScript的单线程环境是可以随时进行这种优化的。但多线程下的指令重排可能导致资源争用，而且极难排错。</p>
+            <p class="calibre1">Atomics API通过两种主要方式解决了这个问题。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">所有原子指令相互之间的顺序永远不会重排。</li>
+              <li class="di_1ji_wu_xu_lie_biao">使用原子读或原子写保证所有指令（包括原子和非原子指令）都不会相对原子读/写重新排序。这意味着位于原子读/写之前的所有指令会在原子读/写发生前完成，而位于原子读/写之后的所有指令会在原子读/写完成后才会开始。</li>
+            </ul>
+            <p class="calibre1">除了读写缓冲区的值，<code class="calibre11">Atomics.load()</code>和<code class="calibre11">Atomics.store()</code>还可以构建“代码围栏”。JavaScript引擎保证非原子指令可以相对于<code class="calibre11">load()</code>或<code class="calibre11">store()</code>
+              <strong class="calibre2">本地</strong>重排，但这个重排不会侵犯原子读/写的边界。以下代码演示了这种行为：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+
+// 执行非原子写
+view[0] = 1;
+
+// 非原子写可以保证在这个读操作之前完成，因此这里一定会读到1
+console.log(atomics.load(view, 0)); // 1
+
+// 执行原子写
+atomics.store(view, 0, 2);
+
+// 非原子读可以保证在原子写完成后发生，因此这里一定会读到2
+console.log(view[0]); // 2</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">原子交换</strong>
+            </p>
+            <p class="calibre1">为了保证连续、不间断的先读后写，Atomics API提供了两种方法：<code class="calibre11">exchange()</code>和<code class="calibre11">compareExchange()</code>。<code class="calibre11">Atomics.exchange()</code>执行简单的交换，以保证其他线程不会中断值的交换：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+
+// 在索引0处写入3
+atomics.store(view, 0, 3);
+
+// 从索引0处读取值，然后在索引0处写入4
+console.log(atomics.exchange(view, 0, 4));  // 3
+
+// 从索引0处读取值
+console.log(atomics.load(view, 0));         // 4</code></pre>
+            <p class="calibre1">在多线程程序中，一个线程可能<strong class="calibre2">只希望</strong>在上次读取某个值之后没有其他线程修改该值的情况下才对共享缓冲区执行写操作。如果这个值没有被修改，这个线程就可以安全地写入更新后的值；如果这个值被修改了，那么执行写操作将会破坏其他线程计算的值。对于这种任务，Atomics API提供了<code class="calibre11">compareExchange()</code>方法。这个方法只在目标索引处的值与预期值匹配时才会执行写操作。来看下面这个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+
+// 在索引0处写入5
+atomics.store(view, 0, 5);
+// 从缓冲区读取值
+let initial = atomics.load(view, 0);
+
+// 对这个值执行非原子操作
+let result = initial ** 2;
+
+// 只在缓冲区未被修改的情况下才会向缓冲区写入新值
+atomics.compareexchange(view, 0, initial, result);
+
+// 检查写入成功
+console.log(atomics.load(view, 0)); // 25</code></pre>
+            <p class="calibre1">如果值不匹配，<code class="calibre11">compareExchange()</code>调用则什么也不做：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+
+// 在索引0处写入5
+atomics.store(view, 0, 5);
+// 从缓冲区读取值
+let initial = atomics.load(view, 0);
+
+// 对这个值执行非原子操作
+let result = initial ** 2;
+
+// 只在缓冲区未被修改的情况下才会向缓冲区写入新值
+atomics.compareexchange(view, 0, -1, result);
+
+// 检查写入失败
+console.log(atomics.load(view, 0)); // 5</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">原子Futex操作与加锁</strong>
+            </p>
+            <p class="calibre1">如果没有某种锁机制，多线程程序就无法支持复杂需求。为此，Atomics API提供了模仿Linux Futex（<strong class="calibre2">快速用户空间互斥量</strong>，fast user-space mutex）的方法。这些方法本身虽然非常简单，但可以作为更复杂锁机制的基本组件。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                所有原子Futex操作只能用于<code class="calibre11">Int32Array</code>视图。而且，也只能用在工作线程内部。</p>
+            </blockquote>
+            <p class="calibre1">
+              <code class="calibre11">Atomics.wait()</code>和<code class="calibre11">Atomics.notify()</code>通过示例很容易理解。下面这个简单的例子创建了4个工作线程，用于对长度为1的<code class="calibre11">Int32Array</code>进行操作。这些工作线程会依次取得锁并执行自己的加操作：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const workerscript = `
+self.onmessage = ({data}) =&gt; {
+  const view = new int32array(data);
+
+  console.log('waiting to obtain lock');
+
+  // 遇到初始值则停止，10 000毫秒超时
+  atomics.wait(view, 0, 0, 1e5);
+
+  console.log('obtained lock');
+
+  // 在索引0处加1
+  atomics.add(view, 0, 1);
+
+  console.log('releasing lock');
+
+  // 只允许1个工作线程继续执行
+  atomics.notify(view, 0, 1);
+
+  self.postmessage(null);
+};
+`;
+
+const workerscriptbloburl = url.createobjecturl(new blob([workerscript]));
+
+const workers = [];
+for (let i = 0; i &lt; 4; ++i) {
+  workers.push(new worker(workerscriptbloburl));
+}
+
+// 在最后一个工作线程完成后打印出最终值
+let responsecount = 0;
+for (const worker of workers) {
+  worker.onmessage = () =&gt; {
+    if (++responsecount == workers.length) {
+      console.log(`final buffer value: ${view[0]}`);
+    }
+  };
+}
+
+// 初始化sharedarraybuffer
+const sharedarraybuffer = new sharedarraybuffer(8);
+const view = new int32array(sharedarraybuffer);
+
+// 把sharedarraybuffer发送到每个工作线程
+for (const worker of workers) {
+  worker.postmessage(sharedarraybuffer);
+}
+
+// 1000毫秒后释放第一个锁
+settimeout(() =&gt; atomics.notify(view, 0, 1), 1000);
+
+// waiting to obtain lock
+// waiting to obtain lock
+// waiting to obtain lock
+// waiting to obtain lock
+// obtained lock
+// releasing lock
+// obtained lock
+// releasing lock
+// obtained lock
+// releasing lock
+// obtained lock
+// releasing lock
+// final buffer value: 4</code></pre>
+            <p class="calibre1">因为是使用0来初始化<code class="calibre11">SharedArrayBuffer</code>，所以每个工作线程都会到达<code class="calibre11">Atomics.wait()</code>并停止执行。在停止状态下，执行线程存在于一个<strong class="calibre2">等待队列</strong>中，在经过指定时间或在相应索引上调用<code class="calibre11">Atomics.notify()</code>之前，一直保持暂停状态。1000毫秒之后，顶部执行上下文会调用<code class="calibre11">Atomics.notify()</code>释放其中一个等待的线程。这个线程执行完毕后会再次调用<code class="calibre11">Atomics.notify()</code>释放另一个线程。这个过程会持续到所有线程都执行完毕并通过<code class="calibre11">postMessage()</code>传出最终的值。</p>
+            <p class="calibre1">Atomics API还提供了<code class="calibre11">Atomics.isLockFree()</code>方法。不过我们基本上应该不会用到。这个方法在高性能算法中可以用来确定是否有必要获取锁。规范中的介绍如下：</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <code class="calibre11">Atomics.isLockFree()</code>是一个优化原语。基本上，如果一个原子原语（<code class="calibre11">compareExchange</code>、<code class="calibre11">load</code>、<code class="calibre11">store</code>、<code class="calibre11">add</code>、<code class="calibre11">sub</code>、<code class="calibre11">and</code>、<code class="calibre11">or</code>、<code class="calibre11">xor</code>或<code class="calibre11">exchange</code>）在<img src="../images/00050.gif" alt="n" class="calibre12"/>字节大小的数据上的原子步骤在不调用代理在组成数据的<img src="../images/00050.gif" alt="n" class="calibre12"/>字节之外获得锁的情况下可以执行，则<code class="calibre11">Atomics.isLockFree(n)</code>会返回<code class="calibre11">true</code>。高性能算法会使用<code class="calibre11">Atomics.isLockFree</code>确定是否在关键部分使用锁或原子操作。如果原子原语需要加锁，则算法提供自己的锁会更高效。</p>
+              <p class="calibre1">
+                <code class="calibre11">Atomics.isLockFree(4)</code>始终返回<code class="calibre11">true</code>，因为在所有已知的相关硬件上都是支持的。能够如此假设通常可以简化程序。</p>
+            </blockquote>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0143.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0145.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

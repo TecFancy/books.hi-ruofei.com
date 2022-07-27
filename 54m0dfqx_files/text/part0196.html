@@ -1,0 +1,533 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0195.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0197.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_650" class="calibre9">27.3 共享工作者线程</h2>
+        <p class="calibre1">
+          <strong class="calibre2">共享工作者线程</strong>或<strong class="calibre2">共享线程</strong>与专用工作者线程类似，但可以被多个可信任的执行上下文访问。例如，同源的两个标签页可以访问同一个共享工作者线程。<code class="calibre11">SharedWorker</code>与<code class="calibre11">Worker</code>的消息接口稍有不同，包括外部和内部。</p>
+        <p class="calibre1">共享线程适合开发者希望通过在多个上下文间共享线程减少计算性消耗的情形。比如，可以用一个共享线程管理多个同源页面WebSocket消息的发送与接收。共享线程也可以用在同源上下文希望通过一个线程通信的情形。</p>
+        <h3 id="nav_point_651" class="calibre15">27.3.1 共享工作者线程简介</h3>
+        <p class="calibre1">从行为上讲，共享工作者线程可以看作是专用工作者线程的一个扩展。线程创建、线程选项、安全限制和<code class="calibre11">importScripts()</code>的行为都是相同的。与专用工作者线程一样，共享工作者线程也在独立执行上下文中运行，也只能与其他上下文异步通信。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">创建共享工作者线程</strong>
+            </p>
+            <p class="calibre1">与专用工作者线程一样，创建共享工作者线程非常常用的方式是通过加载JavaScript文件创建。此时，需要给<code class="calibre11">SharedWorker</code>构造函数传入文件路径，该构造函数在后台异步加载脚本并实例化共享工作者线程。</p>
+            <p class="calibre1">下面的例子演示了如何基于绝对路径创建空共享工作者线程：</p>
+            <p class="calibre1">
+              <strong class="calibre2">emptySharedWorker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 空的javascript线程文件</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(location.href); // "https://example.com/"
+const sharedworker = new sharedworker(
+    location.href + 'emptysharedworker.js');
+console.log(sharedworker);  // sharedworker {}</code></pre>
+            <p class="calibre1">前面的例子可以修改为使用相对路径，不过这需要main.js和emptySharedWorker.js在同一个目录下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./emptyworker.js');
+console.log(worker); // worker {}</code></pre>
+            <p class="calibre1">也可以在行内脚本中创建共享工作者线程，但这样做没什么意义。因为每个基于行内脚本字符串创建的<code class="calibre11">Blob</code>都会被赋予自己唯一的浏览器内部URL，所以行内脚本中创建的共享工作者线程始终是唯一的。这里的原因将在下一节介绍。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">SharedWorker</code>标识与独占</strong>
+            </p>
+            <p class="calibre1">共享工作者线程与专用工作者线程的一个重要区别在于，虽然<code class="calibre11">Worker()</code>构造函数始终会创建新实例，而<code class="calibre11">SharedWorker()</code>则只会在相同的标识不存在的情况下才创建新实例。如果<strong class="calibre2">的确</strong>存在与标识匹配的共享工作者线程，则只会与已有共享者线程建立新的连接。</p>
+            <p class="calibre1">共享工作者线程标识源自解析后的脚本URL、工作者线程名称和文档源。例如，下面的脚本将实例化一个共享工作者线程并添加两个连接：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 实例化一个共享工作者线程
+//  - 全部基于同源调用构造函数
+//  - 所有脚本解析为相同的url
+//  - 所有线程都有相同的名称
+new sharedworker('./sharedworker.js');
+new sharedworker('./sharedworker.js');
+new sharedworker('./sharedworker.js');</code></pre>
+            <p class="calibre1">类似地，因为下面三个脚本字符串都解析到相同的URL，所以也只会创建一个共享工作者线程：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 实例化一个共享工作者线程
+//  - 全部基于同源调用构造函数
+//  - 所有脚本解析为相同的url
+//  - 所有线程都有相同的名称
+new sharedworker('./sharedworker.js');
+new sharedworker('sharedworker.js');
+new sharedworker('https://www.example.com/sharedworker.js');</code></pre>
+            <p class="calibre1">因为可选的工作者线程名称也是共享工作者线程标识的一部分，所以不同的线程名称会强制浏览器创建多个共享工作者线程。对下面的例子而言，一个名为<code class="calibre11">'foo'</code>，另一个名为<code class="calibre11">'bar'</code>，尽管它们同源且脚本URL相同：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 实例化一个共享工作者线程
+//  - 全部基于同源调用构造函数
+//  - 所有脚本解析为相同的url
+//  - 一个线程名称为'foo'，一个线程名称为'bar'
+new sharedworker('./sharedworker.js', {name: 'foo'});
+new sharedworker('./sharedworker.js', {name: 'foo'});
+new sharedworker('./sharedworker.js', {name: 'bar'});</code></pre>
+            <p class="calibre1">共享线程，顾名思义，可以在不同标签页、不同窗口、不同内嵌框架或同源的其他工作者线程之间共享。因此，下面的脚本如果在多个标签页运行，只会在第一次执行时创建一个共享工作者线程，后续执行会连接到该线程：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 实例化一个共享工作者线程
+//  - 全部基于同源调用构造函数
+//  - 所有脚本解析为相同的url
+//  - 所有线程都有相同的名称
+new sharedworker('./sharedworker.js');</code></pre>
+            <p class="calibre1">初始化共享线程的脚本只会限制URL，因此下面的代码会创建两个共享工作者线程，尽管加载了相同的脚本：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 实例化一个共享工作者线程
+//  - 全部基于同源调用构造函数
+//  - '?'导致了两个不同的url
+//  - 所有线程都有相同的名称
+new sharedworker('./sharedworker.js');
+new sharedworker('./sharedworker.js?');</code></pre>
+            <p class="calibre1">如果该脚本在两个不同的标签页中运行，同样也只会创建两个共享工作者线程。每个构造函数都会检查匹配的共享工作者线程，然后连接到已存在的那个。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用<code class="calibre11">SharedWorker</code>对象</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">SharedWorker()</code>构造函数返回的<code class="calibre11">SharedWorker</code>对象被用作与新创建的共享工作者线程通信的连接点。它可以用来通过<code class="calibre11">MessagePort</code>在共享工作者线程和父上下文间传递信息，也可以用来捕获共享线程中发出的错误事件。</p>
+            <p class="calibre1">
+              <code class="calibre11">SharedWorker</code>对象支持以下属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onerror</code>：在共享线程中发生<code class="calibre11">ErrorEvent</code>类型的错误事件时会调用指定给该属性的处理程序。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">此事件会在共享线程抛出错误时发生。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">此事件也可以通过使用<code class="calibre11">sharedWorker.addEventListener('error', handler)</code>处理。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">port</code>：专门用来跟共享线程通信的<code class="calibre11">MessagePort</code>。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">SharedWorkerGlobalScope</code>
+              </strong>
+            </p>
+            <p class="calibre1">在共享线程内部，全局作用域是<code class="calibre11">SharedWorkerGlobalScope</code>的实例。<code class="calibre11">SharedWorkerGlobalScope</code>继承自<code class="calibre11">WorkerGlobalScope</code>，因此包括它所有的属性和方法。与专用工作者线程一样，共享工作者线程也可以通过<code class="calibre11">self</code>关键字访问该全局上下文。</p>
+            <p class="calibre1">
+              <code class="calibre11">SharedWorkerGlobalScope</code>通过以下属性和方法扩展了<code class="calibre11">WorkerGlobalScope</code>。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">name</code>：可选的字符串标识符，可以传给<code class="calibre11">SharedWorker</code>构造函数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">importScripts()</code>：用于向工作者线程中导入任意数量的脚本。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">close()</code>：与<code class="calibre11">worker.terminate()</code>对应，用于立即终止工作者线程。没有给工作者线程提供终止前清理的机会；脚本会突然停止。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onconnect</code>：与共享线程建立新连接时，应将其设置为处理程序。<code class="calibre11">connect</code>事件包括<code class="calibre11">MessagePort</code>实例的<code class="calibre11">ports</code>数组，可用于把消息发送回父上下文。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">在通过<code class="calibre11">worker.port.onmessage</code>或<code class="calibre11">worker.port.首页()</code>与共享线程建立连接时都会触发<code class="calibre11">connect</code>事件。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">connect</code>事件也可以通过使用<code class="calibre11">sharedWorker.addEventListener('connect', handler)</code>处理。</li>
+                </ul>
+              </li>
+            </ul>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                根据浏览器实现，在<code class="calibre11">SharedWorker</code>中把日志打印到控制台不一定能在浏览器默认的控制台中看到。</p>
+            </blockquote>
+          </li>
+        </ol>
+        <h3 id="nav_point_652" class="calibre15">27.3.2 理解共享工作者线程的生命周期</h3>
+        <p class="calibre1">共享工作者线程的生命周期具有与专用工作者线程相同的阶段的特性。不同之处在于，专用工作者线程只跟一个页面绑定，而共享工作者线程只要还有一个上下文连接就会持续存在。</p>
+        <p class="calibre1">比如下面的脚本，每次调用它都会创建一个专用工作者线程：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">new worker('./worker.js');</code></pre>
+        <p class="calibre1">下表详细列出了当三个包含此脚本的标签页按顺序打开和关闭时会发生什么。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">事件</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">结果</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">事件发生后的线程数</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页1执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">创建专用线程1</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">标签页2执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">创建专用线程2</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">2</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页3执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">创建专用线程3</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">3</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">标签页1关闭</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">专用线程1终止</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">2</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页2关闭</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">专用线程2终止</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">标签页3关闭</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">专用线程3终止</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">0</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">如上表所示，脚本执行次数、打开标签页数和运行的线程数是对等关系。下面再来看看这个简单的脚本，每次执行它都会创建或者连接到共享线程：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">new sharedworker('./sharedworker.js');</code></pre>
+        <p class="calibre1">下表列出了当三个包含此脚本的标签页按顺序打开和关闭时会发生什么。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">事件</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">结果</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">事件发生后的线程数</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页1执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">创建共享线程1</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">标签页2执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">连接共享线程1</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页3执行main.js</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">连接共享线程1</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">标签页1关闭</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">断开与共享线程1的连接</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">标签页2关闭</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">断开与共享线程1的连接</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">标签页3关闭-断开与共享线程1的连接。没有连接了，因此终止共享线程1-0</p>
+        <p class="calibre1">如上表所示，标签页2和标签页3再次调用<code class="calibre11">new SharedWorker()</code>会连接到已有线程。随着连接的增加和移除，浏览器会记录连接总数。在连接数为0时，线程被终止。</p>
+        <p class="calibre1">关键在于，没有办法以编程方式终止共享线程。前面已经交代过，<code class="calibre11">SharedWorker</code>对象上没有<code class="calibre11">terminate()</code>方法。在共享线程端口（稍后讨论）上调用<code class="calibre11">close()</code>时，只要还有一个端口连接到该线程就不会真的终止线程。</p>
+        <p class="calibre1">
+          <code class="calibre11">SharedWorker</code>的“连接”与关联<code class="calibre11">MessagePort</code>或<code class="calibre11">MessageChannel</code>的状态无关。只要建立了连接，浏览器会负责管理该连接。建立的连接会在页面的生命周期内持续存在，只有当页面销毁且没有连接时，浏览器才会终止共享线程。</p>
+        <h3 id="nav_point_653" class="calibre15">27.3.3 连接到共享工作者线程</h3>
+        <p class="calibre1">每次调用<code class="calibre11">SharedWorker()</code>构造函数，无论是否创建了工作者线程，都会在共享线程内部触发<code class="calibre11">connect</code>事件。下面的例子演示了这一点，在循环中调用<code class="calibre11">SharedWorker()</code>构造函数：</p>
+        <p class="calibre1">
+          <strong class="calibre2">sharedWorker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let i = 0;
+self.onconnect = () =&gt; console.log(`connected ${++i} times`);</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let i = 0; i &lt; 5; ++i) {
+  new sharedworker('./sharedworker.js');
+}
+
+// connected 1 times
+// connected 2 times
+// connected 3 times
+// connected 4 times
+// connected 5 times</code></pre>
+        <p class="calibre1">发生<code class="calibre11">connect</code>事件时，<code class="calibre11">SharedWorker()</code>构造函数会隐式创建<code class="calibre11">MessageChannel</code>实例，并把<code class="calibre11">MessagePort</code>实例的所有权唯一地转移给该<code class="calibre11">SharedWorker</code>的实例。这个<code class="calibre11">MessagePort</code>实例会保存在<code class="calibre11">connect</code>事件对象的<code class="calibre11">ports</code>数组中。一个连接事件只能代表一个连接，因此可以假定<code class="calibre11">ports</code>数组的长度等于1。</p>
+        <p class="calibre1">下面的代码演示了访问事件对象的<code class="calibre11">ports</code>数组。这里使用了<code class="calibre11">Set</code>来保证只跟踪唯一的对象实例：</p>
+        <p class="calibre1">
+          <strong class="calibre2">sharedWorker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const connectedports = new set();
+
+self.onconnect = ({ports}) =&gt; {
+  connectedports.add(ports[0]);
+
+  console.log(`${connectedports.size} unique connected ports`);
+};</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let i = 0; i &lt; 5; ++i) {
+  new sharedworker('./sharedworker.js');
+}
+
+// 1 unique connected ports
+// 2 unique connected ports
+// 3 unique connected ports
+// 4 unique connected ports
+// 5 unique connected ports</code></pre>
+        <p class="calibre1">关键在于，共享线程与父上下文的启动和关闭不是对称的。每个新<code class="calibre11">SharedWorker</code>连接都会触发一个事件，但没有事件对应断开<code class="calibre11">SharedWorker</code>实例的连接（如页面关闭）。</p>
+        <p class="calibre1">在前面的例子中，随着与相同共享线程连接和断开连接的页面越来越多，<code class="calibre11">connectedPorts</code>集合中会受到死端口的污染，没有办法识别它们。一个解决方案是在<code class="calibre11">beforeunload</code>事件即将销毁页面时，明确发送卸载消息，让共享线程有机会清除死端口。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0195.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0197.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

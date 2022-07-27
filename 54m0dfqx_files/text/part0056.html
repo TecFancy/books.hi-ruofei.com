@@ -1,0 +1,589 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0055.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0057.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_155" class="calibre9">7.2 迭代器模式</h2>
+        <p class="calibre1">
+          <strong class="calibre2">迭代器模式</strong>（特别是在ECMAScript这个语境下）描述了一个方案，即可以把有些结构称为“可迭代对象”（iterable），因为它们实现了正式的<code class="calibre11">Iterable</code>接口，而且可以通过迭代器<code class="calibre11">Iterator</code>消费。</p>
+        <p class="calibre1">可迭代对象是一种抽象的说法。基本上，可以把可迭代对象理解成数组或集合这样的集合类型的对象。它们包含的元素都是有限的，而且都具有无歧义的遍历顺序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 数组的元素是有限的
+// 递增索引可以按序访问每个元素
+let arr = [3, 1, 4];
+
+// 集合的元素是有限的
+// 可以按插入顺序访问每个元素
+let set = new set().add(3).add(1).add(4);</code></pre>
+        <p class="calibre1">不过，可迭代对象不一定是集合对象，也可以是仅仅具有类似数组行为的其他数据结构，比如本章开头提到的计数循环。该循环中生成的值是暂时性的，但循环本身是在执行迭代。计数循环和数组都具有可迭代对象的行为。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            临时性可迭代对象可以实现为生成器，本章后面会讨论。</p>
+        </blockquote>
+        <p class="calibre1">任何实现<code class="calibre11">Iterable</code>接口的数据结构都可以被实现<code class="calibre11">Iterator</code>接口的结构“消费”（consume）。<strong class="calibre2">迭代器</strong>（iterator）是按需创建的一次性对象。每个迭代器都会关联一个<strong class="calibre2">可迭代对象</strong>，而迭代器会暴露迭代其关联可迭代对象的API。迭代器无须了解与其关联的可迭代对象的结构，只需要知道如何取得连续的值。这种概念上的分离正是<code class="calibre11">Iterable</code>和<code class="calibre11">Iterator</code>的强大之处。</p>
+        <h3 id="nav_point_156" class="calibre15">7.2.1 可迭代协议</h3>
+        <p class="calibre1">实现<code class="calibre11">Iterable</code>接口（可迭代协议）要求同时具备两种能力：支持迭代的自我识别能力和创建实现<code class="calibre11">Iterator</code>接口的对象的能力。在ECMAScript中，这意味着必须暴露一个属性作为“默认迭代器”，而且这个属性必须使用特殊的<code class="calibre11">Symbol.iterator</code>作为键。这个默认迭代器属性必须引用一个迭代器工厂函数，调用这个工厂函数必须返回一个新迭代器。</p>
+        <p class="calibre1">很多内置类型都实现了<code class="calibre11">Iterable</code>接口：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">字符串</li>
+          <li class="di_1ji_wu_xu_lie_biao">数组</li>
+          <li class="di_1ji_wu_xu_lie_biao">映射</li>
+          <li class="di_1ji_wu_xu_lie_biao">集合</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">arguments</code>对象</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeList</code>等DOM集合类型</li>
+        </ul>
+        <p class="calibre1">检查是否存在默认迭代器属性可以暴露这个工厂函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 1;
+let obj = {};
+
+// 这两种类型没有实现迭代器工厂函数
+console.log(num[symbol.iterator]); // undefined
+console.log(obj[symbol.iterator]); // undefined
+
+let str = 'abc';
+let arr = ['a', 'b', 'c'];
+let map = new map().set('a', 1).set('b', 2).set('c', 3);
+let set = new set().add('a').add('b').add('c');
+let els = document.queryselectorall('div');
+
+// 这些类型都实现了迭代器工厂函数
+console.log(str[symbol.iterator]); // f values() { [native code] }
+console.log(arr[symbol.iterator]); // f values() { [native code] }
+console.log(map[symbol.iterator]); // f values() { [native code] }
+console.log(set[symbol.iterator]); // f values() { [native code] }
+console.log(els[symbol.iterator]); // f values() { [native code] }
+
+// 调用这个工厂函数会生成一个迭代器
+console.log(str[symbol.iterator]()); // stringiterator {}
+console.log(arr[symbol.iterator]()); // arrayiterator {}
+console.log(map[symbol.iterator]()); // mapiterator {}
+console.log(set[symbol.iterator]()); // setiterator {}
+console.log(els[symbol.iterator]()); // arrayiterator {}</code></pre>
+        <p class="calibre1">实际写代码过程中，不需要显式调用这个工厂函数来生成迭代器。实现可迭代协议的所有类型都会自动兼容接收可迭代对象的任何语言特性。接收可迭代对象的原生语言特性包括：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">for-of</code>循环</li>
+          <li class="di_1ji_wu_xu_lie_biao">数组解构</li>
+          <li class="di_1ji_wu_xu_lie_biao">扩展操作符</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Array.from()</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">创建集合</li>
+          <li class="di_1ji_wu_xu_lie_biao">创建映射</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Promise.all()</code>接收由期约组成的可迭代对象</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Promise.race()</code>接收由期约组成的可迭代对象</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">yield*</code>操作符，在生成器中使用</li>
+        </ul>
+        <p class="calibre1">这些原生语言结构会在后台调用提供的可迭代对象的这个工厂函数，从而创建一个迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = ['foo', 'bar', 'baz'];
+
+// for-of循环
+for (let el of arr) {
+  console.log(el);
+}
+// foo
+// bar
+// baz
+
+// 数组解构
+let [a, b, c] = arr;
+console.log(a, b, c); // foo, bar, baz
+
+// 扩展操作符
+let arr2 = [...arr];
+console.log(arr2); // ['foo', 'bar', 'baz']
+
+// array.from()
+let arr3 = array.from(arr);
+console.log(arr3); // ['foo', 'bar', 'baz']
+
+// set构造函数
+let set = new set(arr);
+console.log(set); // set(3) {'foo', 'bar', 'baz'}
+
+// map构造函数
+let pairs = arr.map((x, i) =&gt; [x, i]);
+console.log(pairs); // [['foo', 0], ['bar', 1], ['baz', 2]]
+let map = new map(pairs);
+console.log(map); // map(3) { 'foo'=&gt;0, 'bar'=&gt;1, 'baz'=&gt;2 }</code></pre>
+        <p class="calibre1">如果对象原型链上的父类实现了<code class="calibre11">Iterable</code>接口，那这个对象也就实现了这个接口：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooarray extends array {}
+let fooarr = new fooarray('foo', 'bar', 'baz');
+
+for (let el of fooarr) {
+  console.log(el);
+}
+// foo
+// bar
+// baz</code></pre>
+        <h3 id="nav_point_157" class="calibre15">7.2.2 迭代器协议</h3>
+        <p class="calibre1">迭代器是一种一次性使用的对象，用于迭代与其关联的可迭代对象。迭代器API使用<code class="calibre11">next()</code>方法在可迭代对象中遍历数据。每次成功调用<code class="calibre11">next()</code>，都会返回一个<code class="calibre11">IteratorResult</code>对象，其中包含迭代器返回的下一个值。若不调用<code class="calibre11">next()</code>，则无法知道迭代器的当前位置。</p>
+        <p class="calibre1">
+          <code class="calibre11">next()</code>方法返回的迭代器对象<code class="calibre11">IteratorResult</code>包含两个属性：<code class="calibre11">done</code>和<code class="calibre11">value</code>。<code class="calibre11">done</code>是一个布尔值，表示是否还可以再次调用<code class="calibre11">next()</code>取得下一个值；<code class="calibre11">value</code>包含可迭代对象的下一个值（<code class="calibre11">done</code>为<code class="calibre11">false</code>），或者<code class="calibre11">undefined</code>（<code class="calibre11">done</code>为<code class="calibre11">true</code>）。<code class="calibre11">done: true</code>状态称为“耗尽”。可以通过以下简单的数组来演示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 可迭代对象
+let arr = ['foo', 'bar'];
+
+// 迭代器工厂函数
+console.log(arr[symbol.iterator]); // f values() { [native code] }
+
+// 迭代器
+let iter = arr[symbol.iterator]();
+console.log(iter); // arrayiterator {}
+
+// 执行迭代
+console.log(iter.next()); // { done: false, value: 'foo' }
+console.log(iter.next()); // { done: false, value: 'bar' }
+console.log(iter.next()); // { done: true, value: undefined }</code></pre>
+        <p class="calibre1">这里通过创建迭代器并调用<code class="calibre11">next()</code>方法按顺序迭代了数组，直至不再产生新值。迭代器并不知道怎么从可迭代对象中取得下一个值，也不知道可迭代对象有多大。只要迭代器到达<code class="calibre11">done: true</code>状态，后续调用<code class="calibre11">next()</code>就一直返回同样的值了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = ['foo'];
+let iter = arr[symbol.iterator]();
+console.log(iter.next()); // { done: false, value: 'foo' }
+console.log(iter.next()); // { done: true, value: undefined }
+console.log(iter.next()); // { done: true, value: undefined }
+console.log(iter.next()); // { done: true, value: undefined }</code></pre>
+        <p class="calibre1">每个迭代器都表示对可迭代对象的一次性有序遍历。不同迭代器的实例相互之间没有联系，只会独立地遍历可迭代对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = ['foo', 'bar'];
+let iter1 = arr[symbol.iterator]();
+let iter2 = arr[symbol.iterator]();
+
+console.log(iter1.next()); // { done: false, value: 'foo' }
+console.log(iter2.next()); // { done: false, value: 'foo' }
+console.log(iter2.next()); // { done: false, value: 'bar' }
+console.log(iter1.next()); // { done: false, value: 'bar' }</code></pre>
+        <p class="calibre1">迭代器并不与可迭代对象某个时刻的快照绑定，而仅仅是使用游标来记录遍历可迭代对象的历程。如果可迭代对象在迭代期间被修改了，那么迭代器也会反映相应的变化：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = ['foo', 'baz'];
+let iter = arr[symbol.iterator]();
+
+console.log(iter.next()); // { done: false, value: 'foo' }
+
+// 在数组中间插入值
+arr.splice(1, 0, 'bar');
+
+console.log(iter.next()); // { done: false, value: 'bar' }
+console.log(iter.next()); // { done: false, value: 'baz' }
+console.log(iter.next()); // { done: true, value: undefined }</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            迭代器维护着一个指向可迭代对象的引用，因此迭代器会阻止垃圾回收程序回收可迭代对象。</p>
+        </blockquote>
+        <p class="calibre1">“迭代器”的概念有时候容易模糊，因为它可以指通用的迭代，也可以指接口，还可以指正式的迭代器类型。下面的例子比较了一个显式的迭代器实现和一个原生的迭代器实现。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 这个类实现了可迭代接口（iterable）
+// 调用默认的迭代器工厂函数会返回
+// 一个实现迭代器接口（iterator）的迭代器对象
+class foo {
+  [symbol.iterator]() {
+    return {
+      next() {
+        return { done: false, value: 'foo' };
+      }
+    }
+  }
+}
+let f = new foo();
+
+// 打印出实现了迭代器接口的对象
+console.log(f[symbol.iterator]()); // { next: f() {} }
+
+// array类型实现了可迭代接口（iterable）
+// 调用array类型的默认迭代器工厂函数
+// 会创建一个arrayiterator的实例
+let a = new array();
+
+// 打印出arrayiterator的实例
+console.log(a[symbol.iterator]()); // array iterator {}</code></pre>
+        <h3 id="nav_point_158" class="calibre15">7.2.3 自定义迭代器</h3>
+        <p class="calibre1">与<code class="calibre11">Iterable</code>接口类似，任何实现<code class="calibre11">Iterator</code>接口的对象都可以作为迭代器使用。下面这个例子中的<code class="calibre11">Counter</code>类只能被迭代一定的次数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class counter {
+  // counter的实例应该迭代limit次
+  constructor(limit) {
+    this.count = 1;
+    this.limit = limit;
+  }
+
+  next() {
+    if (this.count &lt;= this.limit) {
+      return { done: false, value: this.count++ };
+    } else {
+      return { done: true, value: undefined };
+    }
+  }
+  [symbol.iterator]() {
+    return this;
+  }
+}
+
+let counter = new counter(3);
+
+for (let i of counter) {
+  console.log(i);
+}
+// 1
+// 2
+// 3</code></pre>
+        <p class="calibre1">这个类实现了<code class="calibre11">Iterator</code>接口，但不理想。这是因为它的每个实例只能被迭代一次：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let i of counter) { console.log(i); }
+// 1
+// 2
+// 3
+
+for (let i of counter) { console.log(i); }
+// (nothing logged)</code></pre>
+        <p class="calibre1">为了让一个可迭代对象能够创建多个迭代器，必须每创建一个迭代器就对应一个新计数器。为此，可以把计数器变量放到闭包里，然后通过闭包返回迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class counter {
+  constructor(limit) {
+    this.limit = limit;
+  }
+
+  [symbol.iterator]() {
+    let count = 1,
+        limit = this.limit;
+    return {
+      next() {
+        if (count &lt;= limit) {
+          return { done: false, value: count++ };
+        } else {
+          return { done: true, value: undefined };
+        }
+      }
+    };
+  }
+}
+
+let counter = new counter(3);
+
+for (let i of counter) { console.log(i); }
+// 1
+// 2
+// 3
+
+for (let i of counter) { console.log(i); }
+// 1
+// 2
+// 3</code></pre>
+        <p class="calibre1">每个以这种方式创建的迭代器也实现了<code class="calibre11">Iterable</code>接口。<code class="calibre11">Symbol.iterator</code>属性引用的工厂函数会返回相同的迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = ['foo', 'bar', 'baz'];
+let iter1 = arr[symbol.iterator]();
+
+console.log(iter1[symbol.iterator]);  // f values() { [native code] }
+
+let iter2 = iter1[symbol.iterator]();
+
+console.log(iter1 === iter2);         // true</code></pre>
+        <p class="calibre1">因为每个迭代器也实现了<code class="calibre11">Iterable</code>接口，所以它们可以用在任何期待可迭代对象的地方，比如<code class="calibre11">for-of</code>循环：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr = [3, 1, 4];
+let iter = arr[symbol.iterator]();
+
+for (let item of arr ) { console.log(item); }
+// 3
+// 1
+// 4
+
+for (let item of iter ) { console.log(item); }
+// 3
+// 1
+// 4</code></pre>
+        <h3 id="nav_point_159" class="calibre15">7.2.4 提前终止迭代器</h3>
+        <p class="calibre1">可选的<code class="calibre11">return()</code>方法用于指定在迭代器提前关闭时执行的逻辑。执行迭代的结构在想让迭代器知道它不想遍历到可迭代对象耗尽时，就可以“关闭”迭代器。可能的情况包括：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">for-of</code>循环通过<code class="calibre11">break</code>、<code class="calibre11">continue</code>、<code class="calibre11">return</code>或<code class="calibre11">throw</code>提前退出；</li>
+          <li class="di_1ji_wu_xu_lie_biao">解构操作并未消费所有值。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">return()</code>方法必须返回一个有效的<code class="calibre11">IteratorResult</code>对象。简单情况下，可以只返回<code class="calibre11">{ done: true }</code>。因为这个返回值只会用在生成器的上下文中，所以本章后面再讨论这种情况。</p>
+        <p class="calibre1">如下面的代码所示，内置语言结构在发现还有更多值可以迭代，但不会消费这些值时，会自动调用<code class="calibre11">return()</code>方法。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class counter {
+  constructor(limit) {
+    this.limit = limit;
+  }
+
+  [symbol.iterator]() {
+    let count = 1,
+      limit = this.limit;
+    return {
+      next() {
+        if (count &lt;= limit) {
+          return { done: false, value: count++ };
+        } else {
+          return { done: true };
+        }
+      },
+      return() {
+        console.log('exiting early');
+        return { done: true };
+      }
+    };
+  }
+}
+
+
+let counter1 = new counter(5);
+
+for (let i of counter1) {
+  if (i &gt; 2) {
+    break;
+  }
+  console.log(i);
+}
+// 1
+// 2
+// exiting early
+
+
+let counter2 = new counter(5);
+
+try {
+  for (let i of counter2) {
+    if (i &gt; 2) {
+      throw 'err';
+    }
+    console.log(i);
+  }
+} catch(e) {}
+// 1
+// 2
+// exiting early
+
+
+let counter3 = new counter(5);
+
+let [a, b] = counter3;
+// exiting early</code></pre>
+        <p class="calibre1">如果迭代器没有关闭，则还可以继续从上次离开的地方继续迭代。比如，数组的迭代器就是不能关闭的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let a = [1, 2, 3, 4, 5];
+let iter = a[symbol.iterator]();
+
+for (let i of iter) {
+  console.log(i);
+  if (i &gt; 2) {
+    break
+  }
+}
+// 1
+// 2
+// 3
+
+for (let i of iter) {
+  console.log(i);
+}
+// 4
+// 5</code></pre>
+        <p class="calibre1">因为<code class="calibre11">return()</code>方法是可选的，所以并非所有迭代器都是可关闭的。要知道某个迭代器是否可关闭，可以测试这个迭代器实例的<code class="calibre11">return</code>属性是不是函数对象。不过，仅仅给一个不可关闭的迭代器增加这个方法<strong class="calibre2">并不能</strong>让它变成可关闭的。这是因为调用<code class="calibre11">return()</code>不会强制迭代器进入关闭状态。即便如此，<code class="calibre11">return()</code>方法还是会被调用。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let a = [1, 2, 3, 4, 5];
+let iter = a[symbol.iterator]();
+
+iter.return = function() {
+  console.log('exiting early');
+  return { done: true };
+};
+
+for (let i of iter) {
+  console.log(i);
+  if (i &gt; 2) {
+    break
+  }
+}
+// 1
+// 2
+// 3
+// 提前退出
+
+for (let i of iter) {
+  console.log(i);
+}
+// 4
+// 5</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0055.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0057.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

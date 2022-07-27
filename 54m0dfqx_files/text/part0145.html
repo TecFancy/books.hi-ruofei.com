@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0144.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0146.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_454" class="calibre9">20.2 跨上下文消息</h2>
+        <p class="calibre1">
+          <strong class="calibre2">跨文档消息</strong>，有时候也简称为XDM（cross-document messaging），是一种在不同执行上下文（如不同工作线程或不同源的页面）间传递信息的能力。例如，www.wrox.com上的页面想要与包含在内嵌窗格中的p2p.wrox.com上面的页面通信。在XDM之前，要以安全方式实现这种通信需要很多工作。XDM以安全易用的方式规范化了这个功能。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            跨上下文消息用于窗口之间通信或工作线程之间通信。本节主要介绍使用<code class="calibre11">postMessage()</code>与其他窗口通信 。关于工作线程之间通信、<code class="calibre11">MessageChannel</code>和<code class="calibre11">BroadcastChannel</code>，可以参考第27章。</p>
+        </blockquote>
+        <p class="calibre1">XDM的核心是<code class="calibre11">postMessage()</code>方法。除了XDM，这个方法名还在HTML5中很多地方用到过，但目的都一样，都是把数据传送到另一个位置。</p>
+        <p class="calibre1">
+          <code class="calibre11">postMessage()</code>方法接收3个参数：消息、表示目标接收源的字符串和可选的可传输对象的数组（只与工作线程相关）。第二个参数对于安全非常重要，其可以限制浏览器交付数据的目标。下面来看一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let iframewindow = document.getelementbyid("myframe").contentwindow;
+iframewindow.postmessage("a secret", "http://www.wrox.com");</code></pre>
+        <p class="calibre1">最后一行代码尝试向内嵌窗格中发送一条消息，而且指定了源必须是<code class="calibre11">"http://www.wrox.com"</code>。如果源匹配，那么消息将会交付到内嵌窗格；否则，<code class="calibre11">postMessage()</code>什么也不做。这个限制可以保护信息不会因地址改变而泄露。如果不想限制接收目标，则可以给<code class="calibre11">postMessage()</code>的第二个参数传<code class="calibre11">"*"</code>，但不推荐这么做。</p>
+        <p class="calibre1">接收到XDM消息后，<code class="calibre11">window</code>对象上会触发<code class="calibre11">message</code>事件。这个事件是异步触发的，因此从消息发出到接收到消息（接收窗口触发<code class="calibre11">message</code>事件）可能有延迟。传给<code class="calibre11">onmessage</code>事件处理程序的<code class="calibre11">event</code>对象包含以下3方面重要信息。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">data</code>：作为第一个参数传递给<code class="calibre11">postMessage()</code>的字符串数据。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">origin</code>：发送消息的文档源，例如<code class="calibre11">"http://www.wrox.com"</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">source</code>：发送消息的文档中<code class="calibre11">window</code>对象的代理。这个代理对象主要用于在发送上一条消息的窗口中执行<code class="calibre11">postMessage()</code>方法。如果发送窗口有相同的源，那么这个对象应该就是<code class="calibre11">window</code>对象。</li>
+        </ul>
+        <p class="calibre1">接收消息之后验证发送窗口的源是非常重要的。与<code class="calibre11">postMessage()</code>的第二个参数可以保证数据不会意外传给未知页面一样，在<code class="calibre11">onmessage</code>事件处理程序中检查发送窗口的源可以保证数据来自正确的地方。基本的使用方式如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.addeventlistener("message", (event) =&gt; {
+  // 确保来自预期发送者
+  if (event.origin == "http://www.wrox.com") {
+
+    // 对数据进行一些处理
+    processmessage(event.data);
+    // 可选：向来源窗口发送一条消息
+    event.source.postmessage("received!", "http://p2p.wrox.com");
+  }
+});</code></pre>
+        <p class="calibre1">大多数情况下，<code class="calibre11">event.source</code>是某个<code class="calibre11">window</code>对象的代理，而非实际的<code class="calibre11">window</code>对象。因此不能通过它访问所有窗口下的信息。最好只使用<code class="calibre11">postMessage()</code>，这个方法永远存在而且可以调用。</p>
+        <p class="calibre1">XDM有一些怪异之处。首先，<code class="calibre11">postMessage()</code>的第一个参数的最初实现始终是一个字符串。后来，第一个参数改为允许任何结构的数据传入，不过并非所有浏览器都实现了这个改变。为此，最好就是只通过<code class="calibre11">postMessage()</code>发送字符串。如果需要传递结构化数据，那么最好先对该数据调用<code class="calibre11">JSON.stringify()</code>，通过<code class="calibre11">postMessage()</code>传过去之后，再在<code class="calibre11">onmessage</code>事件处理程序中调用<code class="calibre11">JSON.parse()</code>。</p>
+        <p class="calibre1">在通过内嵌窗格加载不同域时，使用XDM是非常方便的。这种方法在混搭（mashup）和社交应用中非常常用。通过使用XDM与内嵌窗格中的网页通信，可以保证包含页面的安全。XDM也可以用于同源页面之间通信。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0144.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0146.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,582 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0014.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0016.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_13" class="calibre9">1.2 JavaScript实现</h2>
+        <p class="calibre1">虽然JavaScript和ECMAScript基本上是同义词，但JavaScript远远不限于ECMA-262所定义的那样。没错，完整的JavaScript实现包含以下几个部分（见图1-1）：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">核心（ECMAScript）</li>
+          <li class="di_1ji_wu_xu_lie_biao">文档对象模型（DOM）</li>
+          <li class="di_1ji_wu_xu_lie_biao">浏览器对象模型（BOM）</li>
+        </ul>
+        <p class="calibre7"><img src="../images/00040.gif" alt="" width="50%" class="calibre14"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 1-1</strong>
+        </p>
+        <h3 id="nav_point_14" class="calibre15">1.2.1 ECMAScript</h3>
+        <p class="calibre1">
+          <strong class="calibre2">ECMAScript</strong>，即ECMA-262定义的语言，并不局限于Web浏览器。事实上，这门语言没有输入和输出之类的方法。ECMA-262将这门语言作为一个基准来定义，以便在它之上再构建更稳健的脚本语言。Web浏览器只是ECMAScript实现可能存在的一种<strong class="calibre2">宿主环境</strong>（host environment）。宿主环境提供ECMAScript的基准实现和与环境自身交互必需的扩展。扩展（比如DOM）使用ECMAScript核心类型和语法，提供特定于环境的额外功能。其他宿主环境还有服务器端JavaScript平台Node.js和即将被淘汰的Adobe Flash。</p>
+        <p class="calibre1">如果不涉及浏览器的话，ECMA-262到底定义了什么？在基本的层面，它描述这门语言的如下部分：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">语法</li>
+          <li class="di_1ji_wu_xu_lie_biao">类型</li>
+          <li class="di_1ji_wu_xu_lie_biao">语句</li>
+          <li class="di_1ji_wu_xu_lie_biao">关键字</li>
+          <li class="di_1ji_wu_xu_lie_biao">保留字</li>
+          <li class="di_1ji_wu_xu_lie_biao">操作符</li>
+          <li class="di_1ji_wu_xu_lie_biao">全局对象</li>
+        </ul>
+        <p class="calibre1">ECMAScript只是对实现这个规范描述的所有方面的一门语言的称呼。JavaScript实现了ECMAScript，而Adobe ActionScript同样也实现了ECMAScript。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">ECMAScript版本</strong>
+            </p>
+            <p class="calibre1">ECMAScript不同的版本以“edition”表示（也就是描述特定实现的ECMA-262的版本）。ECMA-262最近的版本是第10版，发布于2019年6月。ECMA-262的第1版本质上跟网景的JavaScript 1.1相同，只不过删除了所有浏览器特定的代码，外加少量细微的修改。ECMA-262要求支持Unicode标准（以支持多语言），而且对象要与平台无关（Netscape JavaScript 1.1的对象不是这样，比如它的<code class="calibre11">Date</code>对象就依赖平台）。这也是JavaScript 1.1和JavaScript 1.2不符合ECMA-262第1版要求的原因。</p>
+            <p class="calibre1">ECMA-262第2版只是做了一些编校工作，主要是为了更新之后严格符合ISO/IEC-16262的要求，并没有增减或改变任何特性。ECMAScript实现通常不使用第2版来衡量符合性（conformance）。</p>
+            <p class="calibre1">ECMA-262第3版第一次真正对这个标准进行更新，更新了字符串处理、错误定义和数值输出。此外还增加了对正则表达式、新的控制语句、<code class="calibre11">try</code>/<code class="calibre11">catch</code>异常处理的支持，以及为了更好地让标准国际化所做的少量修改。对很多人来说，这标志着ECMAScript作为一门真正的编程语言的时代终于到来了。</p>
+            <p class="calibre1">ECMA-262第4版是对这门语言的一次彻底修订。作为对JavaScript在Web上日益成功的回应，开发者开始修订ECMAScript以满足全球Web开发日益增长的需求。为此，Ecma T39再次被召集起来，以决定这门语言的未来。结果，他们制定的规范几乎在第3版基础上完全定义了一门新语言。第4版包括强类型变量、新语句和数据结构、真正的类和经典的继承，以及操作数据的新手段。</p>
+            <p class="calibre1">与此同时，TC39委员会的一个子委员会也提出了另外一份提案，叫作“ECMAScript 3.1”，只对这门语言进行了较少的改进。这个子委员会的人认为第4版对这门语言来说跳跃太大了。因此，他们提出了一个改动较小的提案，只要在现有JavaScript引擎基础上做一些增改就可以实现。最终，ES3.1子委员会赢得了TC39委员会的支持，ECMA-262第4版在正式发布之前被放弃。</p>
+            <p class="calibre1">ECMAScript 3.1变成了ECMA-262的第5版，于2009年12月3日正式发布。第5版致力于厘清第3版存在的歧义，也增加了新功能。新功能包括原生的解析和序列化JSON数据的<code class="calibre11">JSON</code>对象、方便继承和高级属性定义的方法，以及新的增强ECMAScript引擎解释和执行代码能力的严格模式。第5版在2011年6月发布了一个维护性修订版，这个修订版只更正了规范中的错误，并未增加任何新的语言或库特性。</p>
+            <p class="calibre1">ECMA-262第6版，俗称ES6、ES2015或ES Harmony（和谐版），于2015年6月发布。这一版包含了大概这个规范有史以来最重要的一批增强特性。ES6正式支持了类、模块、迭代器、生成器、箭头函数、期约、反射、代理和众多新的数据类型。</p>
+            <p class="calibre1">ECMA-262第7版，也称为ES7或ES2016，于2016年6月发布。这次修订只包含少量语法层面的增强，如<code class="calibre11">Array.prototype.includes</code>和指数操作符。</p>
+            <p class="calibre1">ECMA-262第8版，也称为ES8、ES2017，完成于2017年6月。这一版主要增加了异步函数（async/await）、<code class="calibre11">SharedArrayBuffer</code>及Atomics API，以及<code class="calibre11">Object.values()</code>/<code class="calibre11">Object.entries()</code>/<code class="calibre11">Object.getOwnPropertyDescriptors()</code>和字符串填充方法，另外明确支持对象字面量最后的逗号。</p>
+            <p class="calibre1">ECMA-262第9版，也称为ES9、ES2018，发布于2018年6月。这次修订包括异步迭代、剩余和扩展属性、一组新的正则表达式特性、<code class="calibre11">Promise finally()</code>，以及模板字面量修订。</p>
+            <p class="calibre1">ECMA-262第10版，也称为ES10、ES2019，发布于2019年6月。这次修订增加了<code class="calibre11">Array.prototype.flat()</code>/<code class="calibre11">flatMap()</code>、<code class="calibre11">String.prototype.trimStart()</code>/<code class="calibre11">trimEnd()</code>、<code class="calibre11">Object.fromEntries()</code>方法，以及<code class="calibre11">Symbol.prototype.description</code>属性，明确定义了<code class="calibre11">Function.prototype.toString()</code>的返回值并固定了<code class="calibre11">Array.prototype.sort()</code>的顺序。另外，这次修订解决了与JSON字符串兼容的问题，并定义了<code class="calibre11">catch</code>子句的可选绑定。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">ECMAScript符合性是什么意思</strong>
+            </p>
+            <p class="calibre1">ECMA-262阐述了什么是ECMAScript符合性。要成为ECMAScript实现，必须满足下列条件：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">支持ECMA-262中描述的所有“类型、值、对象、属性、函数，以及程序语法与语义”；</li>
+              <li class="di_1ji_wu_xu_lie_biao">支持Unicode字符标准。</li>
+            </ul>
+            <p class="calibre1">此外，符合性实现还可以满足下列要求。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">增加ECMA-262中未提及的“额外的类型、值、对象、属性和函数”。ECMA-262所说的这些额外内容主要指规范中未给出的新对象或对象的新属性。</li>
+              <li class="di_1ji_wu_xu_lie_biao">支持ECMA-262中没有定义的“程序和正则表达式语法”（意思是允许修改和扩展内置的正则表达式特性）。</li>
+            </ul>
+            <p class="calibre1">以上条件为实现开发者基于ECMAScript开发语言提供了极大的权限和灵活度，也是其广受欢迎的原因之一。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">浏览器对ECMAScript的支持</strong>
+            </p>
+            <p class="calibre1">1996年，Netscape Navigator 3发布时包含了JavaScript 1.1。JavaScript 1.1规范随后被提交给Ecma，作为对新的ECMA-262标准的建议。随着JavaScript迅速走红，网景非常愿意开发1.2版。可是有个问题：Ecma尚未接受网景的建议。</p>
+            <p class="calibre1">Netscape Navigator 3发布后不久，微软推出了IE3。IE的这个版本包含了JScript 1.0，本意是提供与JavaScript 1.1相同的功能。不过，由于缺少很多文档，而且还有不少重复性功能，JScript 1.0远远没有JavaScript 1.1那么强大。</p>
+            <p class="calibre1">JScript的再次更新出现在IE4中的JScript 3.0（2.0版是在Microsoft Internet Information Server 3.0中发布的，但从未包含在浏览器中）。微软发新闻稿称JScript 3.0是世界上第一门真正兼容Ecma标准的脚本语言。当时ECMA-262还没制定完成，因此JScript 3.0遭受了与JavaScript 1.2同样的命运，它同样没有遵守最终的ECMAScript标准。</p>
+            <p class="calibre1">网景又在Netscape Navigator 4.06中将其JavaScript版本升级到1.3，因此做到了与ECMA-262第1版完全兼容。JavaScript 1.3增加了对Unicode标准的支持，并做到了所有对象都与平台无关，同时保留了JavaScript 1.2所有的特性。</p>
+            <p class="calibre1">后来，当网景以Mozilla项目的名义向公众发布其源代码时，人们都期待Netscape Navigator 5中会包含JavaScript 1.4。可是，一个完全重新设计网景代码的激进决定导致了人们的希望落空。JavaScript 1.4只在Netscape Enterprise Server中作为服务器端语言发布了，从来就没有进入浏览器。</p>
+            <p class="calibre1">到了2008年，五大浏览器（IE、Firefox、Safari、Chrome和Opera）全部兼容ECMA-262第3版。IE8率先实现ECMA-262第5版，并在IE9中完整支持。Firefox 4很快也做到了。下表列出了主要的浏览器版本对ECMAScript的支持情况。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">浏览器</th>
+                <th class="calibre19">ECMAScript符合性</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Netscape Navigator 2</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Netscape Navigator 3</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Netscape Navigator 4~4.05</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Netscape Navigator 4.06~4.79</td>
+                <td class="calibre21">第1版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Netscape 6+（Mozilla 0.6.0+）</td>
+                <td class="calibre21">第3版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">IE3</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">IE4</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">IE5</td>
+                <td class="calibre21">第1版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">IE5.5~8</td>
+                <td class="calibre21">第3版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">IE9</td>
+                <td class="calibre21">第5版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">IE10~11</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Edge 12+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Opera 6~7.1</td>
+                <td class="calibre21">第2版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Opera 7.2+</td>
+                <td class="calibre21">第3版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Opera 15~28</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Opera 29~35</td>
+                <td class="calibre21">第6版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Opera 36+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Safari 1~2.0.<i class="calibre6">x</i>
+                </td>
+                <td class="calibre21">第3版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Safari 3.1~5.1</td>
+                <td class="calibre21">第5版（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Safari 6~8</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Safari 9+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">iOS Safari 3.2~5.1</td>
+                <td class="calibre21">第5版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">iOS Safari 6~8.4</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">iOS Safari 9.2+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Chrome 1~3</td>
+                <td class="calibre21">第3版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Chrome 4~22</td>
+                <td class="calibre21">第5版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Chrome 23+</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Chrome 42~48</td>
+                <td class="calibre21">第6版（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Chrome 49+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Firefox 1~2</td>
+                <td class="calibre21">第3版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Firefox 3.0.<i class="calibre6">x</i>~20</td>
+                <td class="calibre21">第5版（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Firefox 21~44</td>
+                <td class="calibre21">第5版</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Firefox 45+</td>
+                <td class="calibre21">第6版</td>
+              </tr>
+            </table>
+
+          </li>
+        </ol>
+        <h3 id="nav_point_15" class="calibre15">1.2.2 DOM</h3>
+        <p class="calibre1">
+          <strong class="calibre2">文档对象模型</strong>（DOM，Document Object Model）是一个应用编程接口（API），用于在HTML中使用扩展的XML。DOM将整个页面抽象为一组分层节点。HTML或XML页面的每个组成部分都是一种节点，包含不同的数据。比如下面的HTML页面：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;html&gt;
+    &lt;head&gt;
+        &lt;title&gt;sample page&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;p&gt; hello world!&lt;/p&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">这些代码通过DOM可以表示为一组分层节点，如图1-2所示。</p>
+        <p class="calibre7"><img src="../images/00055.gif" alt="" width="50%" class="calibre14"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 1-2</strong>
+        </p>
+        <p class="calibre1">DOM通过创建表示文档的树，让开发者可以随心所欲地控制网页的内容和结构。使用DOM API，可以轻松地删除、添加、替换、修改节点。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">为什么DOM是必需的</strong>
+            </p>
+            <p class="calibre1">在IE4和Netscape Navigator 4支持不同形式的动态HTML（DHTML）的情况下，开发者首先可以做到不刷新页面而修改页面外观和内容。这代表了Web技术的一个巨大进步，但也暴露了很大的问题。由于网景和微软采用不同思路开发DHTML，开发者写一个HTML页面就可以在任何浏览器中运行的好日子就此终结。</p>
+            <p class="calibre1">为了保持Web跨平台的本性，必须要做点什么。人们担心如果无法控制网景和微软各行其是，那么Web就会发生分裂，导致人们面向浏览器开发网页。就在这时，万维网联盟（W3C，World Wide Web Consortium）开始了制定DOM标准的进程。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">DOM级别</strong>
+            </p>
+            <p class="calibre1">1998年10月，DOM Level 1成为W3C的推荐标准。这个规范由两个模块组成：DOM Core和DOM HTML。前者提供了一种映射XML文档，从而方便访问和操作文档任意部分的方式；后者扩展了前者，并增加了特定于HTML的对象和方法。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                DOM并非只能通过JavaScript访问，而且确实被其他很多语言实现了。不过对于浏览器来说，DOM就是使用ECMAScript实现的，如今已经成为JavaScript语言的一大组成部分。</p>
+            </blockquote>
+            <p class="calibre1">DOM Level 1的目标是映射文档结构，而DOM Level 2的目标则宽泛得多。这个对最初DOM的扩展增加了对（DHTML早就支持的）鼠标和用户界面事件、范围、遍历（迭代DOM节点的方法）的支持，而且通过对象接口支持了层叠样式表（CSS）。另外，DOM Level 1中的DOM Core也被扩展以包含对XML命名空间的支持。</p>
+            <p class="calibre1">DOM Level 2新增了以下模块，以支持新的接口。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">DOM视图</strong>：描述追踪文档不同视图（如应用CSS样式前后的文档）的接口。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">DOM事件</strong>：描述事件及事件处理的接口。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">DOM样式</strong>：描述处理元素CSS样式的接口。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">DOM遍历和范围</strong>：描述遍历和操作DOM树的接口。</li>
+            </ul>
+            <p class="calibre1">DOM Level 3进一步扩展了DOM，增加了以统一的方式加载和保存文档的方法（包含在一个叫DOM Load and Save的新模块中），还有验证文档的方法（DOM Validation）。在Level 3中，DOM Core经过扩展支持了所有XML 1.0的特性，包括XML Infoset、XPath和XML Base。</p>
+            <p class="calibre1">目前，W3C不再按照Level来维护DOM了，而是作为DOM Living Standard来维护，其快照称为DOM4。DOM4新增的内容包括替代Mutation Events的Mutation Observers。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                在阅读关于DOM的资料时，你可能会看到DOM Level 0的说法。注意，并没有一个标准叫“DOM Level 0”，这只是DOM历史中的一个参照点。DOM Level 0可以看作IE4和Netscape Navigator 4中最初支持的DHTML。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">其他DOM</strong>
+            </p>
+            <p class="calibre1">除了DOM Core和DOM HTML接口，有些其他语言也发布了自己的DOM标准。下面列出的语言是基于XML的，每一种都增加了该语言独有的DOM方法和接口：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">可伸缩矢量图（SVG，Scalable Vector Graphics）</li>
+              <li class="di_1ji_wu_xu_lie_biao">数学标记语言（MathML，Mathematical Markup Language）</li>
+              <li class="di_1ji_wu_xu_lie_biao">同步多媒体集成语言（SMIL，Synchronized Multimedia Integration Language）</li>
+            </ul>
+            <p class="calibre1">此外，还有一些语言开发了自己的DOM实现，比如Mozilla的XML用户界面语言（XUL，XML User Interface Language）。不过，只有前面列表中的语言是W3C推荐标准。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Web浏览器对DOM的支持情况</strong>
+            </p>
+            <p class="calibre1">DOM标准在Web浏览器实现它之前就已经作为标准发布了。IE在第5版中尝试支持DOM，但直到5.5版才开始真正支持，该版本实现了DOM Level 1的大部分。IE在第6版和第7版中都没有实现新特性，第8版中修复了一些问题。</p>
+            <p class="calibre1">网景在Netscape 6（Mozilla 0.6.0）之前都不支持DOM。Netscape 7之后，Mozilla把开发资源转移到开发Firefox浏览器上。Firefox 3+支持全部的Level 1、几乎全部的Level 2，以及Level 3的某些部分。（Mozilla开发团队的目标是打造百分之百兼容标准的浏览器，他们的工作也得到了应有的回报。）</p>
+            <p class="calibre1">支持DOM是浏览器厂商的重中之重，每个版本发布都会改进支持度。下表展示了主流浏览器支持DOM的情况。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">浏览器</th>
+                <th class="calibre19">DOM兼容</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Netscape Navigator 1~4.<i class="calibre6">x</i>
+                </td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Netscape 6+（Mozilla 0.6.0+）</td>
+                <td class="calibre21">Level 1、Level 2（几乎全部）、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">IE2~4.<i class="calibre6">x</i>
+                </td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">IE5</td>
+                <td class="calibre21">Level 1（很少）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">IE5.5~8</td>
+                <td class="calibre21">Level 1（几乎全部）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">IE9+</td>
+                <td class="calibre21">Level 1、Level 2、Level 3</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Edge</td>
+                <td class="calibre21">Level 1、Level 2、Level 3</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Opera 1~6</td>
+                <td class="calibre21">—</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Opera 7~8.<i class="calibre6">x</i>
+                </td>
+                <td class="calibre21">Level 1（几乎全部）、Level 2（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Opera 9~9.9</td>
+                <td class="calibre21">Level 1、Level 2（几乎全部）、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Opera 10+</td>
+                <td class="calibre21">Level 1、Level 2、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Safari 1.0.<i class="calibre6">x</i>
+                </td>
+                <td class="calibre21">Level 1</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Safari 2+</td>
+                <td class="calibre21">Level 1、Level 2（部分）、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">iOS Safari 3.2+</td>
+                <td class="calibre21">Level 1、Level 2（部分）、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">Chrome 1+</td>
+                <td class="calibre21">Level 1、Level 2（部分）、Level 3（部分）</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">Firefox 1+</td>
+                <td class="calibre21">Level 1、Level 2（几乎全部）、Level 3（部分）</td>
+              </tr>
+            </table>
+
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                上表中兼容性的状态会随时间而变化，其中的内容仅反映本书写作时的状态。</p>
+            </blockquote>
+          </li>
+        </ol>
+        <h3 id="nav_point_16" class="calibre15">1.2.3 BOM</h3>
+        <p class="calibre1">IE3和Netscape Navigator 3提供了<strong class="calibre2">浏览器对象模型</strong>（BOM） API，用于支持访问和操作浏览器的窗口。使用BOM，开发者可以操控浏览器显示页面之外的部分。而BOM真正独一无二的地方，当然也是问题最多的地方，就是它是唯一一个没有相关标准的JavaScript实现。HTML5改变了这个局面，这个版本的HTML以正式规范的形式涵盖了尽可能多的BOM特性。由于HTML5的出现，之前很多与BOM有关的问题都迎刃而解了。</p>
+        <p class="calibre1">总体来说，BOM主要针对浏览器窗口和子窗口（frame），不过人们通常会把任何特定于浏览器的扩展都归在BOM的范畴内。比如，下面就是这样一些扩展：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">弹出新浏览器窗口的能力；</li>
+          <li class="di_1ji_wu_xu_lie_biao">移动、缩放和关闭浏览器窗口的能力；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">navigator</code>对象，提供关于浏览器的详尽信息；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">location</code>对象，提供浏览器加载页面的详尽信息；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">screen</code>对象，提供关于用户屏幕分辨率的详尽信息；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">performance</code>对象，提供浏览器内存占用、导航行为和时间统计的详尽信息；</li>
+          <li class="di_1ji_wu_xu_lie_biao">对cookie的支持；</li>
+          <li class="di_1ji_wu_xu_lie_biao">其他自定义对象，如<code class="calibre11">XMLHttpRequest</code>和IE的<code class="calibre11">ActiveXObject</code>。</li>
+        </ul>
+        <p class="calibre1">因为在很长时间内都没有标准，所以每个浏览器实现的都是自己的BOM。有一些所谓的事实标准，比如对于<code class="calibre11">window</code>对象和<code class="calibre11">navigator</code>对象，每个浏览器都会给它们定义自己的属性和方法。现在有了HTML5，BOM的实现细节应该会日趋一致。关于BOM，本书会在第12章再专门详细介绍。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0014.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0016.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

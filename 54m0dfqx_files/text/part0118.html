@@ -1,0 +1,628 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0117.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0119.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_352" class="calibre9">16.2 样式</h2>
+        <p class="calibre1">HTML中的样式有3种定义方式：外部样式表（通过<code class="calibre11">&lt;link&gt;</code>元素）、文档样式表（使用<code class="calibre11">&lt;style&gt;</code>元素）和元素特定样式（使用<code class="calibre11">style</code>属性）。DOM2 Style为这3种应用样式的机制都提供了API。</p>
+        <h3 id="nav_point_353" class="calibre15">16.2.1 存取元素样式</h3>
+        <p class="calibre1">任何支持<code class="calibre11">style</code>属性的HTML元素在JavaScript中都会有一个对应的<code class="calibre11">style</code>属性。这个<code class="calibre11">style</code>属性是<code class="calibre11">CSSStyleDeclaration</code>类型的实例，其中包含通过HTML
+          <code class="calibre11">style</code>属性为元素设置的所有样式信息，但不包含通过层叠机制从文档样式和外部样式中继承来的样式。HTML
+          <code class="calibre11">style</code>属性中的CSS属性在JavaScript
+          <code class="calibre11">style</code>对象中都有对应的属性。因为CSS属性名使用连字符表示法（用连字符分隔两个单词，如<code class="calibre11">background-image</code>），所以在JavaScript中这些属性必须转换为驼峰大小写形式（如<code class="calibre11">backgroundImage</code>）。下表给出了几个常用的CSS属性与<code class="calibre11">style</code>对象中等价属性的对比。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">CSS属性</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">JavaScript属性</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">background-image</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">style.backgroundImage</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">color</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">style.color</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">display</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">style.display</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">font-family</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">style.fontFamily</code>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">大多数属性名会这样直接转换过来。但有一个CSS属性名不能直接转换，它就是<code class="calibre11">float</code>。因为<code class="calibre11">float</code>是JavaScript的保留字，所以不能用作属性名。DOM2 Style规定它在<code class="calibre11">style</code>对象中对应的属性应该是<code class="calibre11">cssFloat</code>。</p>
+        <p class="calibre1">任何时候，只要获得了有效DOM元素的引用，就可以通过JavaScript来设置样式。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let mydiv = document.getelementbyid("mydiv");
+
+// 设置背景颜色
+mydiv.style.backgroundcolor = "red";
+
+// 修改大小
+mydiv.style.width = "100px";
+mydiv.style.height = "200px";
+
+// 设置边框
+mydiv.style.border = "1px solid black";</code></pre>
+        <p class="calibre1">像这样修改样式时，元素的外观会自动更新。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在标准模式下，所有尺寸都必须包含单位。在混杂模式下，可以把<code class="calibre11">style.width</code>设置为<code class="calibre11">"20"</code>，相当于<code class="calibre11">"20px"</code>。如果是在标准模式下，把<code class="calibre11">style.width</code>设置为<code class="calibre11">"20"</code>会被忽略，因为没有单位。实践中，最好一直加上单位。</p>
+        </blockquote>
+        <p class="calibre1">通过<code class="calibre11">style</code>属性设置的值也可以通过<code class="calibre11">style</code>对象获取。比如下面的HTML：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="mydiv" style="background-color: blue; width: 10px; height: 25px"&gt;&lt;/div&gt;</code></pre>
+        <p class="calibre1">这个元素<code class="calibre11">style</code>属性的值可以像这样通过代码获取：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(mydiv.style.backgroundcolor);   // "blue"
+console.log(mydiv.style.width);             // "10px"
+console.log(mydiv.style.height);            // "25px"</code></pre>
+        <p class="calibre1">如果元素上没有<code class="calibre11">style</code>属性，则<code class="calibre11">style</code>对象包含所有可能的CSS属性的空值。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">DOM样式属性和方法</strong>
+            </p>
+            <p class="calibre1">DOM2 Style规范也在<code class="calibre11">style</code>对象上定义了一些属性和方法。这些属性和方法提供了元素<code class="calibre11">style</code>属性的信息并支持修改，列举如下。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cssText</code>，包含<code class="calibre11">style</code>属性中的CSS代码。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">length</code>，应用给元素的CSS属性数量。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">parentRule</code>，表示CSS信息的<code class="calibre11">CSSRule</code>对象（下一节会讨论<code class="calibre11">CSSRule</code>类型）。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">getPropertyCSSValue(<i class="calibre6">propertyName</i>)</code>，返回包含CSS属性<code class="calibre11">
+                  <i class="calibre6">propertyName</i>
+                </code>值的<code class="calibre11">CSSValue</code>对象（已废弃）。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">getPropertyPriority(<i class="calibre6">propertyName</i>)</code>，如果CSS属性<code class="calibre11">
+                  <i class="calibre6">propertyName</i>
+                </code>使用了<code class="calibre11">!important</code>则返回<code class="calibre11">"important"</code>，否则返回空字符串。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">getPropertyValue(<i class="calibre6">propertyName</i>)</code>，返回属性<code class="calibre11">
+                  <i class="calibre6">propertyName</i>
+                </code>的字符串值。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">item(<i class="calibre6">index</i>)</code>，返回索引为<code class="calibre11">
+                  <i class="calibre6">index</i>
+                </code>的CSS属性名。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">removeProperty(<i class="calibre6">propertyName</i>)</code>，从样式中删除CSS属性<code class="calibre11">
+                  <i class="calibre6">propertyName</i>
+                </code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">setProperty(<i class="calibre6">propertyName, value, priority</i>)</code>，设置CSS属性<code class="calibre11">
+                  <i class="calibre6">propertyName</i>
+                </code>的值为<code class="calibre11">
+                  <i class="calibre6">value</i>
+                </code>，<code class="calibre11">
+                  <i class="calibre6">priority</i>
+                </code>是<code class="calibre11">"important"</code>或空字符串。</li>
+            </ul>
+            <p class="calibre1">通过<code class="calibre11">cssText</code>属性可以存取样式的CSS代码。在读模式下，<code class="calibre11">cssText</code>返回<code class="calibre11">style</code>属性CSS代码在浏览器内部的表示。在写模式下，给<code class="calibre11">cssText</code>赋值会重写整个<code class="calibre11">style</code>属性的值，意味着之前通过<code class="calibre11">style</code>属性设置的属性都会丢失。比如，如果一个元素通过<code class="calibre11">style</code>属性设置了边框，而赋给<code class="calibre11">cssText</code>属性的值不包含边框，则元素的边框会消失。下面的例子演示了<code class="calibre11">cssText</code>的使用：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mydiv.style.csstext = "width: 25px; height: 100px; background-color: green";
+console.log(mydiv.style.csstext);</code></pre>
+            <p class="calibre1">设置<code class="calibre11">cssText</code>是一次性修改元素多个样式最快捷的方式，因为所有变化会同时生效。</p>
+            <p class="calibre1">
+              <code class="calibre11">length</code>属性是跟<code class="calibre11">item()</code>方法一起配套迭代CSS属性用的。此时，<code class="calibre11">style</code>对象实际上变成了一个集合，也可以用中括号代替<code class="calibre11">item()</code>取得相应位置的CSS属性名，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let i = 0, len = mydiv.style.length; i &lt; len; i++) {
+  console.log(mydiv.style[i]);   // 或者用mydiv.style.item(i)
+}</code></pre>
+            <p class="calibre1">使用中括号或者<code class="calibre11">item()</code>都可以取得相应位置的CSS属性名（<code class="calibre11">"background-color"</code>，不是<code class="calibre11">"backgroundColor"</code>）。这个属性名可以传给<code class="calibre11">getPropertyValue()</code>以取得属性的值，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let prop, value, i, len;
+for (i = 0, len = mydiv.style.length; i &lt; len; i++) {
+  prop = mydiv.style[i];   // 或者用mydiv.style.item(i)
+  value = mydiv.style.getpropertyvalue(prop);
+  console.log(`prop: ${value}`);
+}</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">getPropertyValue()</code>方法返回CSS属性值的字符串表示。如果需要更多信息，则可以通过<code class="calibre11">getPropertyCSSValue()</code>获取<code class="calibre11">CSSValue</code>对象。这个对象有两个属性：<code class="calibre11">cssText</code>和<code class="calibre11">cssValueType</code>。前者的值与<code class="calibre11">getPropertyValue()</code>方法返回的值一样；后者是一个数值常量，表示当前值的类型（<code class="calibre11">0</code>代表继承的值，<code class="calibre11">1</code>代表原始值，<code class="calibre11">2</code>代表列表，<code class="calibre11">3</code>代表自定义值）。<span class="zhu_shi_bian_hao">1</span>下面的代码演示了如何输出CSS属性值和值类型：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let prop, value, i, len;
+for (i = 0, len = mydiv.style.length; i &lt; len; i++) {
+  prop = mydiv.style[i];   // alternately, mydiv.style.item(i)
+  value = mydiv.style.getpropertycssvalue(prop);
+  console.log(`prop: ${value.csstext} (${value.cssvaluetype})`);
+}</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">removeProperty()</code>方法用于从元素样式中删除指定的CSS属性。使用这个方法删除属性意味着会应用该属性的默认（从其他样式表层叠继承的）样式。例如，可以像下面这样删除<code class="calibre11">style</code>属性中设置的<code class="calibre11">border</code>样式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mydiv.style.removeproperty("border");</code></pre>
+            <p class="calibre1">在不确定给定CSS属性的默认值是什么的时候，可以使用这个方法。只要从style属性中删除，就可以使用默认值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">计算样式</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">style</code>对象中包含支持<code class="calibre11">style</code>属性的元素为这个属性设置的样式信息，但不包含从其他样式表层叠继承的同样影响该元素的样式信息。DOM2 Style在<code class="calibre11">document.defaultView</code>上增加了<code class="calibre11">getComputedStyle()</code>方法。这个方法接收两个参数：要取得计算样式的元素和伪元素字符串（如<code class="calibre11">":after"</code>）。如果不需要查询伪元素，则第二个参数可以传<code class="calibre11">null</code>。<code class="calibre11">getComputedStyle()</code>方法返回一个<code class="calibre11">CSSStyleDeclaration</code>对象（与<code class="calibre11">style</code>属性的类型一样），包含元素的计算样式。假设有如下HTML页面：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;computed styles example&lt;/title&gt;
+  &lt;style type="text/css"&gt;
+    #mydiv {
+      background-color: blue;
+      width: 100px;
+      height: 200px;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="mydiv" style="background-color: red; border: 1px solid black"&gt;&lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            <p class="calibre1">这里的<code class="calibre11">&lt;div&gt;</code>元素从文档样式表（<code class="calibre11">&lt;style&gt;</code>元素）和自己的<code class="calibre11">style</code>属性获取了样式。此时，这个元素的<code class="calibre11">style</code>对象中包含<code class="calibre11">backgroundColor</code>和<code class="calibre11">border</code>属性，但不包含（通过样式表规则应用的）<code class="calibre11">width</code>和<code class="calibre11">height</code>属性。下面的代码从这个元素获取了计算样式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let mydiv = document.getelementbyid("mydiv");
+let computedstyle = document.defaultview.getcomputedstyle(mydiv, null);
+
+console.log(computedstyle.backgroundcolor);  // "red"
+console.log(computedstyle.width);            // "100px"
+console.log(computedstyle.height);           // "200px"
+console.log(computedstyle.border);           // "1px solid black"（在某些浏览器中）</code></pre>
+            <p class="calibre1">在取得这个元素的计算样式时，得到的背景颜色是<code class="calibre11">"red"</code>，宽度为<code class="calibre11">"100px"</code>，高度为<code class="calibre11">"200px"</code>。背景颜色不是<code class="calibre11">"blue"</code>，因为元素样式覆盖了它。<code class="calibre11">border</code>属性不一定返回样式表中实际的<code class="calibre11">border</code>规则（某些浏览器会）。这种不一致性是因浏览器解释简写样式的方式造成的，比如<code class="calibre11">border</code>实际上会设置一组别的属性。在设置<code class="calibre11">border</code>时，实际上设置的是4条边的线条宽度、颜色和样式（<code class="calibre11">border-left-width</code>、<code class="calibre11">border-top-color</code>、<code class="calibre11">border-bottom-style</code>等）。因此，即使<code class="calibre11">computedStyle.border</code>在所有浏览器中都不会返回值，<code class="calibre11">computedStyle.borderLeftWidth</code>也一定会返回值。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                浏览器虽然会返回样式值，但返回值的格式不一定相同。比如，Firefox和Safari会把所有颜色值转换为RGB格式（如红色会变成<code class="calibre11">rgb(255,0,0)</code>），而Opera把所有颜色转换为十六进制表示法（如红色会变成<code class="calibre11">#ff0000</code>）。因此在使用<code class="calibre11">getComputedStyle()</code>时一定要多测试几个浏览器。</p>
+            </blockquote>
+            <p class="calibre1">关于计算样式要记住一点，在所有浏览器中计算样式都是只读的，不能修改<code class="calibre11">getComputedStyle()</code>方法返回的对象。而且，计算样式还包含浏览器内部样式表中的信息。因此有默认值的CSS属性会出现在计算样式里。例如，<code class="calibre11">visibility</code>属性在所有浏览器中都有默认值，但这个值因实现而不同。有些浏览器会把<code class="calibre11">visibility</code>的默认值设置为<code class="calibre11">"visible"</code>，而另一些将其设置为<code class="calibre11">"inherit"</code>。不能假设CSS属性的默认值在所有浏览器中都一样。如果需要元素具有特定的默认值，那么一定要在样式表中手动指定。</p>
+          </li>
+        </ol>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">1</span>不过，<code class="calibre11">getPropertyCSSValue()</code>方法已经被废弃，虽然可能有浏览器还支持，但随时有可能被删除。建议开发中使用<code class="calibre11">getPropertyValue()</code>。——译者注</p>
+        <h3 id="nav_point_354" class="calibre15">16.2.2 操作样式表</h3>
+        <p class="calibre1">
+          <code class="calibre11">CSSStyleSheet</code>类型表示CSS样式表，包括使用<code class="calibre11">&lt;link&gt;</code>元素和通过<code class="calibre11">&lt;style&gt;</code>元素定义的样式表。注意，这两个元素本身分别是<code class="calibre11">HTMLLinkElement</code>和<code class="calibre11">HTMLStyleElement</code>。<code class="calibre11">CSSStyleSheet</code>类型是一个通用样式表类型，可以表示以任何方式在HTML中定义的样式表。另外，元素特定的类型允许修改HTML属性，而<code class="calibre11">CSSStyleSheet</code>类型的实例则是一个只读对象（只有一个属性例外）。</p>
+        <p class="calibre1">
+          <code class="calibre11">CSSStyleSheet</code>类型继承<code class="calibre11">StyleSheet</code>，后者可用作非CSS样式表的基类。以下是<code class="calibre11">CSSStyleSheet</code>从<code class="calibre11">StyleSheet</code>继承的属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">disabled</code>，布尔值，表示样式表是否被禁用了（这个属性是可读写的，因此将它设置为<code class="calibre11">true</code>会禁用样式表）。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">href</code>，如果是使用<code class="calibre11">&lt;link&gt;</code>包含的样式表，则返回样式表的URL，否则返回<code class="calibre11">null</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">media</code>，样式表支持的媒体类型集合，这个集合有一个<code class="calibre11">length</code>属性和一个<code class="calibre11">item()</code>方法，跟所有DOM集合一样。同样跟所有DOM集合一样，也可以使用中括号访问集合中特定的项。如果样式表可用于所有媒体，则返回空列表。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">ownerNode</code>，指向拥有当前样式表的节点，在HTML中要么是<code class="calibre11">&lt;link&gt;</code>元素要么是<code class="calibre11">&lt;style&gt;</code>元素（在XML中可以是处理指令）。如果当前样式表是通过<code class="calibre11">@import</code>被包含在另一个样式表中，则这个属性值为<code class="calibre11">null</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">parentStyleSheet</code>，如果当前样式表是通过<code class="calibre11">@import</code>被包含在另一个样式表中，则这个属性指向导入它的样式表。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">title</code>，<code class="calibre11">ownerNode</code>的<code class="calibre11">title</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">type</code>，字符串，表示样式表的类型。对CSS样式表来说，就是<code class="calibre11">"text/css"</code>。</li>
+        </ul>
+        <p class="calibre1">上述属性里除了<code class="calibre11">disabled</code>，其他属性都是只读的。除了上面继承的属性，<code class="calibre11">CSSStyleSheet</code>类型还支持以下属性和方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">cssRules</code>，当前样式表包含的样式规则的集合。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">ownerRule</code>，如果样式表是使用<code class="calibre11">@import</code>导入的，则指向导入规则；否则为<code class="calibre11">null</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteRule(<i class="calibre6">index</i>)</code>，在指定位置删除<code class="calibre11">cssRules</code>中的规则。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">insertRule(<i class="calibre6">rule</i>,
+              <i class="calibre6">index</i>)</code>，在指定位置向<code class="calibre11">cssRules</code>中插入规则。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">document.styleSheets</code>表示文档中可用的样式表集合。这个集合的<code class="calibre11">length</code>属性保存着文档中样式表的数量，而每个样式表都可以使用中括号或<code class="calibre11">item()</code>方法获取。来看这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let sheet = null;
+for (let i = 0, len = document.stylesheets.length; i &lt; len; i++) {
+  sheet = document.stylesheets[i];
+  console.log(sheet.href);
+}</code></pre>
+        <p class="calibre1">以上代码输出了文档中每个样式表的<code class="calibre11">href</code>属性（<code class="calibre11">&lt;style&gt;</code>元素没有这个属性）。</p>
+        <p class="calibre1">
+          <code class="calibre11">document.styleSheets</code>返回的样式表可能会因浏览器而异。所有浏览器都会包含<code class="calibre11">&lt;style&gt;</code>元素和<code class="calibre11">rel</code>属性设置为<code class="calibre11">"stylesheet"</code>的<code class="calibre11">&lt;link&gt;</code>元素。IE、Opera、Chrome也包含<code class="calibre11">rel</code>属性设置为<code class="calibre11">"alternate stylesheet"</code>的<code class="calibre11">&lt;link&gt;</code>元素。</p>
+        <p class="calibre1">通过<code class="calibre11">&lt;link&gt;</code>或<code class="calibre11">&lt;style&gt;</code>元素也可以直接获取<code class="calibre11">CSSStyleSheet</code>对象。DOM在这两个元素上暴露了<code class="calibre11">sheet</code>属性，其中包含对应的<code class="calibre11">CSSStyleSheet</code>对象。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">CSS规则</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">CSSRule</code>类型表示样式表中的一条规则。这个类型也是一个通用基类，很多类型都继承它，但其中最常用的是表示样式信息的<code class="calibre11">CSSStyleRule</code>（其他CSS规则还有<code class="calibre11">@import</code>、<code class="calibre11">@font-face</code>、<code class="calibre11">@page</code>和<code class="calibre11">@charset</code>等，不过这些规则很少需要使用脚本来操作）。以下是<code class="calibre11">CSSStyleRule</code>对象上可用的属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cssText</code>，返回整条规则的文本。这里的文本可能与样式表中实际的文本不一样，因为浏览器内部处理样式表的方式也不一样。Safari始终会把所有字母都转换为小写。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">parentRule</code>，如果这条规则被其他规则（如<code class="calibre11">@media</code>）包含，则指向包含规则，否则就是<code class="calibre11">null</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">parentStyleSheet</code>，包含当前规则的样式表。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">selectorText</code>，返回规则的选择符文本。这里的文本可能与样式表中实际的文本不一样，因为浏览器内部处理样式表的方式也不一样。这个属性在Firefox、Safari、Chrome和IE中是只读的，在Opera中是可以修改的。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">style</code>，返回<code class="calibre11">CSSStyleDeclaration</code>对象，可以设置和获取当前规则中的样式。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>，数值常量，表示规则类型。对于样式规则，它始终为<code class="calibre11">1</code>。</li>
+            </ul>
+            <p class="calibre1">在这些属性中，使用最多的是<code class="calibre11">cssText</code>、<code class="calibre11">selectorText</code>和<code class="calibre11">style</code>。<code class="calibre11">cssText</code>属性与<code class="calibre11">style.cssText</code>类似，不过并不完全一样。前者包含选择符文本和环绕样式声明的大括号，而后者则只包含样式声明（类似于元素上的<code class="calibre11">style.cssText</code>）。此外，<code class="calibre11">cssText</code>是只读的，而<code class="calibre11">style.cssText</code>可以被重写。</p>
+            <p class="calibre1">多数情况下，使用<code class="calibre11">style</code>属性就可以实现操作样式规则的任务了。这个对象可以像每个元素上的<code class="calibre11">style</code>对象一样，用来读取或修改规则的样式。比如下面这个CSS规则：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.box {
+  background-color: blue;
+  width: 100px;
+  height: 200px;
+}</code></pre>
+            <p class="calibre1">假设这条规则位于页面中的第一个样式表中，而且是该样式表中唯一一条CSS规则，则下列代码可以获取它的所有信息：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let sheet = document.stylesheets[0];
+let rules = sheet.cssrules || sheet.rules;  // 取得规则集合
+let rule = rules[0];                        // 取得第一条规则
+console.log(rule.selectortext);             // "div.box"
+console.log(rule.style.csstext);            // 完整的css代码
+console.log(rule.style.backgroundcolor);    // "blue"
+console.log(rule.style.width);              // "100px"
+console.log(rule.style.height);             // "200px"</code></pre>
+            <p class="calibre1">使用这些接口，可以像确定元素<code class="calibre11">style</code>对象中包含的样式一样，确定一条样式规则的样式信息。与元素的场景一样，也可以修改规则中的样式，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let sheet = document.stylesheets[0];
+let rules = sheet.cssrules || sheet.rules;  // 取得规则集合
+let rule = rules[0];                        // 取得第一条规则
+rule.style.backgroundcolor = "red"</code></pre>
+            <p class="calibre1">注意，这样修改规则会影响到页面上所有应用了该规则的元素。如果页面上有两个<code class="calibre11">&lt;div&gt;</code>元素有<code class="calibre11">"box"</code>类，则这两个元素都会受到这个修改的影响。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">创建规则</strong>
+            </p>
+            <p class="calibre1">DOM规定，可以使用<code class="calibre11">insertRule()</code>方法向样式表中添加新规则。这个方法接收两个参数：规则的文本和表示插入位置的索引值。下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">sheet.insertrule("body { background-color: silver }", 0);  // 使用dom方法</code></pre>
+            <p class="calibre1">这个例子插入了一条改变文档背景颜色的规则。这条规则是作为样式表的第一条规则（位置0）插入的，顺序对规则层叠是很重要的。</p>
+            <p class="calibre1">虽然可以这样添加规则，但随着要维护的规则增多，很快就会变得非常麻烦。这时候，更好的方式是使用第14章介绍的动态样式加载技术。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">删除规则</strong>
+            </p>
+            <p class="calibre1">支持从样式表中删除规则的DOM方法是<code class="calibre11">deleteRule()</code>，它接收一个参数：要删除规则的索引。要删除样式表中的第一条规则，可以这样做：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">sheet.deleterule(0);  // 使用dom方法</code></pre>
+            <p class="calibre1">与添加规则一样，删除规则并不是Web开发中常见的做法。考虑到可能影响CSS层叠的效果，删除规则时要慎重。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_355" class="calibre15">16.2.3 元素尺寸</h3>
+        <p class="calibre1">本节介绍的属性和方法并不是DOM2 Style规范中定义的，但与HTML元素的样式有关。DOM一直缺乏页面中元素实际尺寸的规定。IE率先增加了一些属性，向开发者暴露元素的尺寸信息。这些属性现在已经得到所有主流浏览器支持。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">偏移尺寸</strong>
+            </p>
+            <p class="calibre1">第一组属性涉及<strong class="calibre2">偏移尺寸</strong>（offset dimensions），包含元素在屏幕上占用的所有视觉空间。元素在页面上的视觉空间由其高度和宽度决定，包括所有内边距、滚动条和边框（但不包含外边距）。以下4个属性用于取得元素的偏移尺寸。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">offsetHeight</code>，元素在垂直方向上占用的像素尺寸，包括它的高度、水平滚动条高度（如果可见）和上、下边框的高度。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">offsetLeft</code>，元素左边框外侧距离包含元素左边框内侧的像素数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">offsetTop</code>，元素上边框外侧距离包含元素上边框内侧的像素数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">offsetWidth</code>，元素在水平方向上占用的像素尺寸，包括它的宽度、垂直滚动条宽度（如果可见）和左、右边框的宽度。</li>
+            </ul>
+            <p class="calibre1">其中，<code class="calibre11">offsetLeft</code>和<code class="calibre11">offsetTop</code>是相对于包含元素的，包含元素保存在<code class="calibre11">offsetParent</code>属性中。<code class="calibre11">offsetParent</code>不一定是<code class="calibre11">parentNode</code>。比如，<code class="calibre11">&lt;td&gt;</code>元素的<code class="calibre11">offsetParent</code>是作为其祖先的<code class="calibre11">&lt;table&gt;</code>元素，因为<code class="calibre11">&lt;table&gt;</code>是节点层级中第一个提供尺寸的元素。图16-1展示了这些属性代表的不同尺寸。</p>
+            <p class="calibre1"><img src="../images/00007.gif" alt="" width="70%" class="calibre39"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 16-1</strong>
+            </p>
+            <p class="calibre1">要确定一个元素在页面中的偏移量，可以把它的<code class="calibre11">offsetLeft</code>和<code class="calibre11">offsetTop</code>属性分别与<code class="calibre11">offsetParent</code>的相同属性相加，一直加到根元素。下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function getelementleft(element) {
+  let actualleft = element.offsetleft;
+  let current = element.offsetparent;
+
+  while (current !== null) {
+    actualleft += current.offsetleft;
+    current = current.offsetparent;
+  }
+
+  return actualleft;
+}
+
+function getelementtop(element) {
+  let actualtop = element.offsettop;
+  let current = element.offsetparent;
+
+  while (current !== null) {
+    actualtop += current.offsettop;
+    current = current.offsetparent;
+  }
+
+  return actualtop;
+}</code></pre>
+            <p class="calibre1">这两个函数使用<code class="calibre11">offsetParent</code>在DOM树中逐级上溯，将每一级的偏移属性相加，最终得到元素的实际偏移量。对于使用CSS布局的简单页面，这两个函数是很精确的。而对于使用表格和内嵌窗格的页面布局，它们返回的值会因浏览器不同而有所差异，因为浏览器实现这些元素的方式不同。一般来说，包含在<code class="calibre11">&lt;div&gt;</code>元素中所有元素都以<code class="calibre11">&lt;body&gt;</code>为其<code class="calibre11">offsetParent</code>，因此<code class="calibre11">getElementleft()</code>和<code class="calibre11">getElementTop()</code>返回的值与<code class="calibre11">offsetLeft</code>和<code class="calibre11">offsetTop</code>返回的值相同。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                所有这些偏移尺寸属性都是只读的，每次访问都会重新计算。因此，应该尽量减少查询它们的次数。比如把查询的值保存在局量中，就可以避免影响性能。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">客户端尺寸</strong>
+            </p>
+            <p class="calibre1">元素的<strong class="calibre2">客户端尺寸</strong>（client dimensions）包含元素内容及其内边距所占用的空间。客户端尺寸只有两个相关属性：<code class="calibre11">clientWidth</code>和<code class="calibre11">clientHeight</code>。其中，<code class="calibre11">clientWidth</code>是内容区宽度加左、右内边距宽度，<code class="calibre11">clientHeight</code>是内容区高度加上、下内边距高度。图16-2形象地展示了这两个属性。</p>
+            <p class="calibre1"><img src="../images/00003.gif" alt="" width="70%" class="calibre39"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 16-2</strong>
+            </p>
+            <p class="calibre1">客户端尺寸实际上就是元素内部的空间，因此不包含滚动条占用的空间。这两个属性最常用于确定浏览器视口尺寸，即检测<code class="calibre11">document.documentElement</code>的<code class="calibre11">clientWidth</code>和<code class="calibre11">clientHeight</code>。这两个属性表示视口（<code class="calibre11">&lt;html&gt;</code>或<code class="calibre11">&lt;body&gt;</code>元素）的尺寸。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                与偏移尺寸一样，客户端尺寸也是只读的，而且每次访问都会重新计算。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">滚动尺寸</strong>
+            </p>
+            <p class="calibre1">最后一组尺寸是<strong class="calibre2">滚动尺寸</strong>（scroll dimensions），提供了元素内容滚动距离的信息。有些元素，比如<code class="calibre11">&lt;html&gt;</code>无须任何代码就可以自动滚动，而其他元素则需要使用CSS的<code class="calibre11">overflow</code>属性令其滚动。滚动尺寸相关的属性有如下4个。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">scrollHeight</code>，没有滚动条出现时，元素内容的总高度。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">scrollLeft</code>，内容区左侧隐藏的像素数，设置这个属性可以改变元素的滚动位置。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">scrollTop</code>，内容区顶部隐藏的像素数，设置这个属性可以改变元素的滚动位置。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">scrollWidth</code>，没有滚动条出现时，元素内容的总宽度。</li>
+            </ul>
+            <p class="calibre1">图16-3展示了这些属性的含义。</p>
+            <p class="calibre1"><img src="../images/00052.gif" alt="" width="85%" class="calibre33"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 16-3</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">scrollWidth</code>和<code class="calibre11">scrollHeight</code>可以用来确定给定元素内容的实际尺寸。例如，<code class="calibre11">&lt;html&gt;</code>元素是浏览器中滚动视口的元素。因此，<code class="calibre11">document.documentElement.scrollHeight</code>就是整个页面垂直方向的总高度。</p>
+            <p class="calibre1">
+              <code class="calibre11">scrollWidth</code>和<code class="calibre11">scrollHeight</code>与<code class="calibre11">clientWidth</code>和<code class="calibre11">clientHeight</code>之间的关系在不需要滚动的文档上是分不清的。如果文档尺寸超过视口尺寸，则在所有主流浏览器中这两对属性都不相等，<code class="calibre11">scrollWidth</code>和<code class="calibre11">scollHeight</code>等于文档内容的宽度，而<code class="calibre11">clientWidth</code>和<code class="calibre11">clientHeight</code>等于视口的大小。</p>
+            <p class="calibre1">
+              <code class="calibre11">scrollLeft</code>和<code class="calibre11">scrollTop</code>属性可以用于确定当前元素滚动的位置，或者用于设置它们的滚动位置。元素在未滚动时，这两个属性都等于<code class="calibre11">0</code>。如果元素在垂直方向上滚动，则<code class="calibre11">scrollTop</code>会大于<code class="calibre11">0</code>，表示元素顶部不可见区域的高度。如果元素在水平方向上滚动，则<code class="calibre11">scrollLeft</code>会大于<code class="calibre11">0</code>，表示元素左侧不可见区域的宽度。因为这两个属性也是可写的，所以把它们都设置为<code class="calibre11">0</code>就可以重置元素的滚动位置。下面这个函数检测元素是不是位于顶部，如果不是则把它滚动回顶部：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function scrolltotop(element) {
+  if (element.scrolltop != 0) {
+    element.scrolltop = 0;
+  }
+}</code></pre>
+            <p class="calibre1">这个函数使用<code class="calibre11">scrollTop</code>获取并设置值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">确定元素尺寸</strong>
+            </p>
+            <p class="calibre1">浏览器在每个元素上都暴露了<code class="calibre11">getBoundingClientRect()</code>方法，返回一个<code class="calibre11">DOMRect</code>对象，包含6个属性：<code class="calibre11">left</code>、<code class="calibre11">top</code>、<code class="calibre11">right</code>、<code class="calibre11">bottom</code>、<code class="calibre11">height</code>和<code class="calibre11">width</code>。这些属性给出了元素在页面中相对于视口的位置。图16-4<span class="zhu_shi_bian_hao">2</span>展示了这些属性的含义。</p>
+            <p class="calibre1"><img src="../images/00044.jpeg" alt="" width="70%" class="calibre39"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 16-4</strong>
+            </p>
+          </li>
+        </ol>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">2</span>这张插图为译者补充，图片来源为MDN文档的<code class="calibre11">Element.getBoundingClientRect()</code>英文版页面。——译者注</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0117.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0119.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

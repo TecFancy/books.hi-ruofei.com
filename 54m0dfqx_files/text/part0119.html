@@ -1,0 +1,391 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0118.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0120.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_356" class="calibre9">16.3 遍历</h2>
+        <p class="calibre1">DOM2 Traversal and Range模块定义了两个类型用于辅助顺序遍历DOM结构。这两个类型——<code class="calibre11">NodeIterator</code>和<code class="calibre11">TreeWalker</code>——从某个起点开始执行对DOM结构的深度优先遍历。</p>
+        <p class="calibre1">如前所述，DOM遍历是对DOM结构的深度优先遍历，至少允许朝两个方向移动（取决于类型）。遍历以给定节点为根，不能在DOM中向上超越这个根节点。来看下面的HTML：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;example&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;p&gt;&lt;b&gt;hello&lt;/b&gt; world!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">这段代码构成的DOM树如图16-5所示。</p>
+        <p class="calibre7"><img src="../images/00035.gif" alt="" width="62%" class="calibre40"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 16-5</strong>
+        </p>
+        <p class="calibre1">其中的任何节点都可以成为遍历的根节点。比如，假设以<code class="calibre11">&lt;body&gt;</code>元素作为遍历的根节点，那么接下来是<code class="calibre11">&lt;p&gt;</code>元素、<code class="calibre11">&lt;b&gt;</code>元素和两个文本节点（都是<code class="calibre11">&lt;body&gt;</code>元素的后代）。但这个遍历不会到达<code class="calibre11">&lt;html&gt;</code>元素、<code class="calibre11">&lt;head&gt;</code>元素，或者其他不属于<code class="calibre11">&lt;body&gt;</code>元素子树的元素。而以<code class="calibre11">document</code>为根节点的遍历，则可以访问到文档中的所有节点。图16-6展示了以<code class="calibre11">document</code>为根节点的深度优先遍历。</p>
+        <p class="calibre7"><img src="../images/00028.gif" alt="" width="65%" class="calibre41"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 16-6</strong>
+        </p>
+        <p class="calibre1">从<code class="calibre11">document</code>开始，然后循序移动，第一个节点是<code class="calibre11">document</code>，最后一个节点是包含<code class="calibre11">" world!"</code>的文本节点。到达文档末尾最后那个文本节点后，遍历会在DOM树中反向回溯。此时，第一个访问的节点就是包含<code class="calibre11">" world!"</code>的文本节点，而最后一个是<code class="calibre11">document</code>节点本身。<code class="calibre11">NodeIterator</code>和<code class="calibre11">TreeWalker</code>都以这种方式进行遍历。</p>
+        <h3 id="nav_point_357" class="calibre15">16.3.1
+          <code class="calibre26">NodeIterator</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">NodeIterator</code>类型是两个类型中比较简单的，可以通过<code class="calibre11">document.createNodeIterator()</code>方法创建其实例。这个方法接收以下4个参数。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">root</code>，作为遍历根节点的节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">whatToShow</code>，数值代码，表示应该访问哪些节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">filter</code>，<code class="calibre11">NodeFilter</code>对象或函数，表示是否接收或跳过特定节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">entityReferenceExpansion</code>，布尔值，表示是否扩展实体引用。这个参数在HTML文档中没有效果，因为实体引用永远不扩展。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">whatToShow</code>参数是一个位掩码，通过应用一个或多个过滤器来指定访问哪些节点。这个参数对应的常量是在<code class="calibre11">NodeFilter</code>类型中定义的。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_ALL</code>，所有节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_ELEMENT</code>，元素节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_ATTRIBUTE</code>，属性节点。由于DOM的结构，因此实际上用不上。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_TEXT</code>，文本节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_CDATA_SECTION</code>，CData区块节点。不是在HTML页面中使用的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_ENTITY_REFERENCE</code>，实体引用节点。不是在HTML页面中使用的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_ENTITY</code>，实体节点。不是在HTML页面中使用的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_PROCESSING_INSTRUCTION</code>，处理指令节点。不是在HTML页面中使用的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_COMMENT</code>，注释节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_DOCUMENT</code>，文档节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_DOCUMENT_TYPE</code>，文档类型节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_DOCUMENT_FRAGMENT</code>，文档片段节点。不是在HTML页面中使用的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">NodeFilter.SHOW_NOTATION</code>，记号节点。不是在HTML页面中使用的。</li>
+        </ul>
+        <p class="calibre1">这些值除了<code class="calibre11">NodeFilter.SHOW_ALL</code>之外，都可以组合使用。比如，可以像下面这样使用按位或操作组合多个选项：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let whattoshow = nodefilter.show_element | nodefilter.show_text;</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">createNodeIterator()</code>方法的<code class="calibre11">filter</code>参数可以用来指定自定义<code class="calibre11">NodeFilter</code>对象，或者一个作为节点过滤器的函数。<code class="calibre11">NodeFilter</code>对象只有一个方法<code class="calibre11">acceptNode()</code>，如果给定节点应该访问就返回<code class="calibre11">NodeFilter.FILTER_ACCEPT</code>，否则返回<code class="calibre11">NodeFilter.FILTER_SKIP</code>。因为<code class="calibre11">NodeFilter</code>是一个抽象类型，所以不可能创建它的实例。只要创建一个包含<code class="calibre11">acceptNode()</code>的对象，然后把它传给<code class="calibre11">createNodeIterator()</code>就可以了。以下代码定义了只接收<code class="calibre11">&lt;p&gt;</code>元素的节点过滤器对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let filter = {
+  acceptnode(node) {
+    return node.tagname.tolowercase() == "p" ?
+         nodefilter.filter_accept :
+         nodefilter.filter_skip;
+  }
+};
+
+let iterator = document.createnodeiterator(root, nodefilter.show_element,
+                                           filter, false);</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">filter</code>参数还可以是一个函数，与<code class="calibre11">acceptNode()</code>的形式一样，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let filter = function(node) {
+    return node.tagname.tolowercase() == "p" ?
+         nodefilter.filter_accept :
+         nodefilter.filter_skip;
+};
+
+let iterator = document.createnodeiterator(root, nodefilter.show_element,
+                                           filter, false);</code></pre>
+        <p class="calibre1">通常，JavaScript会使用这种形式，因为更简单也更像普通JavaScript代码。如果不需要指定过滤器，则可以给这个参数传入<code class="calibre11">null</code>。</p>
+        <p class="calibre1">要创建一个简单的遍历所有节点的<code class="calibre11">NodeIterator</code>，可以使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let iterator = document.createnodeiterator(document, nodefilter.show_all,
+                                           null, false);</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">NodeIterator</code>的两个主要方法是<code class="calibre11">nextNode()</code>和<code class="calibre11">previousNode()</code>。<code class="calibre11">nextNode()</code>方法在DOM子树中以深度优先方式进前一步，而<code class="calibre11">previousNode()</code>则是在遍历中后退一步。创建<code class="calibre11">NodeIterator</code>对象的时候，会有一个内部指针指向根节点，因此第一次调用<code class="calibre11">nextNode()</code>返回的是根节点。当遍历到达DOM树最后一个节点时，<code class="calibre11">nextNode()</code>返回<code class="calibre11">null</code>。<code class="calibre11">previousNode()</code>方法也是类似的。当遍历到达DOM树最后一个节点时，调用<code class="calibre11">previousNode()</code>返回遍历的根节点后，再次调用也会返回<code class="calibre11">null</code>。</p>
+        <p class="calibre1">以下面的HTML片段为例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="div1"&gt;
+  &lt;p&gt;&lt;b&gt;hello&lt;/b&gt; world!&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;list item 1&lt;/li&gt;
+    &lt;li&gt;list item 2&lt;/li&gt;
+    &lt;li&gt;list item 3&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+        <p class="calibre1">假设想要遍历<code class="calibre11">&lt;div&gt;</code>元素内部的所有元素，那么可以使用如下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("div1");
+let iterator = document.createnodeiterator(div, nodefilter.show_element,
+                                           null, false);
+
+let node = iterator.nextnode();
+while (node !== null) {
+  console.log(node.tagname);     // 输出标签名
+  node = iterator.nextnode();
+}</code></pre>
+        <p class="calibre1">这个例子中第一次调用<code class="calibre11">nextNode()</code>返回<code class="calibre11">&lt;div&gt;</code>元素。因为<code class="calibre11">nextNode()</code>在遍历到达DOM子树末尾时返回<code class="calibre11">null</code>，所以这里通过<code class="calibre11">while</code>循环检测每次调用<code class="calibre11">nextNode()</code>的返回值是不是<code class="calibre11">null</code>。以上代码执行后会输出以下标签名：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div
+p
+b
+ul
+li
+li
+li</code></pre>
+        <p class="calibre1">如果只想遍历<code class="calibre11">&lt;li&gt;</code>元素，可以传入一个过滤器，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("div1");
+let filter = function(node) {
+  return node.tagname.tolowercase() == "li" ?
+    nodefilter.filter_accept :
+    nodefilter.filter_skip;
+};
+
+let iterator = document.createnodeiterator(div, nodefilter.show_element,
+       filter, false);
+
+let node = iterator.nextnode();
+while (node !== null) {
+  console.log(node.tagname);     // 输出标签名
+  node = iterator.nextnode();
+}</code></pre>
+        <p class="calibre1">在这个例子中，遍历只会输出<code class="calibre11">&lt;li&gt;</code>元素的标签。</p>
+        <p class="calibre1">
+          <code class="calibre11">nextNode()</code>和<code class="calibre11">previousNode()</code>方法共同维护<code class="calibre11">NodeIterator</code>对DOM结构的内部指针，因此修改DOM结构也会体现在遍历中。</p>
+        <h3 id="nav_point_358" class="calibre15">16.3.2
+          <code class="calibre26">TreeWalker</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">TreeWalker</code>是<code class="calibre11">NodeIterator</code>的高级版。除了包含同样的<code class="calibre11">nextNode()</code>、<code class="calibre11">previousNode()</code>方法，<code class="calibre11">TreeWalker</code>还添加了如下在DOM结构中向不同方向遍历的方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">parentNode()</code>，遍历到当前节点的父节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">firstChild()</code>，遍历到当前节点的第一个子节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">lastChild()</code>，遍历到当前节点的最后一个子节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">nextSibling()</code>，遍历到当前节点的下一个同胞节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">previousSibling()</code>，遍历到当前节点的上一个同胞节点。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">TreeWalker</code>对象要调用<code class="calibre11">document.createTreeWalker()</code>方法来创建，这个方法接收与<code class="calibre11">document.createNodeIterator()</code>同样的参数：作为遍历起点的根节点、要查看的节点类型、节点过滤器和一个表示是否扩展实体引用的布尔值。因为两者很类似，所以<code class="calibre11">TreeWalker</code>通常可以取代<code class="calibre11">NodeIterator</code>，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("div1");
+let filter = function(node) {
+  return node.tagname.tolowercase() == "li" ?
+    nodefilter.filter_accept :
+    nodefilter.filter_skip;
+};
+
+let walker = document.createtreewalker(div, nodefilter.show_element,
+                                       filter, false);
+
+let node = iterator.nextnode();
+while (node !== null) {
+  console.log(node.tagname);      // 输出标签名
+  node = iterator.nextnode();
+}</code></pre>
+        <p class="calibre1">不同的是，节点过滤器（<code class="calibre11">filter</code>）除了可以返回<code class="calibre11">NodeFilter.FILTER_ACCEPT</code>和<code class="calibre11">NodeFilter.FILTER_SKIP</code>，还可以返回<code class="calibre11">NodeFilter.FILTER_REJECT</code>。在使用<code class="calibre11">NodeIterator</code>时，<code class="calibre11">NodeFilter.FILTER_SKIP</code>和<code class="calibre11">NodeFilter.FILTER_REJECT</code>是一样的。但在使用<code class="calibre11">TreeWalker</code>时，<code class="calibre11">NodeFilter.FILTER_SKIP</code>表示跳过节点，访问子树中的下一个节点，而<code class="calibre11">NodeFilter.FILTER_REJECT</code>则表示跳过该节点以及该节点的整个子树。例如，如果把前面示例中的过滤器函数改为返回<code class="calibre11">NodeFilter.FILTER_REJECT</code>（而不是<code class="calibre11">NodeFilter.FILTER_SKIP</code>），则会导致遍历立即返回，不会访问任何节点。这是因为第一个返回的元素是<code class="calibre11">&lt;div&gt;</code>，其中标签名不是<code class="calibre11">"li"</code>，因此过滤函数返回<code class="calibre11">NodeFilter.FILTER_REJECT</code>，表示要跳过整个子树。因为<code class="calibre11">&lt;div&gt;</code>本身就是遍历的根节点，所以遍历会就此结束。</p>
+        <p class="calibre1">当然，<code class="calibre11">TreeWalker</code>真正的威力是可以在DOM结构中四处游走。如果不使用过滤器，单纯使用<code class="calibre11">TreeWalker</code>的漫游能力同样可以在DOM树中访问<code class="calibre11">&lt;li&gt;</code>元素，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("div1");
+let walker = document.createtreewalker(div, nodefilter.show_element, null, false);
+
+walker.firstchild();   // 前往&lt;p&gt;
+walker.nextsibling();  // 前往&lt;ul&gt;
+
+let node = walker.firstchild();  // 前往第一个&lt;li&gt;
+while (node !== null) {
+  console.log(node.tagname);
+  node = walker.nextsibling();
+}</code></pre>
+        <p class="calibre1">因为我们知道<code class="calibre11">&lt;li&gt;</code>元素在文档结构中的位置，所以可以直接定位过去。先使用<code class="calibre11">firstChild()</code>前往<code class="calibre11">&lt;p&gt;</code>元素，再通过<code class="calibre11">nextSibling()</code>前往<code class="calibre11">&lt;ul&gt;</code>元素，然后使用<code class="calibre11">firstChild()</code>到达第一个<code class="calibre11">&lt;li&gt;</code>元素。注意，此时的<code class="calibre11">TreeWalker</code>只返回元素（这是因为传给<code class="calibre11">createTreeWalker()</code>的第二个参数）。最后就可以使用<code class="calibre11">nextSibling()</code>访问每个<code class="calibre11">&lt;li&gt;</code>元素，直到再也没有元素，此时方法返回<code class="calibre11">null</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">TreeWalker</code>类型也有一个名为<code class="calibre11">currentNode</code>的属性，表示遍历过程中上一次返回的节点（无论使用的是哪个遍历方法）。可以通过修改这个属性来影响接下来遍历的起点，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let node = walker.nextnode();
+console.log(node === walker.currentnode);  // true
+walker.currentnode = document.body;        // 修改起点</code></pre>
+        <p class="calibre1">相比于<code class="calibre11">NodeIterator</code>，<code class="calibre11">TreeWalker</code>类型为遍历DOM提供了更大的灵活性。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0118.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0120.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,653 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0133.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0135.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_423" class="calibre9">18.4 WebGL</h2>
+        <p class="calibre1">WebGL是画布的3D上下文。与其他Web技术不同，WebGL不是W3C制定的标准，而是Khronos Group的标准。根据官网描述，“Khronos Group是非营利性、会员资助的联盟，专注于多平台和设备下并行计算、图形和动态媒体的无专利费开放标准”。Khronos Group也制定了其他图形API，包括作为浏览器中WebGL基础的OpenGL ES 2.0。</p>
+        <p class="calibre1">OpenGL这种3D图形语言很复杂，本书不会涉及过多相关概念。不过，要使用WebGL最好熟悉OpenGL ES 2.0，因为很多概念可以照搬过来。</p>
+        <p class="calibre1">本节假设读者了解OpenGL ES 2.0的基本概念，并简单介绍OpenGL ES 2.0在WebGL中实现的部分。要了解关于OpenGL的更多信息，可以访问OpenGL网站。另外，推荐一个WebGL教程网站：Learn WebGL。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            定型数组是在WebGL中执行操作的重要数据结构。第6章中讨论了定型数组。</p>
+        </blockquote>
+        <h3 id="nav_point_424" class="calibre15">18.4.1 WebGL上下文</h3>
+        <p class="calibre1">在完全支持的浏览器中，WebGL 2.0上下文的名字叫<code class="calibre11">"webgl2"</code>，WebGL 1.0上下文的名字叫<code class="calibre11">"webgl1"</code>。如果浏览器不支持WebGL，则尝试访问WebGL上下文会返回<code class="calibre11">null</code>。在使用上下文之前，应该先检测返回值是否存在：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let drawing = document.getelementbyid("drawing");
+
+// 确保浏览器支持&lt;canvas&gt;
+if (drawing.getcontext) {
+  let gl = drawing.getcontext("webgl");
+  if (gl){
+    // 使用webgl
+  }
+}</code></pre>
+        <p class="calibre1">这里把WebGL
+          <code class="calibre11">context</code>对象命名为<code class="calibre11">gl</code>。大多数WebGL应用和例子遵循这个约定，因为OpenGL ES 2.0方法和值通常以<code class="calibre11">"gl"</code>开头。这样可以让JavaScript代码看起来更接近OpenGL程序。</p>
+        <h3 id="nav_point_425" class="calibre15">18.4.2 WebGL基础</h3>
+        <p class="calibre1">取得WebGL上下文后，就可以开始3D绘图了。如前所述，因为WebGL是OpenGL ES 2.0的Web版，所以本节讨论的概念实际上是JavaScript所实现的OpenGL概念。</p>
+        <p class="calibre1">可以在调用<code class="calibre11">getContext()</code>取得WebGL上下文时指定一些选项。这些选项通过一个参数对象传入，选项就是参数对象的一个或多个属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">alpha</code>：布尔值，表示是否为上下文创建透明通道缓冲区，默认为<code class="calibre11">true</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">depth</code>：布尔值，表示是否使用16位深缓冲区，默认为<code class="calibre11">true</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">stencil</code>：布尔值，表示是否使用8位模板缓冲区，默认为<code class="calibre11">false</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">antialias</code>：布尔值，表示是否使用默认机制执行抗锯齿操作，默认为<code class="calibre11">true</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">premultipliedAlpha</code>：布尔值，表示绘图缓冲区是否预乘透明度值，默认为<code class="calibre11">true</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">preserveDrawingBuffer</code>：布尔值，表示绘图完成后是否保留绘图缓冲区，默认为<code class="calibre11">false</code>。建议在充分了解这个选项的作用后再自行修改，因为这可能会影响性能。</li>
+        </ul>
+        <p class="calibre1">可以像下面这样传入<code class="calibre11">options</code>对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let drawing = document.getelementbyid("drawing");
+
+// 确保浏览器支持&lt;canvas&gt;
+if (drawing.getcontext) {
+
+  let gl = drawing.getcontext("webgl", { alpha: false });
+  if (gl) {
+    // 使用webgl
+  }
+}</code></pre>
+        <p class="calibre1">这些上下文选项大部分适合开发高级功能。多数情况下，默认值就可以满足要求。</p>
+        <p class="calibre1">如果调用<code class="calibre11">getContext()</code>不能创建WebGL上下文，某些浏览器就会抛出错误。为此，最好把这个方法调用包装在<code class="calibre11">try</code>/<code class="calibre11">catch</code>块中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">insert iconmargin     [download]let drawing = document.getelementbyid("drawing"),
+  gl;
+
+// 确保浏览器支持&lt;canvas&gt;
+if (drawing.getcontext) {
+  try {
+    gl = drawing.getcontext("webgl");
+  } catch (ex) {
+    // 什么也不做
+  }
+  if (gl) {
+    // 使用webgl
+  } else {
+    alert("webgl context could not be created.");
+  }
+}</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">常量</strong>
+            </p>
+            <p class="calibre1">如果你熟悉OpenGL，那么可能知道用于操作的各种常量。这些常量在OpenGL中的名字以<code class="calibre11">GL_</code>开头。在WebGL中，<code class="calibre11">context</code>对象上的常量则不包含<code class="calibre11">GL_</code>前缀。例如，<code class="calibre11">GL_COLOR_BUFFER_BIT</code>常量在WebGL中要这样访问<code class="calibre11">gl.COLOR_BUFFER_BIT</code>。WebGL以这种方式支持大部分OpenGL常量（少数常量不支持）。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">方法命名</strong>
+            </p>
+            <p class="calibre1">OpenGL（同时也是WebGL）中的很多方法会包含相关的数据类型信息。接收不同类型和不同数量参数的方法，会通过方法名的后缀体现这些信息。表示参数数量的数字（1~4）在先，表示数据类型的字符串（“f”表示浮点数，“i”表示整数）在后。比如，<code class="calibre11">gl.uniform4f()</code>的意思是需要4个浮点数值参数，而<code class="calibre11">gl.uniform3i()</code>表示需要3个整数值参数。</p>
+            <p class="calibre1">还有很多方法接收数组，这类方法用字母“v”（vector）来表示。因此，<code class="calibre11">gl.uniform3iv()</code>就是要接收一个包含3个值的数组参数。在编写WebGL代码时，要记住这些约定。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">准备绘图</strong>
+            </p>
+            <p class="calibre1">准备使用WebGL上下文之前，通常需要先指定一种实心颜色清除<code class="calibre11">&lt;canvas&gt;</code>。为此，要调用<code class="calibre11">clearColor()</code>方法并传入4个参数，分别表示红、绿、蓝和透明度值。每个参数必须是0~1范围内的值，表示各个组件在最终颜色的强度。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">gl.clearcolor(0, 0, 0, 1);  // 黑色
+gl.clear(gl.color_buffer_bit);</code></pre>
+            <p class="calibre1">以上代码把清理颜色缓冲区的值设置为黑色，然后调用<code class="calibre11">clear()</code>方法，这个方法相当于OpenGL中的<code class="calibre11">glClear()</code>方法。参数<code class="calibre11">gl.COLOR_BUFFER_BIT</code>告诉WebGL使用之前定义的颜色填充画布。通常，所有绘图操作之前都需要先清除绘制区域。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">视口与坐标</strong>
+            </p>
+            <p class="calibre1">绘图前还要定义WebGL视口。默认情况下，视口使用整个<code class="calibre11">&lt;canvas&gt;</code>区域。要改变视口，可以调用<code class="calibre11">viewport()</code>方法并传入视口相对于<code class="calibre11">&lt;canvas&gt;</code>元素的<img src="../images/00080.gif" alt="x" class="calibre12"/>、<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标及宽度和高度。例如，以下代码表示要使用整个<code class="calibre11">&lt;canvas&gt;</code>元素：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">gl.viewport(0, 0, drawing.width,
+drawing.height);</code></pre>
+            <p class="calibre1">这个视口的坐标系统与网页中通常的坐标系统不一样。视口的<img src="../images/00080.gif" alt="x" class="calibre12"/>和<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标起点(0, 0)表示<code class="calibre11">&lt;canvas&gt;</code>元素的左下角，向上、向右增长可以用点(width–1, height–1)定义（见图18-14）。</p>
+            <p class="calibre1"><img src="../images/00043.gif" alt="" width="60%" class="calibre36"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 18-14</strong>
+            </p>
+            <p class="calibre1">知道如何定义视口就可以只使用<code class="calibre11">&lt;canvas&gt;</code>元素的一部分来绘图。比如下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 视口是&lt;canvas&gt; 左下角四分之一区域
+gl.viewport(0, 0, drawing.width/2, drawing.height/2);
+// 视口是&lt;canvas&gt; 左上角四分之一区域
+gl.viewport(0, drawing.height/2, drawing.width/2, drawing.height/2);
+// 视口是&lt;canvas&gt; 右下角四分之一区域
+gl.viewport(drawing.width/2, 0, drawing.width/2, drawing.height/2);</code></pre>
+            <p class="calibre1">定义视口的坐标系统与视口中的坐标系统不一样。在视口中，坐标原点(0, 0)是视口的中心点。左下角是(–1, –1)，右上角是(1, 1)，如图18-15所示。</p>
+            <p class="calibre1"><img src="../images/00022.gif" alt="" width="46%" class="calibre49"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 18-15</strong>
+            </p>
+            <p class="calibre1">如果绘图时使用了视口外部的坐标，则绘制结果会被视口剪切。例如，要绘制的形状有一个顶点在(1, 2)，则视口右侧的图形会被切掉。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">缓冲区</strong>
+            </p>
+            <p class="calibre1">在JavaScript中，顶点信息保存在定型数组中。要使用这些信息，必须先把它们转换为WebGL缓冲区。创建缓冲区要调用<code class="calibre11">gl.createBuffer()</code>方法，并使用<code class="calibre11">gl.bindBuffer()</code>方法将缓冲区绑定到WebGL上下文。绑定之后，就可以用数据填充缓冲区了。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let buffer = gl.createbuffer();
+gl.bindbuffer(gl.array_buffer, buffer);
+gl.bufferdata(gl.array_buffer, new float32array([0, 0.5, 1]), gl.static_draw);</code></pre>
+            <p class="calibre1">调用<code class="calibre11">gl.bindBuffer()</code>将<code class="calibre11">buffer</code>设置为上下文的当前缓冲区。然后，所有缓冲区操作都在<code class="calibre11">buffer</code>上直接执行。因此，调用<code class="calibre11">gl.bufferData()</code>虽然没有包含对<code class="calibre11">buffer</code>的直接引用，但仍然是在它上面执行的。上面最后一行代码使用一个<code class="calibre11">Float32Array</code>（通常把所有顶点信息保存在<code class="calibre11">Float32Array</code>中）初始化了<code class="calibre11">buffer</code>。如果想输出缓冲区内容，那么可以调用<code class="calibre11">drawElements()</code>方法并传入<code class="calibre11">gl.ELEMENT_ARRAY_BUFFER</code>。</p>
+            <p class="calibre1">
+              <code class="calibre11">gl.bufferData()</code>方法的最后一个参数表示如何使用缓冲区。这个参数可以是以下常量值。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.STATIC_DRAW</code>：数据加载一次，可以在多次绘制中使用。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.STREAM_DRAW</code>：数据加载一次，只能在几次绘制中使用。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.DYNAMIC_DRAW</code>：数据可以重复修改，在多次绘制中使用。</li>
+            </ul>
+            <p class="calibre1">除非是很有经验的OpenGL程序员，否则我们会对大多数缓冲区使用<code class="calibre11">gl.STATIC_DRAW</code>。</p>
+            <p class="calibre1">缓冲区会一直驻留在内存中，直到页面卸载。如果不再需要缓冲区，那么最好调用<code class="calibre11">gl.deleteBuffer()</code>方法释放其占用的内存：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">gl.deletebuffer(buffer);</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">错误</strong>
+            </p>
+            <p class="calibre1">与JavaScript多数情况下不同的是，在WebGL操作中通常不会抛出错误。必须在调用可能失败的方法后，调用<code class="calibre11">gl.getError()</code>方法。这个方法返回一个常量，表示发生的错误类型。下面列出了这些常量。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.NO_ERROR</code>：上一次操作没有发生错误（0值）。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.INVALID_ENUM</code>：上一次操作没有传入WebGL预定义的常量。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.INVALID_VALUE</code>：上一次操作需要无符号数值，但是传入了负数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.INVALID_OPERATION</code>：上一次操作在当前状态下无法完成。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.OUT_OF_MEMORY</code>：上一次操作因内存不足而无法完成。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.CONTEXT_LOST_WEBGL</code>：上一次操作因外部事件（如设备掉电）而丢失了WebGL上下文。</li>
+            </ul>
+            <p class="calibre1">每次调用<code class="calibre11">gl.getError()</code>方法会返回一个错误值。第一次调用之后，再调用<code class="calibre11">gl.getError()</code>可能会返回另一个错误值。如果有多个错误，则可以重复这个过程，直到<code class="calibre11">gl.getError()</code>返回<code class="calibre11">gl.NO_ERROR</code>。如果执行了多次操作，那么可以通过循环调用<code class="calibre11">getError()</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let errorcode = gl.geterror();
+while (errorcode) {
+  console.log("error occurred: " + errorcode);
+  errorcode = gl.geterror();
+}</code></pre>
+            <p class="calibre1">如果WebGL代码没有产出想要的输出结果，那么可以调用几次<code class="calibre11">getError()</code>，这样有可能帮你找到问题所在。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="7" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">着色器</strong>
+            </p>
+            <p class="calibre1">
+              <strong class="calibre2">着色器</strong>是OpenGL中的另一个概念。WebGL中有两种着色器：<strong class="calibre2">顶点着色器</strong>和<strong class="calibre2">片段</strong>（或像素）<strong class="calibre2">着色器</strong>。顶点着色器用于把3D顶点转换为可以渲染的2D点。片段着色器用于计算绘制一个像素的正确颜色。WebGL着色器的独特之处在于，它们不是JavaScript实现的，而是使用一种与C或JavaScript完全不同的语言GLSL（OpenGL Shading Language）写的。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">编写着色器</strong>
+                </p>
+                <p class="calibre1">GLSL是一种类似于C的语言，专门用于编写OpenGL着色器。因为WebGL是OpenGL ES 2的实现，所以OpenGL中的着色器可以直接在WebGL中使用。这样也可以让桌面应用更方便地移植到Web上。</p>
+                <p class="calibre1">每个着色器都有一个<code class="calibre11">main()</code>方法，在绘制期间会重复执行。给着色器传递数据的方式有两种：<code class="calibre11">attribute</code>和<code class="calibre11">uniform</code>。<code class="calibre11">attribute</code>用于将顶点传入顶点着色器，而<code class="calibre11">uniform</code>用于将常量值传入任何着色器。<code class="calibre11">attribute</code>和<code class="calibre11">uniform</code>是在<code class="calibre11">main()</code>函数外部定义的。在值类型关键字之后是数据类型，然后是变量名。下面是一个简单的顶点着色器的例子：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// opengl着色器语言
+// 着色器，摘自bartek drozdz的文章“get started with webgl—draw a square”
+attribute vec2 avertexposition;
+
+void main() {
+  gl_position = vec4(avertexposition, 0.0, 1.0);
+}</code></pre>
+                <p class="calibre1">这个顶点着色器定义了一个名为<code class="calibre11">aVertexPosition</code>的<code class="calibre11">attribute</code>。这个<code class="calibre11">attribute</code>是一个包含两项的数组（数据类型为<code class="calibre11">vec2</code>），代表<img src="../images/00080.gif" alt="x" class="calibre12"/>和<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标。即使只传入了两个坐标，顶点着色器返回的值也会包含4个元素，保存在变量<code class="calibre11">gl_Position</code>中。这个着色器创建了一个新的包含4项的数组（<code class="calibre11">vec4</code>），缺少的坐标会补充上，实际上是把2D坐标转换为了3D坐标。</p>
+                <p class="calibre1">片段着色器与顶点着色器类似，只不过是通过<code class="calibre11">uniform</code>传入数据。下面是一个片段着色器的例子：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// opengl着色器语言
+// 着色器，摘自bartek drozdz的文章“get started with webgl—draw a square”
+uniform vec4 ucolor;
+
+void main() {
+  gl_fragcolor = ucolor;
+}</code></pre>
+                <p class="calibre1">片段着色器必须返回一个值，保存到变量<code class="calibre11">gl_FragColor</code>中，这个值表示绘制时使用的颜色。这个着色器定义了一个<code class="calibre11">uniform</code>，包含颜色的4个组件（<code class="calibre11">vec4</code>），保存在<code class="calibre11">uColor</code>中。从代码上看，这个着色器只是把传入的值赋给了<code class="calibre11">gl_FragColor</code>。<code class="calibre11">uColor</code>的值在着色器内不能改变。</p>
+                <blockquote class="calibre13">
+                  <p class="calibre1">
+                    <strong class="calibre2">注意</strong>
+                    OpenGL着色器语言比示例中的代码要复杂，详细介绍需要整本书的篇幅。因此，本节只是从使用WebGL的角度对这门语言做个极其简单的介绍。要了解更多信息，可以参考Randi J. Rost的著作《OpenGL着色语言》。</p>
+                </blockquote>
+                <p class="calibre1"></p>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">创建着色器程序</strong>
+                </p>
+                <p class="calibre1">浏览器并不理解原生GLSL代码，因此GLSL代码的字符串必须经过编译并链接到一个着色器程序中。为便于使用，通常可以使用带有自定义<code class="calibre11">type</code>属性的<code class="calibre11">&lt;script&gt;</code>元素把着色器代码包含在网页中。如果<code class="calibre11">type</code>属性无效，则浏览器不会解析<code class="calibre11">&lt;script&gt;</code>的内容，但这并不妨碍读写其中的内容：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script type="x-webgl/x-vertex-shader" id="vertexshader"&gt;
+attribute vec2 avertexposition;
+
+void main() {
+  gl_position = vec4(avertexposition, 0.0, 1.0);
+}
+&lt;/script&gt;
+&lt;script type="x-webgl/x-fragment-shader" id="fragmentshader"&gt;
+uniform vec4 ucolor;
+
+void main() {
+  gl_fragcolor = ucolor;
+}
+&lt;/script&gt;</code></pre>
+                <p class="calibre1">然后可以使用<code class="calibre11">text</code>属性提取<code class="calibre11">&lt;script&gt;</code>元素的内容：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let vertexglsl = document.getelementbyid("vertexshader").text,
+    fragmentglsl = document.getelementbyid("fragmentshader").text;</code></pre>
+                <p class="calibre1">更复杂的WebGL应用可以动态加载着色器。重点在于要使用着色器，必须先拿到GLSL代码的字符串。</p>
+                <p class="calibre1">有了GLSL字符串，下一步是创建<code class="calibre11">shader</code>对象。为此，需要调用<code class="calibre11">gl.createShader()</code>方法，并传入想要创建的着色器类型（<code class="calibre11">gl.VERTEX_SHADER</code>或<code class="calibre11">gl.FRAGMENT_SHADER</code>）。然后，调用<code class="calibre11">gl.shaderSource()</code>方法把GLSL代码应用到着色器，再调用<code class="calibre11">gl.compileShader()</code>编译着色器。下面是一个例子：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let vertexshader = gl.createshader(gl.vertex_shader);
+gl.shadersource(vertexshader, vertexglsl);
+gl.compileshader(vertexshader);
+let fragmentshader = gl.createshader(gl.fragment_shader);
+gl.shadersource(fragmentshader, fragmentglsl);
+gl.compileshader(fragmentshader);</code></pre>
+                <p class="calibre1">这里的代码创建了两个着色器，并把它们保存在<code class="calibre11">vertexShader</code>和<code class="calibre11">fragmentShader</code>中。然后，可以通过以下代码把这两个对象链接到着色器程序：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let program = gl.createprogram();
+gl.attachshader(program, vertexshader);
+gl.attachshader(program, fragmentshader);
+gl.linkprogram(program);</code></pre>
+                <p class="calibre1">第一行代码创建了一个程序，然后<code class="calibre11">attachShader()</code>用于添加着色器。调用<code class="calibre11">gl.linkProgram()</code>将两个着色器链接到了变量<code class="calibre11">program</code>中。链接到程序之后，就可以通过<code class="calibre11">gl.useProgram()</code>方法让WebGL上下文使用这个程序了：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">gl.useprogram(program);</code></pre>
+                <p class="calibre1">调用<code class="calibre11">gl.useProgram()</code>之后，所有后续的绘制操作都会使用这个程序。</p>
+                <p class="calibre1"></p>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">给着色器传值</strong>
+                </p>
+                <p class="calibre1">前面定义的每个着色器都需要传入一个值，才能完成工作。要给着色器传值，必须先找到要接收值的变量。对于<code class="calibre11">uniform</code>变量，可以调用<code class="calibre11">gl.getUniformLocation()</code>方法。这个方法返回一个对象，表示该<code class="calibre11">uniform</code>变量在内存中的位置。然后，可以使用这个位置来完成赋值。比如：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let ucolor = gl.getuniformlocation(program, "ucolor");
+gl.uniform4fv(ucolor, [0, 0, 0, 1]);</code></pre>
+                <p class="calibre1">这个例子从<code class="calibre11">program</code>中找到<code class="calibre11">uniform</code>变量<code class="calibre11">uColor</code>，然后返回了它的内存位置。第二行代码调用<code class="calibre11">gl.uniform4fv()</code>方法给<code class="calibre11">uColor</code>传入了值。</p>
+                <p class="calibre1">给顶点着色器传值也是类似的过程。而要获得<code class="calibre11">attribute</code>变量的位置，可以调用<code class="calibre11">gl.getAttribLocation()</code>方法。找到变量的内存地址后，可以像下面这样给它传入值：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let avertexposition = gl.getattriblocation(program, "avertexposition");
+gl.enablevertexattribarray(avertexposition);
+gl.vertexattribpointer(avertexposition, itemsize, gl.float, false, 0, 0);</code></pre>
+                <p class="calibre1">这里，首先取得<code class="calibre11">aVertexPosition</code>的内存位置，然后使用<code class="calibre11">gl.enableVertexAttribArray()</code>来启用。最后一行代码创建了一个指向调用<code class="calibre11">gl.bindBuffer()</code>指定的缓冲区的指针，并把它保存在<code class="calibre11">aVertexPosition</code>中，从而可以在后面由顶点着色器使用。<br class="calibre4"/>
+                </p>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">调试着色器和程序</strong>
+                </p>
+                <p class="calibre1">与WebGL中的其他操作类似，着色器操作也可能失败，而且是静默失败。如果想知道发生了什么错误，则必须手工通过WebGL上下文获取关于着色器或程序的信息。</p>
+                <p class="calibre1">对于着色器，可以调用<code class="calibre11">gl.getShaderParameter()</code>方法取得编译之后的编译状态：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (!gl.getshaderparameter(vertexshader, gl.compile_status)) {
+  alert(gl.getshaderinfolog(vertexshader));
+}</code></pre>
+                <p class="calibre1">这个例子检查了<code class="calibre11">vertexShader</code>编译的状态。如果着色器编译成功，则调用<code class="calibre11">gl.getShaderParameter()</code>会返回<code class="calibre11">true</code>。如果返回<code class="calibre11">false</code>，则说明编译出错了。此时，可以使用<code class="calibre11">gl.getShaderInfoLog()</code>并传入着色器取得错误。这个方法返回一个字符串消息，表示问题所在。<code class="calibre11">gl.getShaderParameter()</code>和<code class="calibre11">gl.getShaderInfoLog()</code>既可以用于顶点着色器，也可以用于片段着色器。</p>
+                <p class="calibre1">着色器程序也可能失败，因此也有类似的方法。<code class="calibre11">gl.getProgramParameter()</code>用于检测状态。最常见的程序错误发生在链接阶段，为此可以使用以下代码来检查：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (!gl.getprogramparameter(program, gl.link_status)) {
+  alert(gl.getprograminfolog(program));
+}</code></pre>
+                <p class="calibre1">与<code class="calibre11">gl.getShaderParameter()</code>一样，<code class="calibre11">gl.getProgramParameter()</code>会在链接成功时返回<code class="calibre11">true</code>，失败时返回<code class="calibre11">false</code>。当然也有一个<code class="calibre11">gl.getProgramInfoLog()</code>方法，可以在程序失败时获取错误信息。</p>
+                <p class="calibre1">这些方法主要在开发时用于辅助调试。只要没有外部依赖，在产品环境中就可以放心地删除它们。<br class="calibre4"/>
+                </p>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <p class="calibre1">
+                  <strong class="calibre2">GLSL 100升级到GLSL 300</strong>
+                </p>
+                <p class="calibre1">WebGL2的主要变化是升级到了GLSL 3.00 ES着色器。这个升级暴露了很多新的着色器功能，包括3D纹理等在支持OpenGL ES 3.0的设备上都有的功能。要使用升级版的着色器，着色器代码的第一行必须是：</p>
+                <pre class="dai_ma_wu_xing_hao"><code class="calibre11">#version 300 es</code></pre>
+                <p class="calibre1">这个升级需要一些语法的变化。</p>
+                <ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">顶点<code class="calibre11">attribute</code>变量要使用<code class="calibre11">in</code>而不是<code class="calibre11">attribute</code>关键字声明。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">使用<code class="calibre11">varying</code>关键字为顶点或片段着色器声明的变量，现在必须根据相应着色器的行为改为使用<code class="calibre11">in</code>或<code class="calibre11">out</code>。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">预定义的输出变量<code class="calibre11">gl_FragColor</code>没有了，片段着色器必须为颜色输出声明自己的<code class="calibre11">out</code>变量。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">纹理查找函数<code class="calibre11">texture2D</code>和<code class="calibre11">textureCube</code>统一成了一个<code class="calibre11">texture</code>函数。<br class="calibre4"/>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li value="8" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">绘图</strong>
+            </p>
+            <p class="calibre1">WebGL只能绘制三种形状：点、线和三角形。其他形状必须通过这三种基本形状在3D空间的组合来绘制。WebGL绘图要使用<code class="calibre11">drawArrays()</code>和<code class="calibre11">drawElements()</code>方法，前者使用数组缓冲区，后者则操作元素数组缓冲区。</p>
+            <p class="calibre1">
+              <code class="calibre11">drawArrays()</code>和<code class="calibre11">drawElements()</code>的第一个参数都表示要绘制形状的常量。下面列出了这些常量。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.POINTS</code>：将每个顶点当成一个点来绘制。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.LINES</code>：将数组作为一系列顶点，在这些顶点间绘制直线。每个顶点既是起点也是终点，因此数组中的顶点必须是偶数个才能开始绘制。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.LINE_LOOP</code>：将数组作为一系列顶点，在这些顶点间绘制直线。从第一个顶点到第二个顶点绘制一条直线，再从第二个顶点到第三个顶点绘制一条直线，以此类推，直到绘制到最后一个顶点。此时再从最后一个顶点到第一个顶点绘制一条直线。这样就可以绘制出形状的轮廓。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.LINE_STRIP</code>：类似于<code class="calibre11">gl.LINE_LOOP</code>，区别在于不会从最后一个顶点到第一个顶点绘制直线。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.TRIANGLES</code>：将数组作为一系列顶点，在这些顶点间绘制三角形。如不特殊指定，每个三角形都分开绘制，不共享顶点。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.TRIANGLES_STRIP</code>：类似于<code class="calibre11">gl.TRIANGLES</code>，区别在于前3个顶点之后的顶点会作为第三个顶点与其前面的两个顶点构成三角形。例如，如果数组中包含顶点<img src="../images/00048.gif" alt="A" class="calibre12"/>、<img src="../images/00020.gif" alt="B" class="calibre12"/>、<img src="../images/00016.gif" alt="C" class="calibre12"/>、<img src="../images/00076.gif" alt="D" class="calibre12"/>，那么第一个三角形使用<em class="calibre6">ABC</em>，第二个三角形使用<em class="calibre6">BCD</em>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">gl.TRIANGLES_FAN</code>：类似于<code class="calibre11">gl.TRIANGLES</code>，区别在于前3个顶点之后的顶点会作为第三个顶点与其前面的顶点和第一个顶点构成三角形。例如，如果数组中包含顶点<img src="../images/00048.gif" alt="A" class="calibre12"/>、<img src="../images/00020.gif" alt="B" class="calibre12"/>、<img src="../images/00016.gif" alt="C" class="calibre12"/>、<img src="../images/00076.gif" alt="D" class="calibre12"/>，那么第一个三角形使用<em class="calibre6">ABC</em>，第二个三角形使用<em class="calibre6">ACD</em>。</li>
+            </ul>
+            <p class="calibre1">以上常量可以作为<code class="calibre11">gl.drawArrays()</code>方法的第一个参数，第二个参数是数组缓冲区的起点索引，第三个参数是数组缓冲区包含的顶点集合的数量。以下代码使用<code class="calibre11">gl.drawArrays()</code>在画布上绘制了一个三角形：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 假设已经使用本节前面的着色器清除了视口
+// 定义3个顶点的x坐标和y坐标
+let vertices = new float32array([ 0, 1, 1, -1, -1, -1 ]),
+    buffer = gl.createbuffer(),
+    vertexsetsize = 2,
+    vertexsetcount = vertices.length/vertexsetsize,
+    ucolor,
+    avertexposition;
+// 将数据放入缓冲区
+gl.bindbuffer(gl.array_buffer, buffer);
+gl.bufferdata(gl.array_buffer, vertices, gl.static_draw);
+// 给片段着色器传入颜色
+ucolor = gl.getuniformlocation(program, "ucolor");
+gl.uniform4fv(ucolor, [ 0, 0, 0, 1 ]);
+// 把顶点信息传给着色器
+avertexposition = gl.getattriblocation(program, "avertexposition");
+gl.enablevertexattribarray(avertexposition);
+gl.vertexattribpointer(avertexposition, vertexsetsize, gl.float, false, 0, 0);
+// 绘制三角形
+gl.drawarrays(gl.triangles, 0, vertexsetcount);</code></pre>
+            <p class="calibre1">这个例子定义了一个<code class="calibre11">Float32Array</code>变量，它包含3组两个点的顶点。完成计算的关键是跟踪顶点大小和数量。将<code class="calibre11">vertexSetSize</code>的值指定为2，再计算出<code class="calibre11">vertexSetCount</code>。顶点信息保存在了缓冲区。然后把颜色信息传给片段着色器。</p>
+            <p class="calibre1">接着给顶点着色器传入顶点集的大小，以及表示顶点坐标数值类型的<code class="calibre11">gl.FlOAT</code>。第四个参数是一个布尔值，表示坐标不是标准的。第五个参数是<strong class="calibre2">步长值</strong>（stride value），表示跳过多个数组元素取得下一个值。除非真要跳过一些值，否则就向这里传入0即可。最后一个参数是起始偏移量，这里的0表示从第一个数组元素开始。</p>
+            <p class="calibre1">最后一步是使用<code class="calibre11">gl.drawArrays()</code>把三角形绘制出来。通过把第一个参数指定为<code class="calibre11">gl.TRIANGLES</code>，就可以从(0, 1)到(1, –1)再到(–1, –1)绘制一个三角形，并填充传给片段着色器的颜色。第二个参数表示缓冲区的起始偏移量，最后一个参数是要读取的顶点数量。以上绘图操作的结果如图18-16所示。</p>
+            <p class="calibre1"><img src="../images/00060.gif" alt="" width="30%" class="calibre46"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 18-16</strong>
+            </p>
+            <p class="calibre1">通过改变<code class="calibre11">gl.drawArrays()</code>的第一个参数，可以修改绘制三角形的方式。图18-17展示了修改第一个参数之后的两种输出。</p>
+            <p class="calibre1"><img src="../images/00012.gif" alt="" width="60%" class="calibre36"/></p>
+            <p class="calibre1">
+              <strong class="calibre2">图 18-17</strong><br class="calibre4"/>
+            </p>
+          </li>
+          <li value="9" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">纹理</strong>
+            </p>
+            <p class="calibre1">WebGL纹理可以使用DOM中的图片。可以使用<code class="calibre11">gl.createTexture()</code>方法创建新的纹理，然后再将图片绑定到这个纹理。如果图片还没有加载，则可以创建一个<code class="calibre11">Image</code>对象来动态加载。图片加载完成后才能初始化纹理，因此在图片的<code class="calibre11">load</code>事件之后才能使用纹理。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let image = new image(),
+  texture;
+image.src = "smile.gif";
+image.onload = function() {
+  texture = gl.createtexture();
+  gl.bindtexture(gl.texture_2d, texture);
+  gl.pixelstorei(gl.unpack_flip_y_webgl, true);
+
+  gl.teximage2d(gl.texture_2d, 0, gl.rgba, gl.rgba, gl.unsigned_byte, image);
+  gl.texparameteri(gl.texture_2d, gl.texture_mag_filter, gl.nearest);
+  gl.texparameteri(gl.texture_2d, gl.texture_min_filter, gl.nearest);
+
+  // 除当前纹理
+  gl.bindtexture(gl.texture_2d, null);
+}</code></pre>
+            <p class="calibre1">除了使用DOM图片，这些步骤跟在OpenGL中创建纹理是一样的。最大的区别在于使用<code class="calibre11">gl.pixelStorei()</code>设置了像素存储格式。常量<code class="calibre11">gl.UNPACK_FLIP_Y_WEBGL</code>是WebGL独有的，在基于Web加载图片时通常要使用。原因在于GIF、JPEG和PNG图片使用的坐标系统与WebGL内部的坐标系统不一样。如果不使用这个标志，图片就会倒过来。</p>
+            <p class="calibre1">用于纹理的图片必须跟当前页面同源，或者是来自启用了跨源资源共享（CORS，Cross-Origin Resource Sharing）的服务器上。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                纹理来源可以是图片、通过<code class="calibre11">&lt;video&gt;</code>元素加载的视频，甚至是别的<code class="calibre11">&lt;canvas&gt;</code>元素。视频同样受跨源限制。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="10" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">读取像素</strong>
+            </p>
+            <p class="calibre1">与2D上下文一样，可以从WebGL上下文中读取像素数据。读取像素的<code class="calibre11">readPixels()</code>方法与OpenGL中的方法有同样的参数，只不过最后一个参数必须是定型数组。像素信息是从帧缓冲区读出来并放到这个定型数组中的。<code class="calibre11">readPixels()</code>方法的参数包括<img src="../images/00080.gif" alt="x" class="calibre12"/>和<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标、宽度、高度、图像格式、类型和定型数组。前4个参数用于指定要读取像素的位置。图像格式参数几乎总是<code class="calibre11">gl.RGBA</code>。类型参数指的是要存储在定型数组中的数据类型，有如下限制：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">如果这个类型是<code class="calibre11">gl.UNSIGNED_BYTE</code>，则定型数组必须是<code class="calibre11">Uint8Array</code>；</li>
+              <li class="di_1ji_wu_xu_lie_biao">如果这个类型是<code class="calibre11">gl.UNSIGNED_SHORT_5_6_5</code>、<code class="calibre11">gl.UNSIGNED_SHORT_4_4_4_4</code>或<code class="calibre11">gl.UNSIGNED_SHORT_5_5_5_1</code>，则定型数组必须是<code class="calibre11">Uint16Array</code>。</li>
+            </ul>
+            <p class="calibre1">下面是一个调用<code class="calibre11">readPixels()</code>方法的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let pixels = new uint8array(25*25);
+gl.readpixels(0, 0, 25, 25, gl.rgba, gl.unsigned_byte, pixels);</code></pre>
+            <p class="calibre1">以上代码读取了帧缓冲区中25像素×25像素大小的区域，并把读到的像素信息保存在<code class="calibre11">pixels</code>数组中，其中每个像素的颜色在这个数组中都以4个值表示，分别代表红、绿、蓝和透明度值。每个数组值的取值范围是0~255（包括0和255）。别忘了先按照预期存储的数据量初始化定型数组。</p>
+            <p class="calibre1">在浏览器绘制更新后的WebGL图像之前调用<code class="calibre11">readPixels()</code>没有问题。而在绘制完成后，帧缓冲区会恢复到其初始清除状态，此时调用<code class="calibre11">readPixels()</code>会得到与清除状态一致的像素数据。如果想在绘制之后读取像素，则必须使用前面讨论过的<code class="calibre11">preserveDrawingBuffer</code>选项初始化WebGL上下文：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let gl = drawing.getcontext("webgl", { preservedrawingbuffer: true; });</code></pre>
+            <p class="calibre1">设置这个标志可以强制帧缓冲区在下一次绘制之前保持上一次绘制的状态。这个选项可能会影响性能，因此尽量不要使用。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_426" class="calibre15">18.4.3 WebGL1与WebGL2</h3>
+        <p class="calibre1">WebGL1代码几乎完全与WebGL2兼容。在使用WebGL2上下文时，唯一可能涉及修改代码以保证兼容性的就是扩展。在WebGL2中，很多扩展都变成了默认功能。</p>
+        <p class="calibre1">例如，要在WebGL1中使用绘制缓冲区，需要先测试相应扩展后再使用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let ext = gl.getextension('webgl_draw_buffers');
+
+if (!ext) {
+  // 没有扩展的代码
+} else {
+  ext.drawbufferswebgl([...])
+}</code></pre>
+        <p class="calibre1">而在WebGL2中，这里的检测代码就不需要了，因为这个扩展已经直接暴露在上下文对象上了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">gl.drawbuffers([...]);</code></pre>
+        <p class="calibre1">以下特性都已成为WebGL2的标准特性：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">ANGLE_instanced_arrays</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">EXT_blend_minmax</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">EXT_frag_depth</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">EXT_shader_texture_lod</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">OES_element_index_uint</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">OES_standard_derivatives</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">OES_texture_float</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">OES_texture_float_linear</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">OES_vertex_array_object</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WEBGL_depth_texture</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WEBGL_draw_buffers</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Vertex shader texture access</code>
+          </li>
+        </ul>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            要了解WebGL更新的内容，可以参考WebGL2Fundamentals网站上的文章“WebGL2 from WebGL1”。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0133.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0135.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

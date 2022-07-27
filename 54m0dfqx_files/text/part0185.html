@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0184.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0186.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_595" class="calibre9">25.3 IndexedDB</h2>
+        <p class="calibre1">Indexed Database API简称<strong class="calibre2">IndexedDB</strong>，是浏览器中存储结构化数据的一个方案。IndexedDB用于代替目前已废弃的Web SQL Database API。IndexedDB背后的思想是创造一套API，方便JavaScript对象的存储和获取，同时也支持查询和搜索。</p>
+        <p class="calibre1">IndexedDB的设计几乎完全是异步的。为此，大多数操作以请求的形式执行，这些请求会异步执行，产生成功的结果或错误。绝大多数IndexedDB操作要求添加<code class="calibre11">onerror</code>和<code class="calibre11">onsuccess</code>事件处理程序来确定输出。</p>
+        <p class="calibre1">2017年，新发布的主流浏览器（Chrome、Firefox、Opera、Safari）完全支持IndexedDB。IE10/11和Edge浏览器部分支持IndexedDB。</p>
+        <h3 id="nav_point_596" class="calibre15">25.3.1 数据库</h3>
+        <p class="calibre1">IndexedDB是类似于MySQL或Web SQL Database的数据库。与传统数据库最大的区别在于，IndexedDB使用对象存储而不是表格保存数据。IndexedDB数据库就是在一个公共命名空间下的一组对象存储，类似于NoSQL风格的实现。</p>
+        <p class="calibre1">使用IndexedDB数据库的第一步是调用<code class="calibre11">indexedDB.open()</code>方法，并给它传入一个要打开的数据库名称。如果给定名称的数据库已存在，则会发送一个打开它的请求；如果不存在，则会发送创建并打开这个数据库的请求。这个方法会返回<code class="calibre11">IDBRequest</code>的实例，可以在这个实例上添加<code class="calibre11">onerror</code>和<code class="calibre11">onsuccess</code>事件处理程序。举例如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let db,
+    request,
+    version = 1;
+
+request = indexeddb.open("admin", version);
+request.onerror = (event) =&gt;
+  alert(`failed to open: ${event.target.errorcode}`);
+request.onsuccess = (event) =&gt; {
+  db = event.target.result;
+};</code></pre>
+        <p class="calibre1">以前，IndexedDB使用<code class="calibre11">setVersion()</code>方法指定版本号。这个方法目前已废弃。如前面代码所示，要在打开数据库的时候指定版本。这个版本号会被转换为一个<code class="calibre11">unsigned long long</code>数值，因此不要使用小数，而要使用整数。</p>
+        <p class="calibre1">在两个事件处理程序中，<code class="calibre11">event.target</code>都指向<code class="calibre11">request</code>，因此使用哪个都可以。如果<code class="calibre11">onsuccess</code>事件处理程序被调用，说明可以通过<code class="calibre11">event.target.result</code>访问数据库（<code class="calibre11">IDBDatabase</code>）实例了，这个实例会保存到<code class="calibre11">db</code>变量中。之后，所有与数据库相关的操作都要通过<code class="calibre11">db</code>对象本身来进行。如果打开数据库期间发生错误，<code class="calibre11">event.target.errorCode</code>中就会存储表示问题的错误码。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            以前，出错时会使用<code class="calibre11">IDBDatabaseException</code>表示IndexedDB发生的错误。目前它已被标准的<code class="calibre11">DOMExceptions</code>取代。</p>
+        </blockquote>
+        <h3 id="nav_point_597" class="calibre15">25.3.2 对象存储</h3>
+        <p class="calibre1">建立了数据库连接之后，下一步就是使用对象存储。如果数据库版本与期待的不一致，那可能需要创建对象存储。不过，在创建对象存储前，有必要想一想要存储什么类型的数据。</p>
+        <p class="calibre1">假设要存储包含用户名、密码等内容的用户记录。可以用如下对象来表示一条记录：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let user = {
+  username: "007",
+  firstname: "james",
+  lastname: "bond",
+  password: "foo"
+};</code></pre>
+        <p class="calibre1">观察这个对象，可以很容易看出最适合作为对象存储键的<code class="calibre11">username</code>属性。用户名必须全局唯一，它也是大多数情况下访问数据的凭据。这个键很重要，因为创建对象存储时必须指定一个键。</p>
+        <p class="calibre1">数据库的版本决定了数据库模式，包括数据库中的对象存储和这些对象存储的结构。如果数据库还不存在，<code class="calibre11">open()</code>操作会创建一个新数据库，然后触发<code class="calibre11">upgradeneeded</code>事件。可以为这个事件设置处理程序，并在处理程序中创建数据库模式。如果数据库存在，而你指定了一个升级版的版本号，则会立即触发<code class="calibre11">upgradeneeded</code>事件，因而可以在事件处理程序中更新数据库模式。</p>
+        <p class="calibre1">下面的代码演示了为存储上述用户信息如何创建对象存储：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">request.onupgradeneeded = (event) =&gt; {
+  const db = event.target.result;
+
+  // 如果存在则删除当前objectstore。测试的时候可以这样做
+  // 但这样会在每次执行事件处理程序时删除已有数据
+  if (db.objectstorenames.contains("users")) {
+    db.deleteobjectstore("users");
+  }
+
+  db.createobjectstore("users", { keypath: "username" });
+};</code></pre>
+        <p class="calibre1">这里第二个参数的<code class="calibre11">keyPath</code>属性表示应该用作键的存储对象的属性名。</p>
+        <h3 id="nav_point_598" class="calibre15">25.3.3 事务</h3>
+        <p class="calibre1">创建了对象存储之后，剩下的所有操作都是通过<strong class="calibre2">事务</strong>完成的。事务要通过调用数据库对象的<code class="calibre11">transaction()</code>方法创建。任何时候，只要想要读取或修改数据，都要通过事务把所有修改操作组织起来。最简单的情况下，可以像下面这样创建事务：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let transaction = db.transaction();</code></pre>
+        <p class="calibre1">如果不指定参数，则对数据库中所有的对象存储有只读权限。更具体的方式是指定一个或多个要访问的对象存储的名称：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let transaction = db.transaction("users");</code></pre>
+        <p class="calibre1">这样可以确保在事务期间只加载<code class="calibre11">users</code>对象存储的信息。如果想要访问多个对象存储，可以给第一个参数传入一个字符串数组：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let transaction = db.transaction(["users", "anotherstore"]);</code></pre>
+        <p class="calibre1">如前所述，每个事务都以只读方式访问数据。要修改访问模式，可以传入第二个参数。这个参数应该是下列三个字符串之一：<code class="calibre11">"readonly"</code>、<code class="calibre11">"readwrite"</code>或<code class="calibre11">"versionchange"</code>。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let transaction = db.transaction("users", "readwrite");</code></pre>
+        <p class="calibre1">这样事务就可以对<code class="calibre11">users</code>对象存储读写了。</p>
+        <p class="calibre1">有了事务的引用，就可以使用<code class="calibre11">objectStore()</code>方法并传入对象存储的名称以访问特定的对象存储。然后，可以使用<code class="calibre11">add()</code>和<code class="calibre11">put()</code>方法添加和更新对象，使用<code class="calibre11">get()</code>取得对象，使用<code class="calibre11">delete()</code>删除对象，使用<code class="calibre11">clear()</code>删除所有对象。其中，<code class="calibre11">get()</code>和<code class="calibre11">delete()</code>方法都接收对象键作为参数，这5个方法都创建新的请求对象。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    request = store.get("007");
+request.onerror = (event) =&gt; alert("did not get the object!");
+request.onsuccess = (event) =&gt; alert(event.target.result.firstname);</code></pre>
+        <p class="calibre1">因为一个事务可以完成任意多个请求，所以事务对象本身也有事件处理程序：<code class="calibre11">onerror</code>和<code class="calibre11">oncomplete</code>。这两个事件可以用来获取事务级的状态信息：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">transaction.onerror = (event) =&gt; {
+  // 整个事务被取消
+};
+transaction.oncomplete = (event) =&gt; {
+  // 整个事务成功完成
+};</code></pre>
+        <p class="calibre1">注意，不能通过<code class="calibre11">oncomplete</code>事件处理程序的<code class="calibre11">event</code>对象访问<code class="calibre11">get()</code>请求返回的任何数据。因此，仍然需要通过这些请求的<code class="calibre11">onsuccess</code>事件处理程序来获取数据。</p>
+        <h3 id="nav_point_599" class="calibre15">25.3.4 插入对象</h3>
+        <p class="calibre1">拿到了对象存储的引用后，就可以使用<code class="calibre11">add()</code>或<code class="calibre11">put()</code>写入数据了。这两个方法都接收一个参数，即要存储的对象，并把对象保存到对象存储。这两个方法只在对象存储中已存在同名的键时有区别。这种情况下，<code class="calibre11">add()</code>会导致错误，而<code class="calibre11">put()</code>会简单地重写该对象。更简单地说，可以把<code class="calibre11">add()</code>想象成插入新值，而把<code class="calibre11">put()</code>想象为更新值。因此第一次初始化对象存储时，可以这样做：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// users是一个用户数据的数组
+for (let user of users) {
+   store.add(user);
+}</code></pre>
+        <p class="calibre1">每次调用<code class="calibre11">add()</code>或<code class="calibre11">put()</code>都会创建对象存储的新更新请求。如果想验证请求成功与否，可以把请求对象保存到一个变量，然后为它添加<code class="calibre11">onerror</code>和<code class="calibre11">onsuccess</code>事件处理程序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// users是一个用户数据的数组
+let request,
+    requests = [];
+for (let user of users) {
+  request = store.add(user);
+  request.onerror = () =&gt; {
+    // 处理错误
+  };
+  request.onsuccess = () =&gt; {
+    // 处理成功
+  };
+  requests.push(request);
+}</code></pre>
+        <p class="calibre1">创建并填充了数据后，就可以查询对象存储了。</p>
+        <h3 id="nav_point_600" class="calibre15">25.3.5 通过游标查询</h3>
+        <p class="calibre1">使用事务可以通过一个已知键取得一条记录。如果想取得多条数据，则需要在事务中创建一个<strong class="calibre2">游标</strong>。游标是一个指向结果集的指针。与传统数据库查询不同，游标不会事先收集所有结果。相反，游标指向第一个结果，并在接到指令前不会主动查找下一条数据。</p>
+        <p class="calibre1">需要在对象存储上调用<code class="calibre11">openCursor()</code>方法创建游标。与其他IndexedDB操作一样，<code class="calibre11">openCursor()</code>方法也返回一个请求，因此必须为它添加<code class="calibre11">onsuccess</code>和<code class="calibre11">onerror</code>事件处理程序。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    request = store.opencursor();
+request.onsuccess = (event) =&gt; {
+  // 处理成功
+};
+request.onerror = (event) =&gt; {
+  // 处理错误
+};</code></pre>
+        <p class="calibre1">在调用<code class="calibre11">onsuccess</code>事件处理程序时，可以通过<code class="calibre11">event.target.result</code>访问对象存储中的下一条记录，这个属性中保存着<code class="calibre11">IDBCursor</code>的实例（有下一条记录时）或<code class="calibre11">null</code>（没有记录时）。这个<code class="calibre11">IDBCursor</code>实例有几个属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">direction</code>：字符串常量，表示游标的前进方向以及是否应该遍历所有重复的值。可能的值包括：<code class="calibre11">NEXT("next")</code>、<code class="calibre11">NEXTUNIQUE("nextunique")</code>、<code class="calibre11">PREV("prev")</code>、<code class="calibre11">PREVUNIQUE("prevunique")</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">key</code>：对象的键。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">value</code>：实际的对象。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">primaryKey</code>：游标使用的键。可能是对象键或索引键（稍后讨论）。</li>
+        </ul>
+        <p class="calibre1">可以像下面这样取得一个结果：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">request.onsuccess = (event) =&gt; {
+  const cursor = event.target.result;
+  if (cursor) { // 永远要检查
+    console.log(`key: ${cursor.key}, value: ${json.stringify(cursor.value)}`);
+  }
+};</code></pre>
+        <p class="calibre1">注意，这个例子中的<code class="calibre11">cursor.value</code>保存着实际的对象。正因为如此，在显示它之前才需要使用JSON来编码。</p>
+        <p class="calibre1">游标可用于更新个别记录。<code class="calibre11">update()</code>方法使用指定的对象更新当前游标对应的值。与其他类似操作一样，调用<code class="calibre11">update()</code>会创建一个新请求，因此如果想知道结果，需要为<code class="calibre11">onsuccess</code>和<code class="calibre11">onerror</code>赋值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">request.onsuccess = (event) =&gt; {
+  const cursor = event.target.result;
+  let value,
+      updaterequest;
+
+  if (cursor) { // 永远要检查
+    if (cursor.key == "foo") {
+      value = cursor.value;                 // 取得当前对象
+      value.password = "magic!";            // 更新密码
+      updaterequest = cursor.update(value); // 请求保存更新后的对象
+      updaterequest.onsuccess = () =&gt; {
+        // 处理成功
+      };
+      updaterequest.onerror = () =&gt; {
+        // 处理错误
+      };
+    }
+  }
+};</code></pre>
+        <p class="calibre1">也可以调用<code class="calibre11">delelte()</code>来删除游标位置的记录，与<code class="calibre11">update()</code>一样，这也会创建一个请求：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">request.onsuccess = (event) =&gt; {
+  const cursor = event.target.result;
+  let value,
+      deleterequest;
+  if (cursor) { // 永远要检查
+    if (cursor.key == "foo") {
+      deleterequest = cursor.delete();  // 请求删除对象
+      deleterequest.onsuccess = () =&gt; {
+        // 处理成功
+      };
+      deleterequest.onerror = () =&gt; {
+        // 处理错误
+      };
+    }
+  }
+};</code></pre>
+        <p class="calibre1">如果事务没有修改对象存储的权限，<code class="calibre11">update()</code>和<code class="calibre11">delete()</code>都会抛出错误。</p>
+        <p class="calibre1">默认情况下，每个游标只会创建一个请求。要创建另一个请求，必须调用下列中的一个方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">continue(<i class="calibre6">key</i>)</code>：移动到结果集中的下一条记录。参数<code class="calibre11">
+              <i class="calibre6">key</i>
+            </code>是可选的。如果没有指定<code class="calibre11">key</code>，游标就移动到下一条记录；如果指定了，则游标移动到指定的键。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">advance(<i class="calibre6">count</i>)</code>：游标向前移动指定的<code class="calibre11">
+              <i class="calibre6">count</i>
+            </code>条记录。</li>
+        </ul>
+        <p class="calibre1">这两个方法都会让游标重用相同的请求，因此也会重用<code class="calibre11">onsuccess</code>和<code class="calibre11">onerror</code>处理程序，直至不再需要。例如，下面的代码迭代了一个对象存储中的所有记录：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">request.onsuccess = (event) =&gt; {
+  const cursor = event.target.result;
+  if (cursor) {  // 永远要检查
+    console.log(`key: ${cursor.key}, value: ${json.stringify(cursor.value)}`);
+    cursor.continue();  // 移动到下一条记录
+  } else {
+    console.log("done!");
+  }
+};</code></pre>
+        <p class="calibre1">调用<code class="calibre11">cursor.continue()</code>会触发另一个请求并再次调用<code class="calibre11">onsuccess</code>事件处理程序。在没有更多记录时，<code class="calibre11">onsuccess</code>事件处理程序最后一次被调用，此时<code class="calibre11">event.target.result</code>等于<code class="calibre11">null</code>。</p>
+        <h3 id="nav_point_601" class="calibre15">25.3.6 键范围</h3>
+        <p class="calibre1">使用游标会给人一种不太理想的感觉，因为获取数据的方式受到了限制。使用<strong class="calibre2">键范围</strong>（key range）可以让游标更容易管理。键范围对应<code class="calibre11">IDBKeyRange</code>的实例。有四种方式指定键范围，第一种是使用<code class="calibre11">only()</code>方法并传入想要获取的键：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const onlyrange = idbkeyrange.only("007");</code></pre>
+        <p class="calibre1">这个范围保证只获取键为<code class="calibre11">"007"</code>的值。使用这个范围创建的游标类似于直接访问对象存储并调用<code class="calibre11">get("007")</code>。</p>
+        <p class="calibre1">第二种键范围可以定义结果集的下限。下限表示游标开始的位置。例如，下面的键范围保证游标从<code class="calibre11">"007"</code>这个键开始，直到最后：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 从"007"记录开始，直到最后
+const lowerrange = idbkeyrange.lowerbound("007");</code></pre>
+        <p class="calibre1">如果想从<code class="calibre11">"007"</code>后面的记录开始，可以再传入第二个参数<code class="calibre11">true</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 从"007"的下一条记录开始，直到最后
+const lowerrange = idbkeyrange.lowerbound("007", true);</code></pre>
+        <p class="calibre1">第三种键范围可以定义结果集的上限，通过调用<code class="calibre11">upperBound()</code>方法可以指定游标不会越过的记录。下面的键范围保证游标从头开始并在到达键为<code class="calibre11">"ace"</code>的记录停止：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 从头开始，到"ace"记录为止
+const upperrange = idbkeyrange.upperbound("ace");</code></pre>
+        <p class="calibre1">如果不想包含指定的键，可以在第二个参数传入<code class="calibre11">true</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 从头开始，到"ace"的前一条记录为止
+const upperrange = idbkeyrange.upperbound("ace", true);</code></pre>
+        <p class="calibre1">要同时指定下限和上限，可以使用<code class="calibre11">bound()</code>方法。这个方法接收四个参数：下限的键、上限的键、可选的布尔值表示是否跳过下限和可选的布尔值表示是否跳过上限。下面是几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 从"007"记录开始，到"ace"记录停止
+const boundrange = idbkeyrange.bound("007", "ace");
+// 从"007"的下一条记录开始，到"ace"记录停止
+const boundrange = idbkeyrange.bound("007", "ace", true);
+// 从"007"的下一条记录开始，到"ace"的前一条记录停止
+const boundrange = idbkeyrange.bound("007", "ace", true, true);
+// 从"007"记录开始，到"ace"的前一条记录停止
+const boundrange = idbkeyrange.bound("007", "ace", false, true);</code></pre>
+        <p class="calibre1">定义了范围之后，把它传给<code class="calibre11">openCursor()</code>方法，就可以得到位于该范围内的游标：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const store = db.transaction("users").objectstore("users"),
+    range = idbkeyrange.bound("007", "ace");
+    request = store.opencursor(range);
+request.onsuccess = function(event){
+  const cursor = event.target.result;
+  if (cursor) { // 永远要检查
+    console.log(`key: ${cursor.key}, value: ${json.stringify(cursor.value)}`);
+    cursor.continue(); // 移动到下一条记录
+  } else {
+    console.log("done!");
+  }
+};</code></pre>
+        <p class="calibre1">这个例子只会输出从键为<code class="calibre11">"007"</code>的记录开始到键为<code class="calibre11">"ace"</code>的记录结束的对象，比上一节的例子要少。</p>
+        <h3 id="nav_point_602" class="calibre15">25.3.7 设置游标方向</h3>
+        <p class="calibre1">
+          <code class="calibre11">openCursor()</code>方法实际上可以接收两个参数，第一个是<code class="calibre11">IDBKeyRange</code>的实例，第二个是表示方向的字符串。通常，游标都是从对象存储的第一条记录开始，每次调用<code class="calibre11">continue()</code>或<code class="calibre11">advance()</code>都会向最后一条记录前进。这样的游标其默认方向为<code class="calibre11">"next"</code>。如果对象存储中有重复的记录，可能需要游标跳过那些重复的项。为此，可以给<code class="calibre11">openCursor()</code>的第二个参数传入<code class="calibre11">"nextunique"</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    request = store.opencursor(null, "nextunique");</code></pre>
+        <p class="calibre1">注意，<code class="calibre11">openCursor()</code>的第一个参数是<code class="calibre11">null</code>，表示默认的键范围是所有值。此游标会遍历对象存储中的记录，从第一条记录开始迭代，到最后一条记录，但会跳过重复的记录。</p>
+        <p class="calibre1">另外，也可以创建在对象存储中反向移动的游标，从最后一项开始向第一项移动。此时需要给<code class="calibre11">openCursor()</code>传入<code class="calibre11">"prev"</code>或<code class="calibre11">"prevunique"</code>作为第二个参数（后者的意思当然是避免重复）。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    request = store.opencursor(null, "prevunique");</code></pre>
+        <p class="calibre1">在使用<code class="calibre11">"prev"</code>或<code class="calibre11">"prevunique"</code>打开游标时，每次调用<code class="calibre11">continue()</code>或<code class="calibre11">advance()</code>都会在对象存储中反向移动游标。</p>
+        <h3 id="nav_point_603" class="calibre15">25.3.8 索引</h3>
+        <p class="calibre1">对某些数据集，可能需要为对象存储指定多个键。例如，如果同时记录了用户ID和用户名，那可能需要通过任何一种方式来获取用户数据。为此，可以考虑将用户ID作为主键，然后在用户名上创建索引。</p>
+        <p class="calibre1">要创建新索引，首先要取得对象存储的引用，然后像下面的例子一样调用<code class="calibre11">createIndex()</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.createindex("username", "username", { unique: true });</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">createIndex()</code>的第一个参数是索引的名称，第二个参数是索引属性的名称，第三个参数是包含键<code class="calibre11">unique</code>的<code class="calibre11">options</code>对象。这个选项中的<code class="calibre11">unique</code>应该必须指定，表示这个键是否在所有记录中唯一。因为<code class="calibre11">username</code>可能不会重复，所以这个键是唯一的。</p>
+        <p class="calibre1">
+          <code class="calibre11">createIndex()</code>返回的是<code class="calibre11">IDBIndex</code>实例。在对象存储上调用<code class="calibre11">index()</code>方法也可以得到同一个实例。例如，要使用一个已存在的名为<code class="calibre11">"username"</code>的索引，可以像下面这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.index("username");</code></pre>
+        <p class="calibre1">索引非常像对象存储。可以在索引上使用<code class="calibre11">openCursor()</code>方法创建新游标，这个游标与在对象存储上调用<code class="calibre11">openCursor()</code>创建的游标完全一样。只是其<code class="calibre11">result.key</code>属性中保存的是索引键，而不是主键。下面看一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.index("username"),
+    request = index.opencursor();
+request.onsuccess = (event) =&gt; {
+  // 处理成功
+};</code></pre>
+        <p class="calibre1">使用<code class="calibre11">openKeyCursor()</code>方法也可以在索引上创建特殊游标，只返回每条记录的主键。这个方法接收的参数与<code class="calibre11">openCursor()</code>一样。最大的不同在于，<code class="calibre11">event.result.key</code>是索引键，且<code class="calibre11">event.result.value</code>是主键而不是整个记录。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.index("username"),
+    request = index.openkeycursor();
+request.onsuccess = (event) =&gt; {
+  // 处理成功
+  // event.result.key是索引键，event.result.value是主键
+};</code></pre>
+        <p class="calibre1">可以使用<code class="calibre11">get()</code>方法并传入索引键通过索引取得单条记录，这会创建一个新请求：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.index("username"),
+    request = index.get("007");
+request.onsuccess = (event) =&gt; {
+  // 处理成功
+};
+request.onerror = (event) =&gt; {
+  // 处理错误
+};</code></pre>
+        <p class="calibre1">如果想只取得给定索引键的主键，可以使用<code class="calibre11">getKey()</code>方法。这样也会创建一个新请求，但<code class="calibre11">result.value</code>等于主键而不是整个记录：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    index = store.index("username"),
+    request = index.getkey("007");
+request.onsuccess = (event) =&gt; {
+  // 处理成功
+  // event.target.result.key是索引键，event.target.result.value是主键
+};</code></pre>
+        <p class="calibre1">在这个<code class="calibre11">onsuccess</code>事件处理程序中，<code class="calibre11">event.target.result.value</code>中应该是用户ID。</p>
+        <p class="calibre1">任何时候，都可以使用<code class="calibre11">IDBIndex</code>对象的下列属性取得索引的相关信息。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">name</code>：索引的名称。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">keyPath</code>：调用<code class="calibre11">createIndex()</code>时传入的属性路径。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">objectStore</code>：索引对应的对象存储。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">unique</code>：表示索引键是否唯一的布尔值。</li>
+        </ul>
+        <p class="calibre1">对象存储自身也有一个<code class="calibre11">indexNames</code>属性，保存着与之相关索引的名称。使用如下代码可以方便地了解对象存储上已存在哪些索引：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    indexnames = store.indexnames
+for (let indexname in indexnames) {
+    const index = store.index(indexname);
+    console.log(`index name: ${index.name}
+                 keypath: ${index.keypath}
+                 unique: ${index.unique}`);
+}</code></pre>
+        <p class="calibre1">以上代码迭代了每个索引并在控制台中输出了它们的信息。</p>
+        <p class="calibre1">在对象存储上调用<code class="calibre11">deleteIndex()</code>方法并传入索引的名称可以删除索引：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const transaction = db.transaction("users"),
+    store = transaction.objectstore("users"),
+    store.deleteindex("username");</code></pre>
+        <p class="calibre1">因为删除索引不会影响对象存储中的数据，所以这个操作没有回调。</p>
+        <h3 id="nav_point_604" class="calibre15">25.3.9 并发问题</h3>
+        <p class="calibre1">IndexedDB虽然是网页中的异步API，但仍存在并发问题。如果两个不同的浏览器标签页同时打开了同一个网页，则有可能出现一个网页尝试升级数据库而另一个尚未就绪的情形。有问题的操作是设置数据库为新版本，而版本变化只能在浏览器只有一个标签页使用数据库时才能完成。</p>
+        <p class="calibre1">第一次打开数据库时，添加<code class="calibre11">onversionchange</code>事件处理程序非常重要。另一个同源标签页将数据库打开到新版本时，将执行此回调。对这个事件最好的回应是立即关闭数据库，以便完成版本升级。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let request, database;
+
+request = indexeddb.open("admin", 1);
+request.onsuccess = (event) =&gt; {
+  database = event.target.result;
+  database.onversionchange = () =&gt; database.close();
+};</code></pre>
+        <p class="calibre1">应该在每次成功打开数据库后都指定<code class="calibre11">onversionchange</code>事件处理程序。记住，<code class="calibre11">onversionchange</code>有可能会被其他标签页触发。</p>
+        <p class="calibre1">通过始终都指定这些事件处理程序，可以保证Web应用程序能够更好地处理与IndexedDB相关的并发问题。</p>
+        <h3 id="nav_point_605" class="calibre15">25.3.10 限制</h3>
+        <p class="calibre1">IndexedDB的很多限制实际上与Web Storage一样。首先，IndexedDB数据库是与页面源（协议、域和端口）绑定的，因此信息不能跨域共享。这意味着www.wrox.com和p2p.wrox.com会对应不同的数据存储。</p>
+        <p class="calibre1">其次，每个源都有可以存储的空间限制。当前Firefox的限制是每个源50MB，而Chrome是5MB。移动版Firefox有5MB限制，如果用度超出配额则会请求用户许可。</p>
+        <p class="calibre1">Firefox还有一个限制——本地文本不能访问IndexedDB数据库。Chrome没有这个限制。因此在本地运行本书示例时，要使用Chrome。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0184.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0186.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0112.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0114.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_334" class="calibre9">15.3 HTML5</h2>
+        <p class="calibre1">HTML5代表着与以前的HTML截然不同的方向。在所有以前的HTML规范中，从未出现过描述JavaScript接口的情形，HTML就是一个纯标记语言。JavaScript绑定的事，一概交给DOM规范去定义。</p>
+        <p class="calibre1">然而，HTML5规范却包含了与标记相关的大量JavaScript API定义。其中有的API与DOM重合，定义了浏览器应该提供的DOM扩展。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            因为HTML5覆盖的范围极其广泛，所以本节主要讨论其影响所有DOM节点的部分。HTML5的其他部分将在本书后面的相关章节中再讨论。</p>
+        </blockquote>
+        <h3 id="nav_point_335" class="calibre15">15.3.1 CSS类扩展</h3>
+        <p class="calibre1">自HTML4被广泛采用以来，Web开发中一个主要的变化是<code class="calibre11">class</code>属性用得越来越多，其用处是为元素添加样式以及语义信息。自然地，JavaScript与CSS类的交互就增多了，包括动态修改类名，以及根据给定的一个或一组类名查询元素，等等。为了适应开发者和他们对<code class="calibre11">class</code>属性的认可，HTML5增加了一些特性以方便使用CSS类。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">getElementsByClassName()</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">getElementsByClassName()</code>是HTML5新增的最受欢迎的一个方法，暴露在<code class="calibre11">document</code>对象和所有HTML元素上。 这个方法脱胎于基于原有DOM特性实现该功能的JavaScript库，提供了性能高好的原生实现。</p>
+            <p class="calibre1">
+              <code class="calibre11">getElementsByClassName()</code>方法接收一个参数，即包含一个或多个类名的字符串，返回类名中包含相应类的元素的<code class="calibre11">NodeList</code>。如果提供了多个类名，则顺序无关紧要。下面是几个示例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 取得所有类名中包含"username"和"current"元素
+// 这两个类名的顺序无关紧要
+let allcurrentusernames = document.getelementsbyclassname("username current");
+// 取得id为"mydiv"的元素子树中所有包含"selected"类的元素
+let selected = document.getelementbyid("mydiv").getelementsbyclassname("selected");</code></pre>
+            <p class="calibre1">这个方法只会返回以调用它的对象为根元素的子树中所有匹配的元素。在<code class="calibre11">document</code>上调用<code class="calibre11">getElementsByClassName()</code>返回文档中所有匹配的元素，而在特定元素上调用<code class="calibre11">getElementsByClassName()</code>则返回该元素后代中匹配的元素。</p>
+            <p class="calibre1">如果要给包含特定类（而不是特定ID或标签）的元素添加事件处理程序，使用这个方法会很方便。不过要记住，因为返回值是<code class="calibre11">NodeList</code>，所以使用这个方法会遇到跟使用<code class="calibre11">getElementsByTagName()</code>和其他返回<code class="calibre11">NodeList</code>对象的DOM方法同样的问题。</p>
+            <p class="calibre1">IE9及以上版本，以及所有现代浏览器都支持<code class="calibre11">getElementsByClassName()</code>方法。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">classList</code>属性</strong>
+            </p>
+            <p class="calibre1">要操作类名，可以通过<code class="calibre11">className</code>属性实现添加、删除和替换。但<code class="calibre11">className</code>是一个字符串，所以每次操作之后都需要重新设置这个值才能生效，即使只改动了部分字符串也一样。以下面的HTML代码为例：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div class="bd user disabled"&gt;...&lt;/div&gt;</code></pre>
+            <p class="calibre1">这个<code class="calibre11">&lt;div&gt;</code>元素有3个类名。要想删除其中一个，就得先把<code class="calibre11">className</code>拆开，删除不想要的那个，再把包含剩余类的字符串设置回去。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 要删除"user"类
+let targetclass = "user";
+
+// 把类名拆成数组
+let classnames = div.classname.split(/\s+/);
+
+// 找到要删除类名的索引
+let idx = classnames.indexof(targetclass);
+
+// 如果有则删除
+if (idx &gt; -1) {
+  classnames.splice(i,1);
+}
+
+// 重新设置类名
+div.classname = classnames.join(" ");</code></pre>
+            <p class="calibre1">这就是从<code class="calibre11">&lt;div&gt;</code>元素的类名中删除<code class="calibre11">"user"</code>类要写的代码。替换类名和检测类名也要涉及同样的算法。添加类名只涉及字符串拼接，但必须先检查一下以确保不会重复添加相同的类名。很多JavaScript库为这些操作实现了便利方法。</p>
+            <p class="calibre1">HTML5通过给所有元素增加<code class="calibre11">classList</code>属性为这些操作提供了更简单也更安全的实现方式。<code class="calibre11">classList</code>是一个新的集合类型<code class="calibre11">DOMTokenList</code>的实例。与其他DOM集合类型一样，<code class="calibre11">DOMTokenList</code>也有<code class="calibre11">length</code>属性表示自己包含多少项，也可以通过<code class="calibre11">item()</code>或中括号取得个别的元素。此外，<code class="calibre11">DOMTokenList</code>还增加了以下方法。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">add(<i class="calibre6">value</i>)</code>，向类名列表中添加指定的字符串值<code class="calibre11">value</code>。如果这个值已经存在，则什么也不做。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">contains(<i class="calibre6">value</i>)</code>，返回布尔值，表示给定的<code class="calibre11">value</code>是否存在。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">remove(<i class="calibre6">value</i>)</code>，从类名列表中删除指定的字符串值<code class="calibre11">value</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">toggle(<i class="calibre6">value</i>)</code>，如果类名列表中已经存在指定的<code class="calibre11">value</code>，则删除；如果不存在，则添加。</li>
+            </ul>
+            <p class="calibre1">这样一来，前面的例子中那么多行代码就可以简化成下面的一行：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.classlist.remove("user");</code></pre>
+            <p class="calibre1">这行代码可以在不影响其他类名的情况下完成删除。其他方法同样极大地简化了操作类名的复杂性，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 删除"disabled"类
+div.classlist.remove("disabled");
+
+// 添加"current"类
+div.classlist.add("current");
+
+// 切换"user"类
+div.classlist.toggle("user");
+
+// 检测类名
+if (div.classlist.contains("bd") &amp;&amp; !div.classlist.contains("disabled")){
+  // 执行操作
+)
+
+// 迭代类名
+for (let class of div.classlist){
+  dostuff(class);
+}</code></pre>
+            <p class="calibre1">添加了<code class="calibre11">classList</code>属性之后，除非是完全删除或完全重写元素的<code class="calibre11">class</code>属性，否则<code class="calibre11">className</code>属性就用不到了。IE10及以上版本（部分）和其他主流浏览器（完全）实现了<code class="calibre11">classList</code>属性。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_336" class="calibre15">15.3.2 焦点管理</h3>
+        <p class="calibre1">HTML5增加了辅助DOM焦点管理的功能。首先是<code class="calibre11">document.activeElement</code>，始终包含当前拥有焦点的DOM元素。页面加载时，可以通过用户输入（按Tab键或代码中使用<code class="calibre11">focus()</code>方法）让某个元素自动获得焦点。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let button = document.getelementbyid("mybutton");
+button.focus();
+console.log(document.activeelement === button); // true</code></pre>
+        <p class="calibre1">默认情况下，<code class="calibre11">document.activeElement</code>在页面刚加载完之后会设置为<code class="calibre11">document.body</code>。而在页面完全加载之前，<code class="calibre11">document.activeElement</code>的值为<code class="calibre11">null</code>。</p>
+        <p class="calibre1">其次是<code class="calibre11">document.hasFocus()</code>方法，该方法返回布尔值，表示文档是否拥有焦点：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let button = document.getelementbyid("mybutton");
+button.focus();
+console.log(document.hasfocus()); // true</code></pre>
+        <p class="calibre1">确定文档是否获得了焦点，就可以帮助确定用户是否在操作页面。</p>
+        <p class="calibre1">第一个方法可以用来查询文档，确定哪个元素拥有焦点，第二个方法可以查询文档是否获得了焦点，而这对于保证Web应用程序的无障碍使用是非常重要的。无障碍Web应用程序的一个重要方面就是焦点管理，而能够确定哪个元素当前拥有焦点（相比于之前的猜测）是一个很大的进步。</p>
+        <h3 id="nav_point_337" class="calibre15">15.3.3
+          <code class="calibre26">HTMLDocument</code>扩展</h3>
+        <p class="calibre1">HTML5扩展了<code class="calibre11">HTMLDocument</code>类型，增加了更多功能。与其他HTML5定义的DOM扩展一样，这些变化同样基于所有浏览器事实上都已经支持的专有扩展。为此，即使这些扩展的标准化相对较晚，很多浏览器也早就实现了相应的功能。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">readyState</code>属性</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">readyState</code>是IE4最早添加到<code class="calibre11">document</code>对象上的属性，后来其他浏览器也都依葫芦画瓢地支持这个属性。最终，HTML5将这个属性写进了标准。<code class="calibre11">document.readyState</code>属性有两个可能的值：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">loading</code>，表示文档正在加载；</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">complete</code>，表示文档加载完成。</li>
+            </ul>
+            <p class="calibre1">实际开发中，最好是把<code class="calibre11">document.readState</code>当成一个指示器，以判断文档是否加载完毕。在这个属性得到广泛支持以前，通常要依赖<code class="calibre11">onload</code>事件处理程序设置一个标记，表示文档加载完了。这个属性的基本用法如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (document.readystate == "complete"){
+  // 执行操作
+}</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">compatMode</code>属性</strong>
+            </p>
+            <p class="calibre1">自从IE6提供了以标准或混杂模式渲染页面的能力之后，检测页面渲染模式成为一个必要的需求。IE为<code class="calibre11">document</code>添加了<code class="calibre11">compatMode</code>属性，这个属性唯一的任务是指示浏览器当前处于什么渲染模式。如下面的例子所示，标准模式下<code class="calibre11">document.compatMode</code>的值是<code class="calibre11">"CSS1Compat"</code>，而在混杂模式下，<code class="calibre11">document.compatMode</code>的值是<code class="calibre11">"BackCompat"</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (document.compatmode == "css1compat"){
+  console.log("standards mode");
+} else {
+  console.log("quirks mode");
+}</code></pre>
+            <p class="calibre1">HTML5最终也把<code class="calibre11">compatMode</code>属性的实现标准化了。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">head</code>属性</strong>
+            </p>
+            <p class="calibre1">作为对<code class="calibre11">document.body</code>（指向文档的<code class="calibre11">&lt;body&gt;</code>元素）的补充，HTML5增加了<code class="calibre11">document.head</code>属性，指向文档的<code class="calibre11">&lt;head&gt;</code>元素。可以像下面这样直接取得<code class="calibre11">&lt;head&gt;</code>元素：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let head = document.head;</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_338" class="calibre15">15.3.4 字符集属性</h3>
+        <p class="calibre1">HTML5增加了几个与文档字符集有关的新属性。其中，<code class="calibre11">characterSet</code>属性表示文档实际使用的字符集，也可以用来指定新字符集。这个属性的默认值是<code class="calibre11">"UTF-16"</code>，但可以通过<code class="calibre11">&lt;meta&gt;</code>元素或响应头，以及新增的<code class="calibre11">characterSeet</code>属性来修改。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(document.characterset); // "utf-16"
+document.characterset = "utf-8";</code></pre>
+        <h3 id="nav_point_339" class="calibre15">15.3.5 自定义数据属性</h3>
+        <p class="calibre1">HTML5允许给元素指定非标准的属性，但要使用前缀<code class="calibre11">data-</code>以便告诉浏览器，这些属性既不包含与渲染有关的信息，也不包含元素的语义信息。除了前缀，自定义属性对命名是没有限制的，<code class="calibre11">data-</code>后面跟什么都可以。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="mydiv" data-appid="12345" data-myname="nicholas"&gt;&lt;/div&gt;</code></pre>
+        <p class="calibre1">定义了自定义数据属性后，可以通过元素的<code class="calibre11">dataset</code>属性来访问。<code class="calibre11">dataset</code>属性是一个<code class="calibre11">DOMStringMap</code>的实例，包含一组键/值对映射。元素的每个<code class="calibre11">data-name</code>属性在<code class="calibre11">dataset</code>中都可以通过<code class="calibre11">data-</code>后面的字符串作为键来访问（例如，属性<code class="calibre11">data-myname</code>、<code class="calibre11">data-myName</code>可以通过<code class="calibre11">myname</code>访问，但要注意<code class="calibre11">data-my-name</code>、<code class="calibre11">data-My-Name</code>要通过<code class="calibre11">myName</code>来访问）。下面是一个使用自定义数据属性的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 本例中使用的方法仅用于示范
+
+let div = document.getelementbyid("mydiv");
+
+// 取得自定义数据属性的值
+let appid = div.dataset.appid;
+let myname = div.dataset.myname;
+
+// 设置自定义数据属性的值
+div.dataset.appid = 23456;
+div.dataset.myname = "michael";
+
+// 有"myname"吗？
+if (div.dataset.myname){
+  console.log(`hello, ${div.dataset.myname}`);
+}</code></pre>
+        <p class="calibre1">自定义数据属性非常适合需要给元素附加某些数据的场景，比如链接追踪和在聚合应用程序中标识页面的不同部分。另外，单页应用程序框架也非常多地使用了自定义数据属性。</p>
+        <h3 id="nav_point_340" class="calibre15">15.3.6 插入标记</h3>
+        <p class="calibre1">DOM虽然已经为操纵节点提供了很多API，但向文档中一次性插入大量HTML时还是比较麻烦。相比先创建一堆节点，再把它们以正确的顺序连接起来，直接插入一个HTML字符串要简单（快速）得多。HTML5已经通过以下DOM扩展将这种能力标准化了。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">innerHTML</code>属性</strong>
+            </p>
+            <p class="calibre1">在读取<code class="calibre11">innerHTML</code>属性时，会返回元素所有后代的HTML字符串，包括元素、注释和文本节点。而在写入<code class="calibre11">innerHTML</code>时，则会根据提供的字符串值以新的DOM子树替代元素中原来包含的所有节点。比如下面的HTML代码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="content"&gt;
+  &lt;p&gt;this is a &lt;strong&gt;paragraph&lt;/strong&gt; with a list following it.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;item 1&lt;/li&gt;
+    &lt;li&gt;item 2&lt;/li&gt;
+    &lt;li&gt;item 3&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+            <p class="calibre1">对于这里的<code class="calibre11">&lt;div&gt;</code>元素而言，其<code class="calibre11">innerHTML</code>属性会返回以下字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;p&gt;this is a &lt;strong&gt;paragraph&lt;/strong&gt; with a list following it.&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;item 1&lt;/li&gt;
+  &lt;li&gt;item 2&lt;/li&gt;
+  &lt;li&gt;item 3&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+            <p class="calibre1">实际返回的文本内容会因浏览器而不同。IE和Opera会把所有元素标签转换为大写，而Safari、Chrome和Firefox则会按照文档源代码的格式返回，包含空格和缩进。因此不要指望不同浏览器的<code class="calibre11">innerHTML</code>会返回完全一样的值。</p>
+            <p class="calibre1">在写入模式下，赋给<code class="calibre11">innerHTML</code>属性的值会被解析为DOM子树，并替代元素之前的所有节点。因为所赋的值默认为HTML，所以其中的所有标签都会以浏览器处理HTML的方式转换为元素（同样，转换结果也会因浏览器不同而不同）。如果赋值中不包含任何HTML标签，则直接生成一个文本节点，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.innerhtml = "hello world!";</code></pre>
+            <p class="calibre1">因为浏览器会解析设置的值，所以给<code class="calibre11">innerHTML</code>设置包含HTML的字符串时，结果会大不一样。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.innerhtml = "hello &amp; welcome, &lt;b&gt;\"reader\"!&lt;/b&gt;";</code></pre>
+            <p class="calibre1">这个操作的结果相当于：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="content"&gt;hello &amp;amp; welcome, &lt;b&gt;&amp;quot;reader&amp;quot;!&lt;/b&gt;&lt;/div&gt;</code></pre>
+            <p class="calibre1">设置完<code class="calibre11">innerHTML</code>，马上就可以像访问其他节点一样访问这些新节点。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                设置<code class="calibre11">innerHTML</code>会导致浏览器将HTML字符串解析为相应的DOM树。这意味着设置<code class="calibre11">innerHTML</code>属性后马上再读出来会得到不同的字符串。这是因为返回的字符串是将原始字符串对应的DOM子树序列化之后的结果。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">旧IE中的<code class="calibre11">innerHTML</code>
+              </strong>
+            </p>
+            <p class="calibre1">在所有现代浏览器中，通过<code class="calibre11">innerHTML</code>插入的<code class="calibre11">&lt;script&gt;</code>标签是不会执行的。而在IE8及之前的版本中，只要这样插入的<code class="calibre11">&lt;script&gt;</code>元素指定了<code class="calibre11">defer</code>属性，且<code class="calibre11">&lt;script&gt;</code>之前是“受控元素”（scoped element），那就是可以执行的。<code class="calibre11">&lt;script&gt;</code>元素与<code class="calibre11">&lt;style&gt;</code>或注释一样，都是“非受控元素”（NoScope element），也就是在页面上看不到它们。IE会把<code class="calibre11">innerHTML</code>中从非受控元素开始的内容都删掉，也就是说下面的例子是行不通的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 行不通
+div.innerhtml = "&lt;script defer&gt;console.log('hi');&lt;\/script&gt;";</code></pre>
+            <p class="calibre1">在这个例子中，<code class="calibre11">innerHTML</code>字符串以一个非受控元素开始，因此整个字符串都会被清空。为了达到目的，必须在<code class="calibre11">&lt;script&gt;</code>前面加上一个受控元素，例如文本节点或没有结束标签的元素（如<code class="calibre11">&lt;input&gt;</code>）。因此，下面的代码就是可行的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 以下都可行
+div.innerhtml = "_&lt;script defer&gt;console.log('hi');&lt;\/script&gt;";
+div.innerhtml = "&lt;div&gt;&amp;nbsp;&lt;/div&gt;&lt;script defer&gt;console.log('hi');&lt;\/script&gt;";
+div.innerhtml = "&lt;input type=\"hidden\"&gt;&lt;script defer&gt;console.
+log('hi');&lt;\/script&gt;";</code></pre>
+            <p class="calibre1">第一行会在<code class="calibre11">&lt;script&gt;</code>元素前面插入一个文本节点。为了不影响页面排版，可能稍后需要删掉这个文本节点。第二行与之类似，使用了包含空格的<code class="calibre11">&lt;div&gt;</code>元素。空<code class="calibre11">&lt;div&gt;</code>是不行的，必须包含一点内容，以强制创建一个文本节点。同样，这个<code class="calibre11">&lt;div&gt;</code>元素可能也需要事后删除，以免影响页面外观。第三行使用了一个隐藏的<code class="calibre11">&lt;input&gt;</code>字段来达成同样的目的。因为这个字段不影响页面布局，所以应该是最理想的方案。</p>
+            <p class="calibre1">在IE中，通过<code class="calibre11">innerHTML</code>插入<code class="calibre11">&lt;style&gt;</code>也会有类似的问题。多数浏览器支持使用<code class="calibre11">innerHTML</code>插入<code class="calibre11">&lt;style&gt;</code>元素：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.innerhtml = "&lt;style type=\"text/css\"&gt;body {background-color: red; }&lt;/style&gt;";</code></pre>
+            <p class="calibre1">但在IE8及之前的版本中，<code class="calibre11">&lt;style&gt;</code>也被认为是非受控元素，所以必须前置一个受控元素：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.innerhtml = "_&lt;style type=\"text/css\"&gt;body {background-color: red; }&lt;/style&gt;";
+div.removechild(div.firstchild);</code></pre>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                Firefox在内容类型为<code class="calibre11">application</code>/<code class="calibre11">xhtml+xml</code>的XHTML文档中对<code class="calibre11">innerHTML</code>更加严格。在XHTML文档中使用<code class="calibre11">innerHTML</code>，必须使用格式良好的XHTML代码。否则，在Firefox中会静默失败。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">outerHTML</code>属性</strong>
+            </p>
+            <p class="calibre1">读取<code class="calibre11">outerHTML</code>属性时，会返回调用它的元素（及所有后代元素）的HTML字符串。在写入<code class="calibre11">outerHTML</code>属性时，调用它的元素会被传入的HTML字符串经解释之后生成的DOM子树取代。比如下面的HTML代码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="content"&gt;
+  &lt;p&gt;this is a &lt;strong&gt;paragraph&lt;/strong&gt; with a list following it.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;item 1&lt;/li&gt;
+    &lt;li&gt;item 2&lt;/li&gt;
+    &lt;li&gt;item 3&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+            <p class="calibre1">在这个<code class="calibre11">&lt;div&gt;</code>元素上调用<code class="calibre11">outerHTML</code>会返回相同的字符串，包括<code class="calibre11">&lt;div&gt;</code>本身。注意，浏览器因解析和解释HTML代码的机制不同，返回的字符串也可能不同。（跟<code class="calibre11">innerHTML</code>的情况是一样的。）</p>
+            <p class="calibre1">如果使用<code class="calibre11">outerHTML</code>设置HTML，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">div.outerhtml = "&lt;p&gt;this is a paragraph.&lt;/p&gt;";</code></pre>
+            <p class="calibre1">则会得到与执行以下脚本相同的结果：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let p = document.createelement("p");
+p.appendchild(document.createtextnode("this is a paragraph."));
+div.parentnode.replacechild(p, div);</code></pre>
+            <p class="calibre1">新的<code class="calibre11">&lt;p&gt;</code>元素会取代DOM树中原来的<code class="calibre11">&lt;div&gt;</code>元素。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">insertAdjacentHTML()</code>与<code class="calibre11">insertAdjacentText()</code>
+              </strong>
+            </p>
+            <p class="calibre1">关于插入标签的最后两个新增方法是<code class="calibre11">insertAdjacentHTML()</code>和<code class="calibre11">insertAdjacentText()</code>。这两个方法最早源自IE，它们都接收两个参数：要插入标记的位置和要插入的HTML或文本。第一个参数必须是下列值中的一个：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">"beforebegin"</code>，插入当前元素前面，作为前一个同胞节点；</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">"afterbegin"</code>，插入当前元素内部，作为新的子节点或放在第一个子节点前面；</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">"beforeend"</code>，插入当前元素内部，作为新的子节点或放在最后一个子节点后面；</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">"afterend"</code>，插入当前元素后面，作为下一个同胞节点。</li>
+            </ul>
+            <p class="calibre1">注意这几个值是不区分大小写的。第二个参数会作为HTML字符串解析（与<code class="calibre11">innerHTML</code>和<code class="calibre11">outerHTML</code>相同）或者作为纯文本解析（与<code class="calibre11">innerText</code>和<code class="calibre11">outerText</code>相同）。如果是HTML，则会在解析出错时抛出错误。下面展示了基本用法<span class="zhu_shi_bian_hao">1</span>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 作为前一个同胞节点插入
+element.insertadjacenthtml("beforebegin", "&lt;p&gt;hello world!&lt;/p&gt;");
+element.insertadjacenttext("beforebegin", "hello world!");
+
+// 作为第一个子节点插入
+element.insertadjacenthtml("afterbegin", "&lt;p&gt;hello world!&lt;/p&gt;");
+element.insertadjacenttext("afterbegin", "hello world!");
+
+// 作为最后一个子节点插入
+element.insertadjacenthtml("beforeend", "&lt;p&gt;hello world!&lt;/p&gt;");
+element.insertadjacenttext("beforeend", "hello world!");
+
+// 作为下一个同胞节点插入
+element.insertadjacenthtml("afterend", "&lt;p&gt;hello world!&lt;/p&gt;"); element.
+insertadjacenttext("afterend", "hello world!");</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">内存与性能问题</strong>
+            </p>
+            <p class="calibre1">使用本节介绍的方法替换子节点可能在浏览器（特别是IE）中导致内存问题。比如，如果被移除的子树元素中之前有关联的事件处理程序或其他JavaScript对象（作为元素的属性），那它们之间的绑定关系会滞留在内存中。如果这种替换操作频繁发生，页面的内存占用就会持续攀升。在使用<code class="calibre11">innerHTML</code>、<code class="calibre11">outerHTML</code>和<code class="calibre11">insertAdjacentHTML()</code>之前，最好手动删除要被替换的元素上关联的事件处理程序和JavaScript对象。</p>
+            <p class="calibre1">使用这些属性当然有其方便之处，特别是<code class="calibre11">innerHTML</code>。一般来讲，插入大量的新HTML使用<code class="calibre11">innerHTML</code>比使用多次DOM操作创建节点再插入来得更便捷。这是因为HTML解析器会解析设置给<code class="calibre11">innerHTML</code>（或<code class="calibre11">outerHTML</code>）的值。解析器在浏览器中是底层代码（通常是C++代码），比JavaScript快得多。不过，HTML解析器的构建与解构也不是没有代价，因此最好限制使用<code class="calibre11">innerHTML</code>和<code class="calibre11">outerHTML</code>的次数。比如，下面的代码使用<code class="calibre11">innerHTML</code>创建了一些列表项：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let value of values){
+  ul.innerhtml += '&lt;li&gt;${value}&lt;/li&gt;';  // 别这样做！
+}</code></pre>
+            <p class="calibre1">这段代码效率低，因为每次迭代都要设置一次<code class="calibre11">innerHTML</code>。不仅如此，每次循环还要先读取<code class="calibre11">innerHTML</code>，也就是说循环一次要访问两次<code class="calibre11">innerHTML</code>。为此，最好通过循环先构建一个独立的字符串，最后再一次性把生成的字符串赋值给<code class="calibre11">innerHTML</code>，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let itemshtml = "";
+for (let value of values){
+  itemshtml += '&lt;li&gt;${value}&lt;/li&gt;';
+}
+ul.innerhtml = itemshtml;</code></pre>
+            <p class="calibre1">这样修改之后效率就高多了，因为只有对<code class="calibre11">innerHTML</code>的一次赋值。当然，像下面这样一行代码也可以搞定：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">ul.innerhtml = values.map(value =&gt; '&lt;li&gt;${value}&lt;/li&gt;').join('');</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">跨站点脚本</strong>
+            </p>
+            <p class="calibre1">尽管<code class="calibre11">innerHTML</code>不会执行自己创建的<code class="calibre11">&lt;script&gt;</code>标签，但仍然向恶意用户暴露了很大的攻击面，因为通过它可以毫不费力地创建元素并执行<code class="calibre11">onclick</code>之类的属性。</p>
+            <p class="calibre1">如果页面中要使用用户提供的信息，则不建议使用<code class="calibre11">innerHTML</code>。与使用<code class="calibre11">innerHTML</code>获得的方便相比，防止XSS攻击更让人头疼。此时一定要隔离要插入的数据，在插入页面前必须毫不犹豫地使用相关的库对它们进行转义。</p>
+          </li>
+        </ol>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">1</span>假设当前元素是<code class="calibre11">&lt;p&gt;Hello world!&lt;/p&gt;</code>，则<code class="calibre11">"beforebegin"</code>和<code class="calibre11">"afterbegin"</code>中的<code class="calibre11">"begin"</code>指开始标签<code class="calibre11">&lt;p&gt;</code>；而<code class="calibre11">"afterend"</code>和<code class="calibre11">"beforeend"</code>中的<code class="calibre11">"end"</code>指结束标签<code class="calibre11">&lt;/p&gt;</code>。——译者注</p>
+        <h3 id="nav_point_341" class="calibre15">15.3.7
+          <code class="calibre26">scrollIntoView()</code>
+        </h3>
+        <p class="calibre1">DOM规范中没有涉及的一个问题是如何滚动页面中的某个区域。为填充这方面的缺失，不同浏览器实现了不同的控制滚动的方式。在所有这些专有方法中，HTML5选择了标准化<code class="calibre11">scrollIntoView()</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">scrollIntoView()</code>方法存在于所有HTML元素上，可以滚动浏览器窗口或容器元素以便包含元素进入视口。这个方法的参数如下：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">alignToTop</code>是一个布尔值。<ul class="calibre28">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">true</code>：窗口滚动后元素的顶部与视口顶部对齐。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">false</code>：窗口滚动后元素的底部与视口底部对齐。</li>
+            </ul>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">scrollIntoViewOptions</code>是一个选项对象。<ul class="calibre28">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">behavior</code>：定义过渡动画，可取的值为<code class="calibre11">"smooth"</code>和<code class="calibre11">"auto"</code>，默认为<code class="calibre11">"auto"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">block</code>：定义垂直方向的对齐，可取的值为<code class="calibre11">"首页"</code>、<code class="calibre11">"center"</code>、<code class="calibre11">"end"</code>和<code class="calibre11">"nearest"</code>，默认为
+                <code class="calibre11">"首页"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">inline</code>：定义水平方向的对齐，可取的值为<code class="calibre11">"首页"</code>、<code class="calibre11">"center"</code>、<code class="calibre11">"end"</code>和<code class="calibre11">"nearest"</code>，默认为
+                <code class="calibre11">"nearest"</code>。</li>
+            </ul>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">不传参数等同于<code class="calibre11">alignToTop</code>为<code class="calibre11">true</code>。</li>
+        </ul>
+        <p class="calibre1">来看几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 确保元素可见
+document.forms[0].scrollintoview();
+
+// 同上
+document.forms[0].scrollintoview(true);
+document.forms[0].scrollintoview({block: '首页'});
+
+// 尝试将元素平滑地滚入视口
+document.forms[0].scrollintoview({behavior: 'smooth', block: '首页'});</code></pre>
+        <p class="calibre1">这个方法可以用来在页面上发生某个事件时引起用户关注。把焦点设置到一个元素上也会导致浏览器将元素滚动到可见位置。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0112.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0114.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

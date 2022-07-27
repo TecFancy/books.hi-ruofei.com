@@ -1,0 +1,404 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0018.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0020.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_20" class="calibre9">2.1
+          <code class="calibre26">&lt;script&gt;</code>元素</h2>
+        <p class="calibre1">将JavaScript插入HTML的主要方法是使用<code class="calibre11">&lt;script&gt;</code>元素。这个元素是由网景公司创造出来，并最早在Netscape Navigator 2中实现的。后来，这个元素被正式加入到HTML规范。<code class="calibre11">&lt;script&gt;</code>元素有下列8个属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">async</code>：可选。表示应该立即开始下载脚本，但不能阻止其他页面动作，比如下载资源或等待其他脚本加载。只对外部脚本文件有效。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">charset</code>：可选。使用<code class="calibre11">src</code>属性指定的代码字符集。这个属性很少使用，因为大多数浏览器不在乎它的值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">crossorigin</code>：可选。配置相关请求的CORS（跨源资源共享）设置。默认不使用CORS。<code class="calibre11">crossorigin="anonymous"</code>配置文件请求不必设置凭据标志。<code class="calibre11">crossorigin="use-credentials"</code>设置凭据标志，意味着出站请求会包含凭据。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">defer</code>：可选。表示脚本可以延迟到文档完全被解析和显示之后再执行。只对外部脚本文件有效。在IE7及更早的版本中，对行内脚本也可以指定这个属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">integrity</code>：可选。允许比对接收到的资源和指定的加密签名以验证子资源完整性（SRI，Subresource Integrity）。如果接收到的资源的签名与这个属性指定的签名不匹配，则页面会报错，脚本不会执行。这个属性可以用于确保内容分发网络（CDN，Content Delivery Network）不会提供恶意内容。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">language</code>：废弃。最初用于表示代码块中的脚本语言（如<code class="calibre11">"JavaScript"</code>、<code class="calibre11">"JavaScript 1.2"</code>或<code class="calibre11">"VBScript"</code>）。大多数浏览器都会忽略这个属性，不应该再使用它。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">src</code>：可选。表示包含要执行的代码的外部文件。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">type</code>：可选。代替<code class="calibre11">language</code>，表示代码块中脚本语言的内容类型（也称MIME类型）。按照惯例，这个值始终都是<code class="calibre11">"text/javascript"</code>，尽管<code class="calibre11">"text/javascript"</code>和<code class="calibre11">"text/ecmascript"</code>都已经废弃了。JavaScript文件的MIME类型通常是<code class="calibre11">"application/x-javascript"</code>，不过给type属性这个值有可能导致脚本被忽略。在非IE的浏览器中有效的其他值还有<code class="calibre11">"application/javascript"</code>和<code class="calibre11">"application/ecmascript"</code>。如果这个值是<code class="calibre11">module</code>，则代码会被当成ES6模块，而且只有这时候代码中才能出现<code class="calibre11">import</code>和<code class="calibre11">export</code>关键字。</li>
+        </ul>
+        <p class="calibre1">使用<code class="calibre11">&lt;script&gt;</code>的方式有两种：通过它直接在网页中嵌入JavaScript代码，以及通过它在网页中包含外部JavaScript文件。</p>
+        <p class="calibre1">要嵌入行内JavaScript代码，直接把代码放在<code class="calibre11">&lt;script&gt;</code>元素中就行：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;
+  function sayhi() {
+    console.log("hi!");
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">包含在<code class="calibre11">&lt;script&gt;</code>内的代码会被从上到下解释。在上面的例子中，被解释的是一个函数定义，并且该函数会被保存在解释器环境中。在<code class="calibre11">&lt;script&gt;</code>元素中的代码被计算完成之前，页面的其余内容不会被加载，也不会被显示。</p>
+        <p class="calibre1">在使用行内JavaScript代码时，要注意代码中不能出现字符串<code class="calibre11">&lt;/script&gt;</code>。比如，下面的代码会导致浏览器报错：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;
+  function sayscript() {
+    console.log("&lt;/script&gt;");
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">浏览器解析行内脚本的方式决定了它在看到字符串<code class="calibre11">&lt;/script&gt;</code>时，会将其当成结束的<code class="calibre11">&lt;/script&gt;</code>标签。想避免这个问题，只需要转义字符“\”<span class="zhu_shi_bian_hao">1</span>即可：</p>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">1</span>此处的转义字符指在JavaScript中使用反斜杠“<code class="calibre11">\</code>”来向文本字符串添加特殊字符。——编者注</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;
+  function sayscript() {
+    console.log("&lt;\/script&gt;");
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">这样修改之后，代码就可以被浏览器完全解释，不会导致任何错误。</p>
+        <p class="calibre1">要包含外部文件中的JavaScript，就必须使用<code class="calibre11">src</code>属性。这个属性的值是一个URL，指向包含JavaScript代码的文件，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script src="example.js"&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">这个例子在页面中加载了一个名为example.js的外部文件。文件本身只需包含要放在<code class="calibre11">&lt;script&gt;</code>的起始及结束标签中间的JavaScript代码。与解释行内JavaScript一样，在解释外部JavaScript文件时，页面也会阻塞。（阻塞时间也包含下载文件的时间。）在XHTML文档中，可以忽略结束标签，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script src="example.js"/&gt;</code></pre>
+        <p class="calibre1">以上语法不能在HTML文件中使用，因为它是无效的HTML，有些浏览器不能正常处理，比如IE。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            按照惯例，外部JavaScript文件的扩展名是.js。这不是必需的，因为浏览器不会检查所包含JavaScript文件的扩展名。这就为使用服务器端脚本语言动态生成JavaScript代码，或者在浏览器中将JavaScript扩展语言（如TypeScript，或React的JSX）转译为JavaScript提供了可能性。不过要注意，服务器经常会根据文件扩展来确定响应的正确MIME类型。如果不打算使用.js扩展名，一定要确保服务器能返回正确的MIME类型。</p>
+        </blockquote>
+        <p class="calibre1">另外，使用了<code class="calibre11">src</code>属性的<code class="calibre11">&lt;script&gt;</code>元素不应该再在<code class="calibre11">&lt;script&gt;</code>和<code class="calibre11">&lt;/script&gt;</code>标签中再包含其他JavaScript代码。如果两者都提供的话，则浏览器只会下载并执行脚本文件，从而忽略行内代码。</p>
+        <p class="calibre1">
+          <code class="calibre11">&lt;script&gt;</code>元素的一个最为强大、同时也备受争议的特性是，它可以包含来自外部域的JavaScript文件。跟<code class="calibre11">&lt;img&gt;</code>元素很像，<code class="calibre11">&lt;script&gt;</code>元素的<code class="calibre11">src</code>属性可以是一个完整的URL，而且这个URL指向的资源可以跟包含它的HTML页面不在同一个域中，比如这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script src="http://www.somewhere.com/afile.js"&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">浏览器在解析这个资源时，会向<code class="calibre11">src</code>属性指定的路径发送一个<code class="calibre11">GET</code>请求，以取得相应资源，假定是一个JavaScript文件。这个初始的请求不受浏览器同源策略限制，但返回并被执行的JavaScript则受限制。当然，这个请求仍然受父页面HTTP/HTTPS协议的限制。</p>
+        <p class="calibre1">来自外部域的代码会被当成加载它的页面的一部分来加载和解释。这个能力可以让我们通过不同的域分发JavaScript。不过，引用了放在别人服务器上的JavaScript文件时要格外小心，因为恶意的程序员随时可能替换这个文件。在包含外部域的JavaScript文件时，要确保该域是自己所有的，或者该域是一个可信的来源。<code class="calibre11">&lt;script&gt;</code>标签的<code class="calibre11">integrity</code>属性是防范这种问题的一个武器，但这个属性也不是所有浏览器都支持。</p>
+        <p class="calibre1">不管包含的是什么代码，浏览器都会按照<code class="calibre11">&lt;script&gt;</code>在页面中出现的顺序依次解释它们，前提是它们没有使用<code class="calibre11">defer</code>和<code class="calibre11">async</code>属性。第二个<code class="calibre11">&lt;script&gt;</code>元素的代码必须在第一个<code class="calibre11">&lt;script&gt;</code>元素的代码解释完毕才能开始解释，第三个则必须等第二个解释完，以此类推。</p>
+        <h3 id="nav_point_21" class="calibre15">2.1.1 标签占位符</h3>
+        <p class="calibre1">过去，所有<code class="calibre11">&lt;script&gt;</code>元素都被放在页面的<code class="calibre11">&lt;head&gt;</code>标签内，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt;example html page&lt;/title&gt;
+  &lt;script src="example1.js"&gt;&lt;/script&gt;
+  &lt;script src="example2.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;!-- 这里是页面内容 --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">这种做法的主要目的是把外部的CSS和JavaScript文件都集中放到一起。不过，把所有JavaScript文件都放在<code class="calibre11">&lt;head&gt;</code>里，也就意味着必须把所有JavaScript代码都下载、解析和解释完成后，才能开始渲染页面（页面在浏览器解析到<code class="calibre11">&lt;body&gt;</code>的起始标签时开始渲染）。对于需要很多JavaScript的页面，这会导致页面渲染的明显延迟，在此期间浏览器窗口完全空白。为解决这个问题，现代Web应用程序通常将所有JavaScript引用放在<code class="calibre11">&lt;body&gt;</code>元素中的页面内容后面，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt;example html page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;!-- 这里是页面内容 --&gt;
+  &lt;script src="example1.js"&gt;&lt;/script&gt;
+  &lt;script src="example2.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">这样一来，页面会在处理JavaScript代码之前完全渲染页面。用户会感觉页面加载更快了，因为浏览器显示空白页面的时间短了。</p>
+        <h3 id="nav_point_22" class="calibre15">2.1.2 推迟执行脚本</h3>
+        <p class="calibre1">HTML 4.01为<code class="calibre11">&lt;script&gt;</code>元素定义了一个叫<code class="calibre11">defer</code>的属性。这个属性表示脚本在执行的时候不会改变页面的结构。也就是说，脚本会被延迟到整个页面都解析完毕后再运行。因此，在<code class="calibre11">&lt;script&gt;</code>元素中设置<code class="calibre11">defer</code>属性，相当于告诉浏览器立即下载，但延迟执行。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt;example html page&lt;/title&gt;
+  &lt;script defer src="example1.js"&gt;&lt;/script&gt;
+  &lt;script defer src="example2.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;!-- 这里是页面内容 --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">虽然这个例子中的<code class="calibre11">&lt;script&gt;</code>元素包含在页面的<code class="calibre11">&lt;head&gt;</code>中，但它们会在浏览器解析到结束的<code class="calibre11">&lt;/html&gt;</code>标签后才会执行。HTML5规范要求脚本应该按照它们出现的顺序执行，因此第一个推迟的脚本会在第二个推迟的脚本之前执行，而且两者都会在<code class="calibre11">DOMContentLoaded</code>事件之前执行（关于事件，请参考第17章）。不过在实际当中，推迟执行的脚本不一定总会按顺序执行或者在<code class="calibre11">DOMContentLoaded</code>事件之前执行，因此最好只包含一个这样的脚本。</p>
+        <p class="calibre1">如前所述，<code class="calibre11">defer</code>属性只对外部脚本文件才有效。这是HTML5中明确规定的，因此支持HTML5的浏览器会忽略行内脚本的<code class="calibre11">defer</code>属性。IE4~7展示出的都是旧的行为，IE8及更高版本则支持HTML5定义的行为。</p>
+        <p class="calibre1">对<code class="calibre11">defer</code>属性的支持是从IE4、Firefox 3.5、Safari 5和Chrome 7开始的。其他所有浏览器则会忽略这个属性，按照通常的做法来处理脚本。考虑到这一点，还是把要推迟执行的脚本放在页面底部比较好。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            对于XHTML文档，指定<code class="calibre11">defer</code>属性时应该写成<code class="calibre11">defer="defer"</code>。</p>
+        </blockquote>
+        <h3 id="nav_point_23" class="calibre15">2.1.3 异步执行脚本</h3>
+        <p class="calibre1">HTML5为<code class="calibre11">&lt;script&gt;</code>元素定义了<code class="calibre11">async</code>属性。从改变脚本处理方式上看，<code class="calibre11">async</code>属性与<code class="calibre11">defer</code>类似。当然，它们两者也都只适用于外部脚本，都会告诉浏览器立即开始下载。不过，与<code class="calibre11">defer</code>不同的是，标记为<code class="calibre11">async</code>的脚本并不保证能按照它们出现的次序执行，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+  &lt;title&gt;example html page&lt;/title&gt;
+  &lt;script async src="example1.js"&gt;&lt;/script&gt;
+  &lt;script async src="example2.js"&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;!-- 这里是页面内容 --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">在这个例子中，第二个脚本可能先于第一个脚本执行。因此，重点在于它们之间没有依赖关系。给脚本添加<code class="calibre11">async</code>属性的目的是告诉浏览器，不必等脚本下载和执行完后再加载页面，同样也不必等到该异步脚本下载和执行后再加载其他脚本。正因为如此，异步脚本不应该在加载期间修改DOM。</p>
+        <p class="calibre1">异步脚本保证会在页面的<code class="calibre11">load</code>事件前执行，但可能会在<code class="calibre11">DOMContentLoaded</code>（参见第17章）之前或之后。Firefox 3.6、Safari 5和Chrome 7支持异步脚本。使用<code class="calibre11">async</code>也会告诉页面你不会使用<code class="calibre11">document.write</code>，不过好的Web开发实践根本就不推荐使用这个方法。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            对于XHTML文档，指定<code class="calibre11">async</code>属性时应该写成<code class="calibre11">async="async"</code>。</p>
+        </blockquote>
+        <h3 id="nav_point_24" class="calibre15">2.1.4 动态加载脚本</h3>
+        <p class="calibre1">除了<code class="calibre11">&lt;script&gt;</code>标签，还有其他方式可以加载脚本。因为JavaScript可以使用DOM API，所以通过向DOM中动态添加<code class="calibre11">script</code>元素同样可以加载指定的脚本。只要创建一个<code class="calibre11">script</code>元素并将其添加到DOM即可。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let script = document.createelement('script');
+script.src = 'gibberish.js';
+document.head.appendchild(script);</code></pre>
+        <p class="calibre1">当然，在把<code class="calibre11">HTMLElement</code>元素添加到DOM且执行到这段代码之前不会发送请求。默认情况下，以这种方式创建的<code class="calibre11">&lt;script&gt;</code>元素是以异步方式加载的，相当于添加了<code class="calibre11">async</code>属性。不过这样做可能会有问题，因为所有浏览器都支持<code class="calibre11">createElement()</code>方法，但不是所有浏览器都支持<code class="calibre11">async</code>属性。因此，如果要统一动态脚本的加载行为，可以明确将其设置为同步加载：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let script = document.createelement('script');
+script.src = 'gibberish.js';
+script.async = false;
+document.head.appendchild(script);</code></pre>
+        <p class="calibre1">以这种方式获取的资源对浏览器预加载器是不可见的。这会严重影响它们在资源获取队列中的优先级。根据应用程序的工作方式以及怎么使用，这种方式可能会严重影响性能。要想让预加载器知道这些动态请求文件的存在，可以在文档头部显式声明它们：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;link rel="preload" href="gibberish.js"&gt;</code></pre>
+        <h3 id="nav_point_25" class="calibre15">2.1.5 XHTML中的变化</h3>
+        <p class="calibre1">可扩展超文本标记语言（XHTML，Extensible HyperText Markup Language）是将HTML作为XML的应用重新包装的结果。与HTML不同，在XHTML中使用JavaScript必须指定<code class="calibre11">type</code>属性且值为<code class="calibre11">text/javascript</code>，HTML中则可以没有这个属性。XHTML虽然已经退出历史舞台，但实践中偶尔可能也会遇到遗留代码，为此本节稍作介绍。</p>
+        <p class="calibre1">在XHTML中编写代码的规则比HTML中严格，这会影响使用<code class="calibre11">&lt;script&gt;</code>元素嵌入JavaScript代码。下面的代码块虽然在HTML中有效，但在XHML中是无效的。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script type="text/javascript"&gt;
+  function compare(a, b) {
+    if (a &lt; b) {
+      console.log("a is less than b");
+    } else if (a &gt; b) {
+      console.log("a is greater than b");
+    } else {
+      console.log("a is equal to b");
+    }
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">在HTML中，解析<code class="calibre11">&lt;script&gt;</code>元素会应用特殊规则。XHTML中则没有这些规则。这意味着<code class="calibre11">a &lt; b</code>语句中的小于号（<code class="calibre11">&lt;</code>）会被解释成一个标签的开始，并且由于作为标签开始的小于号后面不能有空格，这会导致语法错误。</p>
+        <p class="calibre1">避免XHTML中这种语法错误的方法有两种。第一种是把所有小于号（<code class="calibre11">&lt;</code>）都替换成对应的HTML实体形式（<code class="calibre11">&amp;lt;</code>）。结果代码就是这样的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script type="text/javascript"&gt;
+  function compare(a, b) {
+    if (a &amp;lt; b) {
+      console.log("a is less than b");
+    } else if (a &gt; b) {
+      console.log("a is greater than b");
+    } else {
+      console.log("a is equal to b");
+    }
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">这样代码就可以在XHTML页面中运行了。不过，缺点是会影响阅读。好在还有另一种方法。</p>
+        <p class="calibre1">第二种方法是把所有代码都包含到一个CDATA块中。在XHTML（及XML）中，CDATA块表示文档中可以包含任意文本的区块，其内容不作为标签来解析，因此可以在其中包含任意字符，包括小于号，并且不会引发语法错误。使用CDATA的格式如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script type="text/javascript"&gt;&lt;![cdata[
+  function compare(a, b) {
+    if (a &lt; b) {
+      console.log("a is less than b");
+    } else if (a &gt; b) {
+      console.log("a is greater than b");
+    } else {
+      console.log("a is equal to b");
+    }
+  }
+]]&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">在兼容XHTML的浏览器中，这样能解决问题。但在不支持CDATA块的非XHTML兼容浏览器中则不行。为此，CDATA标记必须使用JavaScript注释来抵消：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script type="text/javascript"&gt;
+//&lt;![cdata[
+  function compare(a, b) {
+    if (a &lt; b) {
+      console.log("a is less than b");
+    } else if (a &gt; b) {
+      console.log("a is greater than b");
+    } else {
+      console.log("a is equal to b");
+    }
+  }
+//]]&gt;
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">这种格式适用于所有现代浏览器。虽然有点黑科技的味道，但它可以通过XHTML验证，而且对XHTML之前的浏览器也能优雅地降级。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            XHTML模式会在页面的MIME类型被指定为<code class="calibre11">"application/xhtml+xml"</code>时触发。并不是所有浏览器都支持以这种方式送达的XHTML。</p>
+        </blockquote>
+        <h3 id="nav_point_26" class="calibre15">2.1.6 废弃的语法</h3>
+        <p class="calibre1">自1995年Netscape 2发布以来，所有浏览器都将JavaScript作为默认的编程语言。<code class="calibre11">type</code>属性使用一个MIME类型字符串来标识<code class="calibre11">&lt;script&gt;</code>的内容，但MIME类型并没有跨浏览器标准化。即使浏览器默认使用JavaScript，在某些情况下某个无效或无法识别的MIME类型也可能导致浏览器跳过（不执行）相关代码。因此，除非你使用XHTML或<code class="calibre11">&lt;script&gt;</code>标签要求或包含非JavaScript代码，最佳做法是不指定<code class="calibre11">type</code>属性。</p>
+        <p class="calibre1">在最初采用<code class="calibre11">script</code>元素时，它标志着开始走向与传统HTML解析不同的流程。对这个元素需要应用特殊的解析规则，而这在不支持JavaScript的浏览器（特别是Mosaic）中会导致问题。不支持的浏览器会把<code class="calibre11">&lt;script&gt;</code>元素的内容输出到页面上，从而破坏页面的外观。</p>
+        <p class="calibre1">Netscape联合Mosaic拿出了一个解决方案，对不支持JavaScript的浏览器隐藏嵌入的JavaScript代码。最终方案是把脚本代码包含在一个HTML注释中，像这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;&lt;!--
+  function sayhi(){
+    console.log("hi!");
+  }
+//--&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">使用这种格式，Mosaic等浏览器就可以忽略<code class="calibre11">&lt;script&gt;</code>标签中的内容，而支持JavaScript的浏览器则必须识别这种模式，将其中的内容作为JavaScript来解析。</p>
+        <p class="calibre1">虽然这种格式仍然可以被所有浏览器识别和解析，但已经不再必要，而且不应该再使用了。在XHTML模式下，这种格式也会导致脚本被忽略，因为代码处于有效的XML注释当中。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0018.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0020.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

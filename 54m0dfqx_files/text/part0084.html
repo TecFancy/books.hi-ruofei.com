@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0083.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0085.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_249" class="calibre9">10.14 闭包</h2>
+        <p class="calibre1">匿名函数经常被人误认为是闭包（closure）。<strong class="calibre2">闭包</strong>指的是那些引用了另一个函数作用域中变量的函数，通常是在嵌套函数中实现的。比如，下面是之前展示的<code class="calibre11">createComparisonFunction()</code>函数，注意其中加粗的代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function createcomparisonfunction(propertyname) {
+  return function(object1, object2) {
+    let value1 = object1[propertyname];
+    let value2 = object2[propertyname];
+
+    if (value1 &lt; value2) {
+      return -1;
+    } else if (value1 &gt; value2) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+}</code></pre>
+        <p class="calibre1">这里加粗的代码位于内部函数（匿名函数）中，其中引用了外部函数的变量<code class="calibre11">propertyName</code>。在这个内部函数被返回并在其他地方被使用后，它仍然引用着那个变量。这是因为内部函数的作用域链包含<code class="calibre11">createComparisonFunction()</code>函数的作用域。要理解为什么会这样，可以想想第一次调用这个函数时会发生什么。</p>
+        <p class="calibre1">本书在第4章曾介绍过作用域链的概念。理解作用域链创建和使用的细节对理解闭包非常重要。在调用一个函数时，会为这个函数调用创建一个执行上下文，并创建一个作用域链。然后用<code class="calibre11">arguments</code>和其他命名参数来初始化这个函数的活动对象。外部函数的活动对象是内部函数作用域链上的第二个对象。这个作用域链一直向外串起了所有包含函数的活动对象，直到全局执行上下文才终止。</p>
+        <p class="calibre1">在函数执行时，要从作用域链中查找变量，以便读、写值。来看下面的代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function compare(value1, value2) {
+  if (value1 &lt; value2) {
+    return -1;
+  } else if (value1 &gt; value2) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+let result = compare(5, 10);</code></pre>
+        <p class="calibre1">这里定义的<code class="calibre11">compare()</code>函数是在全局上下文中调用的。第一次调用<code class="calibre11">compare()</code>时，会为它创建一个包含<code class="calibre11">arguments</code>、<code class="calibre11">value1</code>和<code class="calibre11">value2</code>的活动对象，这个对象是其作用域链上的第一个对象。而全局上下文的变量对象则是<code class="calibre11">compare()</code>作用域链上的第二个对象，其中包含<code class="calibre11">this</code>、<code class="calibre11">result</code>和<code class="calibre11">compare</code>。图10-1展示了以上关系。</p>
+        <p class="calibre7"><img src="../images/00053.gif" alt="{%}" class="calibre12"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 10-1</strong>
+        </p>
+        <p class="calibre1">函数执行时，每个执行上下文中都会有一个包含其中变量的对象。全局上下文中的叫变量对象，它会在代码执行期间始终存在。而函数局部上下文中的叫活动对象，只在函数执行期间存在。在定义<code class="calibre11">compare()</code>函数时，就会为它创建作用域链，预装载全局变量对象，并保存在内部的<code class="calibre11">[[Scope]]</code>中。在调用这个函数时，会创建相应的执行上下文，然后通过复制函数的<code class="calibre11">[[Scope]]</code>来创建其作用域链。接着会创建函数的活动对象（用作变量对象）并将其推入作用域链的前端。在这个例子中，这意味着<code class="calibre11">compare()</code>函数执行上下文的作用域链中有两个变量对象：局部变量对象和全局变量对象。作用域链其实是一个包含指针的列表，每个指针分别指向一个变量对象，但物理上并不会包含相应的对象。</p>
+        <p class="calibre1">函数内部的代码在访问变量时，就会使用给定的名称从作用域链中查找变量。函数执行完毕后，局部活动对象会被销毁，内存中就只剩下全局作用域。不过，闭包就不一样了。</p>
+        <p class="calibre1">在一个函数内部定义的函数会把其包含函数的活动对象添加到自己的作用域链中。因此，在<code class="calibre11">createComparisonFunction()</code>函数中，匿名函数的作用域链中实际上包含<code class="calibre11">createComparisonFunction()</code>的活动对象。图10-2展示了以下代码执行后的结果。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let compare = createcomparisonfunction('name');
+let result = compare({ name: 'nicholas' }, { name: 'matt' });</code></pre>
+        <p class="calibre7"><img src="../images/00008.gif" alt="{%}" class="calibre12"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 10-2</strong>
+        </p>
+        <p class="calibre1">在<code class="calibre11">createComparisonFunction()</code>返回匿名函数后，它的作用域链被初始化为包含<code class="calibre11">createComparisonFunction()</code>的活动对象和全局变量对象。这样，匿名函数就可以访问到<code class="calibre11">createComparisonFunction()</code>可以访问的所有变量。另一个有意思的副作用就是，<code class="calibre11">createComparisonFunction()</code>的活动对象并不能在它执行完毕后销毁，因为匿名函数的作用域链中仍然有对它的引用。在<code class="calibre11">createComparisonFunction()</code>执行完毕后，其执行上下文的作用域链会销毁，但它的活动对象仍然会保留在内存中，直到匿名函数被销毁后才会被销毁：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建比较函数
+let comparenames = createcomparisonfunction('name');
+
+// 调用函数
+let result = comparenames({ name: 'nicholas' }, { name: 'matt' });
+
+// 解除对函数的引用，这样就可以释放内存了
+comparenames = null;</code></pre>
+        <p class="calibre1">这里，创建的比较函数被保存在变量<code class="calibre11">compareNames</code>中。把<code class="calibre11">compareNames</code>设置为等于<code class="calibre11">null</code>会解除对函数的引用，从而让垃圾回收程序可以将内存释放掉。作用域链也会被销毁，其他作用域（除全局作用域之外）也可以销毁。图10-2展示了调用<code class="calibre11">compareNames()</code>之后作用域链之间的关系。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            因为闭包会保留它们包含函数的作用域，所以比其他函数更占用内存。过度使用闭包可能导致内存过度占用，因此建议仅在十分必要时使用。V8等优化的JavaScript引擎会努力回收被闭包困住的内存，不过我们还是建议在使用闭包时要谨慎。</p>
+        </blockquote>
+        <h3 id="nav_point_250" class="calibre15">10.14.1
+          <code class="calibre26">this</code>对象</h3>
+        <p class="calibre1">在闭包中使用<code class="calibre11">this</code>会让代码变复杂。如果内部函数没有使用箭头函数定义，则<code class="calibre11">this</code>对象会在运行时绑定到执行函数的上下文。如果在全局函数中调用，则<code class="calibre11">this</code>在非严格模式下等于<code class="calibre11">window</code>，在严格模式下等于<code class="calibre11">undefined</code>。如果作为某个对象的方法调用，则<code class="calibre11">this</code>等于这个对象。匿名函数在这种情况下不会绑定到某个对象，这就意味着<code class="calibre11">this</code>会指向<code class="calibre11">window</code>，除非在严格模式下<code class="calibre11">this</code>是<code class="calibre11">undefined</code>。不过，由于闭包的写法所致，这个事实有时候没有那么容易看出来。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.identity = 'the window';
+
+let object = {
+  identity: 'my object',
+  getidentityfunc() {
+    return function() {
+      return this.identity;
+    };
+  }
+};
+
+console.log(object.getidentityfunc()()); // 'the window'</code></pre>
+        <p class="calibre1">这里先创建了一个全局变量<code class="calibre11">identity</code>，之后又创建一个包含<code class="calibre11">identity</code>属性的对象。这个对象还包含一个<code class="calibre11">getIdentityFunc()</code>方法，返回一个匿名函数。这个匿名函数返回<code class="calibre11">this.identity</code>。因为<code class="calibre11">getIdentityFunc()</code>返回函数，所以<code class="calibre11">object.getIdentityFunc()()</code>会立即调用这个返回的函数，从而得到一个字符串。可是，此时返回的字符串是<code class="calibre11">"The Winodw"</code>，即全局变量<code class="calibre11">identity</code>的值。为什么匿名函数没有使用其包含作用域（<code class="calibre11">getIdentityFunc()</code>）的<code class="calibre11">this</code>对象呢？</p>
+        <p class="calibre1">前面介绍过，每个函数在被调用时都会自动创建两个特殊变量：<code class="calibre11">this</code>和<code class="calibre11">arguments</code>。内部函数永远不可能直接访问外部函数的这两个变量。但是，如果把<code class="calibre11">this</code>保存到闭包可以访问的另一个变量中，则是行得通的。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.identity = 'the window';
+
+let object = {
+  identity: 'my object',
+  getidentityfunc() {
+    let that = this;
+    return function() {
+      return that.identity;
+    };
+  }
+};
+
+console.log(object.getidentityfunc()()); // 'my object'</code></pre>
+        <p class="calibre1">这里加粗的代码展示了与前面那个例子的区别。在定义匿名函数之前，先把外部函数的<code class="calibre11">this</code>保存到变量<code class="calibre11">that</code>中。然后在定义闭包时，就可以让它访问<code class="calibre11">that</code>，因为这是包含函数中名称没有任何冲突的一个变量。即使在外部函数返回之后，<code class="calibre11">that</code>仍然指向<code class="calibre11">object</code>，所以调用<code class="calibre11">object.getIdentityFunc()()</code>就会返回<code class="calibre11">"My Object"</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">this</code>和<code class="calibre11">arguments</code>都是不能直接在内部函数中访问的。如果想访问包含作用域中的<code class="calibre11">arguments</code>对象，则同样需要将其引用先保存到闭包能访问的另一个变量中。</p>
+        </blockquote>
+        <p class="calibre1">在一些特殊情况下，<code class="calibre11">this</code>值可能并不是我们所期待的值。比如下面这个修改后的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.identity = 'the window';
+let object = {
+  identity: 'my object',
+  getidentity () {
+    return this.identity;
+  }
+};</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">getIdentity()</code>方法就是返回<code class="calibre11">this.identity</code>的值。以下是几种调用<code class="calibre11">object.getIdentity()</code>的方式及返回值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">object.getidentity();                         // 'my object'
+(object.getidentity)();                       // 'my object'
+(object.getidentity = object.getidentity)();  // 'the window'</code></pre>
+        <p class="calibre1">第一行调用<code class="calibre11">object.getIdentity()</code>是正常调用，会返回<code class="calibre11">"My Object"</code>，因为<code class="calibre11">this.identity</code>就是<code class="calibre11">object.identity</code>。第二行在调用时把<code class="calibre11">object.getIdentity</code>放在了括号里。虽然加了括号之后看起来是对一个函数的引用，但<code class="calibre11">this</code>值并没有变。这是因为按照规范，<code class="calibre11">object.getIdentity</code>和<code class="calibre11">(object.getIdentity)</code>是相等的。第三行执行了一次赋值，然后再调用赋值后的结果。因为赋值表达式的值是函数本身，<code class="calibre11">this</code>值不再与任何对象绑定，所以返回的是<code class="calibre11">"The Window"</code>。</p>
+        <p class="calibre1">一般情况下，不大可能像第二行和第三行这样调用对象上的方法。但通过这个例子，我们可以知道，即使语法稍有不同，也可能影响<code class="calibre11">this</code>的值。</p>
+        <h3 id="nav_point_251" class="calibre15">10.14.2 内存泄漏</h3>
+        <p class="calibre1">由于IE在IE9之前对JScript对象和COM对象使用了不同的垃圾回收机制（第4章讨论过），所以闭包在这些旧版本IE中可能会导致问题。在这些版本的IE中，把HTML元素保存在某个闭包的作用域中，就相当于宣布该元素不能被销毁。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function assignhandler() {
+  let element = document.getelementbyid('someelement');
+  element.onclick = () =&gt; console.log(element.id);
+}</code></pre>
+        <p class="calibre1">以上代码创建了一个闭包，即<code class="calibre11">element</code>元素的事件处理程序（事件处理程序将在第13章讨论）。而这个处理程序又创建了一个循环引用。匿名函数引用着<code class="calibre11">assignHandler()</code>的活动对象，阻止了对<code class="calibre11">element</code>的引用计数归零。只要这个匿名函数存在，<code class="calibre11">element</code>的引用计数就至少等于1。也就是说，内存不会被回收。其实只要这个例子稍加修改，就可以避免这种情况，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function assignhandler() {
+  let element = document.getelementbyid('someelement');
+  let id = element.id;
+
+  element.onclick = () =&gt; console.log(id);
+
+  element = null;
+}</code></pre>
+        <p class="calibre1">在这个修改后的版本中，闭包改为引用一个保存着<code class="calibre11">element.id</code>的变量<code class="calibre11">id</code>，从而消除了循环引用。不过，光有这一步还不足以解决内存问题。因为闭包还是会引用包含函数的活动对象，而其中包含<code class="calibre11">element</code>。即使闭包没有直接引用<code class="calibre11">element</code>，包含函数的活动对象上还是保存着对它的引用。因此，必须再把<code class="calibre11">element</code>设置为<code class="calibre11">null</code>。这样就解除了对这个COM对象的引用，其引用计数也会减少，从而确保其内存可以在适当的时候被回收。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0083.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0085.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0123.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0125.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_375" class="calibre9">17.2 事件处理程序</h2>
+        <p class="calibre1">事件意味着用户或浏览器执行的某种动作。比如，单击（<code class="calibre11">click</code>）、加载（<code class="calibre11">load</code>）、鼠标悬停（<code class="calibre11">mouseover</code>）。为响应事件而调用的函数被称为<strong class="calibre2">事件处理程序</strong>（或<strong class="calibre2">事件监听器</strong>）。事件处理程序的名字以<code class="calibre11">"on"</code>开头，因此<code class="calibre11">click</code>事件的处理程序叫作<code class="calibre11">onclick</code>，而<code class="calibre11">load</code>事件的处理程序叫作<code class="calibre11">onload</code>。有很多方式可以指定事件处理程序。</p>
+        <h3 id="nav_point_376" class="calibre15">17.2.1 HTML事件处理程序</h3>
+        <p class="calibre1">特定元素支持的每个事件都可以使用事件处理程序的名字以HTML属性的形式来指定。此时属性的值必须是能够执行的JavaScript代码。例如，要在按钮被点击时执行某些JavaScript代码，可以使用以下HTML属性：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;input type="button" value="click me" onclick="console.log('clicked')"/&gt;</code></pre>
+        <p class="calibre1">点击这个按钮后，控制台会输出一条消息。这种交互能力是通过为<code class="calibre11">onclick</code>属性指定JavaScript代码值来实现的。注意，因为属性的值是JavaScript代码，所以不能在未经转义的情况下使用HTML语法字符，比如和号（<code class="calibre11">&amp;</code>）、双引号（<code class="calibre11">"</code>）、小于号（<code class="calibre11">&lt;</code>）和大于号（<code class="calibre11">&gt;</code>）。此时，为了避免使用HTML实体，可以使用单引号代替双引号。如果确实需要使用双引号，则要把代码改成下面这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;input type="button" value="click me"
+       onclick="console.log(&amp;quot;clicked&amp;quot;)"/&gt;</code></pre>
+        <p class="calibre1">在HTML中定义的事件处理程序可以包含精确的动作指令，也可以调用在页面其他地方定义的脚本，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;
+  function showmessage() {
+    console.log("hello world!");
+  }
+&lt;/script&gt;
+&lt;input type="button" value="click me" onclick="showmessage()"/&gt;</code></pre>
+        <p class="calibre1">在这个例子中，单击按钮会调用<code class="calibre11">showMessage()</code>函数。<code class="calibre11">showMessage()</code>函数是在单独的<code class="calibre11">&lt;script&gt;</code>元素中定义的，而且也可以在外部文件中定义。作为事件处理程序执行的代码可以访问全局作用域中的一切。</p>
+        <p class="calibre1">以这种方式指定的事件处理程序有一些特殊的地方。首先，会创建一个函数来封装属性的值。这个函数有一个特殊的局部变量<code class="calibre11">event</code>，其中保存的就是<code class="calibre11">event</code>对象（本章后面会讨论）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 输出"click" --&gt;
+&lt;input type="button" value="click me" onclick="console.log(event.type)"&gt;</code></pre>
+        <p class="calibre1">有了这个对象，就不用开发者另外定义其他变量，也不用从包装函数的参数列表中去取了。</p>
+        <p class="calibre1">在这个函数中，<code class="calibre11">this</code>值相当于事件的目标元素，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 输出"click me" --&gt;
+&lt;input type="button" value="click me" onclick="console.log(this.value)"&gt;</code></pre>
+        <p class="calibre1">这个动态创建的包装函数还有一个特别有意思的地方，就是其作用域链被扩展了。在这个函数中，<code class="calibre11">document</code>和元素自身的成员都可以被当成局部变量来访问。这是通过使用<code class="calibre11">with</code>实现的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function() {
+  with(document) {
+    with(this) {
+       // 属性值
+    }
+  }
+}</code></pre>
+        <p class="calibre1">这意味着事件处理程序可以更方便地访问自己的属性。下面的代码与前面的示例功能一样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 输出"click me" --&gt;
+&lt;input type="button" value="click me" onclick="console.log(value)"&gt;</code></pre>
+        <p class="calibre1">如果这个元素是一个表单输入框，则作用域链中还会包含表单元素，事件处理程序对应的函数等价于如下这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function() {
+  with(document) {
+    with(this.form) {
+      with(this) {
+         // 属性值
+      }
+    }
+  }
+}</code></pre>
+        <p class="calibre1">本质上，经过这样的扩展，事件处理程序的代码就可以不必引用表单元素，而直接访问同一表单中的其他成员了。下面的例子就展示了这种成员访问模式：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;form method="post"&gt;
+  &lt;input type="text" name="username" value=""&gt;
+  &lt;input type="button" value="echo username"
+         onclick="console.log(username.value)"&gt;
+&lt;/form&gt;</code></pre>
+        <p class="calibre1">点击这个例子中的按钮会显示出文本框中包含的文本。注意，事件处理程序中的代码直接引用了<code class="calibre11">username</code>。</p>
+        <p class="calibre1">在HTML中指定事件处理程序有一些问题。第一个问题是时机问题。有可能HTML元素已经显示在页面上，用户都与其交互了，而事件处理程序的代码还无法执行。比如在前面的例子中，如果<code class="calibre11">showMessage()</code>函数是在页面后面，在按钮中代码的后面定义的，那么当用户在<code class="calibre11">showMessage()</code>函数被定义之前点击按钮时，就会发生错误。为此，大多数HTML事件处理程序会封装在<code class="calibre11">try</code>/<code class="calibre11">catch</code>块中，以便在这种情况下静默失败，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;input type="button" value="click me" onclick="try{showmessage();}catch(ex) {}"&gt;</code></pre>
+        <p class="calibre1">这样，如果在<code class="calibre11">showMessage()</code>函数被定义之前点击了按钮，就不会发生JavaScript错误了，这是因为错误在浏览器收到之前已经被拦截了。</p>
+        <p class="calibre1">另一个问题是对事件处理程序作用域链的扩展在不同浏览器中可能导致不同的结果。不同JavaScript引擎中标识符解析的规则存在差异，因此访问无限定的对象成员可能导致错误。</p>
+        <p class="calibre1">使用HTML指定事件处理程序的最后一个问题是HTML与JavaScript强耦合。如果需要修改事件处理程序，则必须在两个地方，即HTML和JavaScript中，修改代码。这也是很多开发者不使用HTML事件处理程序，而使用JavaScript指定事件处理程序的主要原因。</p>
+        <h3 id="nav_point_377" class="calibre15">17.2.2 DOM0事件处理程序</h3>
+        <p class="calibre1">在JavaScript中指定事件处理程序的传统方式是把一个函数赋值给（DOM元素的）一个事件处理程序属性。这也是在第四代Web浏览器中开始支持的事件处理程序赋值方法，直到现在所有现代浏览器仍然都支持此方法，主要原因是简单。要使用JavaScript指定事件处理程序，必须先取得要操作对象的引用。</p>
+        <p class="calibre1">每个元素（包括<code class="calibre11">window</code>和<code class="calibre11">document</code>）都有通常小写的事件处理程序属性，比如<code class="calibre11">onclick</code>。只要把这个属性赋值为一个函数即可：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+btn.onclick = function() {
+  console.log("clicked");
+};</code></pre>
+        <p class="calibre1">这里先从文档中取得按钮，然后给它的<code class="calibre11">onclick</code>事件处理程序赋值一个函数。注意，前面的代码在运行之后才会给事件处理程序赋值。因此如果在页面中上面的代码出现在按钮之后，则有可能出现用户点击按钮没有反应的情况。</p>
+        <p class="calibre1">像这样使用DOM0方式为事件处理程序赋值时，所赋函数被视为元素的方法。因此，事件处理程序会在元素的作用域中运行，即<code class="calibre11">this</code>等于元素。下面的例子演示了使用<code class="calibre11">this</code>引用元素本身：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+btn.onclick = function() {
+  console.log(this.id);  // "mybtn"
+};</code></pre>
+        <p class="calibre1">点击按钮，这段代码会显示元素的ID。这个ID是通过<code class="calibre11">this.id</code>获取的。不仅仅是<code class="calibre11">id</code>，在事件处理程序里通过<code class="calibre11">this</code>可以访问元素的任何属性和方法。以这种方式添加事件处理程序是注册在事件流的冒泡阶段的。</p>
+        <p class="calibre1">通过将事件处理程序属性的值设置为<code class="calibre11">null</code>，可以移除通过DOM0方式添加的事件处理程序，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">btn.onclick = null;  // 移除事件处理程序</code></pre>
+        <p class="calibre1">把事件处理程序设置为<code class="calibre11">null</code>，再点击按钮就不会执行任何操作了。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            如果事件处理程序是在HTML中指定的，则<code class="calibre11">onclick</code>属性的值是一个包装相应HTML事件处理程序属性值的函数。这些事件处理程序也可以通过在JavaScript中将相应属性设置为<code class="calibre11">null</code>来移除。</p>
+        </blockquote>
+        <h3 id="nav_point_378" class="calibre15">17.2.3 DOM2事件处理程序</h3>
+        <p class="calibre1">DOM2 Events为事件处理程序的赋值和移除定义了两个方法：<code class="calibre11">addEventListener()</code>和<code class="calibre11">removeEventListener()</code>。这两个方法暴露在所有DOM节点上，它们接收3个参数：事件名、事件处理函数和一个布尔值，<code class="calibre11">true</code>表示在捕获阶段调用事件处理程序，<code class="calibre11">false</code>（默认值）表示在冒泡阶段调用事件处理程序。</p>
+        <p class="calibre1">仍以给按钮添加<code class="calibre11">click</code>事件处理程序为例，可以这样写：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+btn.addeventlistener("click", () =&gt; {
+  console.log(this.id);
+}, false);</code></pre>
+        <p class="calibre1">以上代码为按钮添加了会在事件冒泡阶段触发的<code class="calibre11">onclick</code>事件处理程序（因为最后一个参数值为<code class="calibre11">false</code>）。与DOM0方式类似，这个事件处理程序同样在被附加到的元素的作用域中运行。使用DOM2方式的主要优势是可以为同一个事件添加多个事件处理程序。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+btn.addeventlistener("click", () =&gt; {
+  console.log(this.id);
+}, false);
+btn.addeventlistener("click", () =&gt; {
+  console.log("hello world!");
+}, false);</code></pre>
+        <p class="calibre1">这里给按钮添加了两个事件处理程序。多个事件处理程序以添加顺序来触发，因此前面的代码会先打印元素ID，然后显示消息“Hello world!”。</p>
+        <p class="calibre1">通过<code class="calibre11">addEventListener()</code>添加的事件处理程序只能使用<code class="calibre11">removeEventListener()</code>并传入与添加时同样的参数来移除。这意味着使用<code class="calibre11">addEventListener()</code>添加的匿名函数无法移除，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+btn.addeventlistener("click", () =&gt; {
+  console.log(this.id);
+ }, false);
+
+// 其他代码
+
+btn.removeeventlistener("click", function() {    // 没有效果！
+  console.log(this.id);
+}, false);</code></pre>
+        <p class="calibre1">这个例子通过<code class="calibre11">addEventListener()</code>添加了一个匿名函数作为事件处理程序。然后，又以看起来相同的参数调用了<code class="calibre11">removeEventListener()</code>。但实际上，传递给<code class="calibre11">removeEventListener()</code>的第二个参数与传给<code class="calibre11">addEventListener()</code>的完全不是一回事。传给<code class="calibre11">removeEventListener()</code>的事件处理函数必须与传给<code class="calibre11">addEventListener()</code>的是同一个，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+let handler = function() {
+  console.log(this.id);
+};
+btn.addeventlistener("click", handler, false);
+
+// 其他代码
+
+btn.removeeventlistener("click", handler, false);  // 有效果！</code></pre>
+        <p class="calibre1">这个例子有效，因为调用<code class="calibre11">addEventListener()</code>和<code class="calibre11">removeEventListener()</code>时传入的是同一个函数。</p>
+        <p class="calibre1">大多数情况下，事件处理程序会被添加到事件流的冒泡阶段，主要原因是跨浏览器兼容性好。把事件处理程序注册到捕获阶段通常用于在事件到达其指定目标之前拦截事件。如果不需要拦截，则不要使用事件捕获。</p>
+        <h3 id="nav_point_379" class="calibre15">17.2.4 IE事件处理程序</h3>
+        <p class="calibre1">IE实现了与DOM类似的方法，即<code class="calibre11">attachEvent()</code>和<code class="calibre11">detachEvent()</code>。这两个方法接收两个同样的参数：事件处理程序的名字和事件处理函数。因为IE8及更早版本只支持事件冒泡，所以使用attachEvent()添加的事件处理程序会添加到冒泡阶段。</p>
+        <p class="calibre1">要使用<code class="calibre11">attachEvent()</code>给按钮添加<code class="calibre11">click</code>事件处理程序，可以使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var btn = document.getelementbyid("mybtn");
+btn.attachevent("onclick", function() {
+  console.log("clicked");
+});</code></pre>
+        <p class="calibre1">注意，<code class="calibre11">attachEvent()</code>的第一个参数是<code class="calibre11">"onclick"</code>，而不是DOM的<code class="calibre11">addEventListener()</code>方法的<code class="calibre11">"click"</code>。</p>
+        <p class="calibre1">在IE中使用<code class="calibre11">attachEvent()</code>与使用DOM0方式的主要区别是事件处理程序的作用域。使用DOM0方式时，事件处理程序中的<code class="calibre11">this</code>值等于目标元素。而使用<code class="calibre11">attachEvent()</code>时，事件处理程序是在全局作用域中运行的，因此<code class="calibre11">this</code>等于<code class="calibre11">window</code>。来看下面使用<code class="calibre11">attachEvent()</code>的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var btn = document.getelementbyid("mybtn");
+btn.attachevent("onclick", function() {
+  console.log(this === window);   // true
+});</code></pre>
+        <p class="calibre1">理解这些差异对编写跨浏览器代码是非常重要的。</p>
+        <p class="calibre1">与使用<code class="calibre11">addEventListener()</code>一样，使用<code class="calibre11">attachEvent()</code>方法也可以给一个元素添加多个事件处理程序。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var btn = document.getelementbyid("mybtn");
+btn.attachevent("onclick", function() {
+  console.log("clicked");
+});
+btn.attachevent("onclick", function() {
+  console.log("hello world!");
+});</code></pre>
+        <p class="calibre1">这里调用了两次<code class="calibre11">attachEvent()</code>，分别给同一个按钮添加了两个不同的事件处理程序。不过，与DOM方法不同，这里的事件处理程序会以添加它们的顺序反向触发。换句话说，在点击例子中的按钮后，控制台中会先打印出<code class="calibre11">"Hello world!"</code>，然后再打印出<code class="calibre11">"Clicked"</code>。</p>
+        <p class="calibre1">使用<code class="calibre11">attachEvent()</code>添加的事件处理程序将使用<code class="calibre11">detachEvent()</code>来移除，只要提供相同的参数。与使用DOM方法类似，作为事件处理程序添加的匿名函数也无法移除。但只要传给<code class="calibre11">detachEvent()</code>方法相同的函数引用，就可以移除。下面的例子演示了附加和剥离事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var btn = document.getelementbyid("mybtn");
+var handler = function() {
+  console.log("clicked");
+};
+btn.attachevent("onclick", handler);
+
+// 其他代码
+
+btn.detachevent("onclick", handler);</code></pre>
+        <p class="calibre1">这里先把事件处理程序保存到变量<code class="calibre11">handler</code>，之后又将其传给<code class="calibre11">detachEvent()</code>来移除事件处理程序。</p>
+        <h3 id="nav_point_380" class="calibre15">17.2.5 跨浏览器事件处理程序</h3>
+        <p class="calibre1">为了以跨浏览器兼容的方式处理事件，很多开发者会选择使用一个JavaScript库，其中抽象了不同浏览器的差异。有些开发者也可能会自己编写代码，以便使用最合适的事件处理手段。自己编写跨浏览器事件处理代码也很简单，主要依赖能力检测。要确保事件处理代码具有最大兼容性，只需要让代码在冒泡阶段运行即可。</p>
+        <p class="calibre1">为此，需要先创建一个<code class="calibre11">addHandler()</code>方法。这个方法的任务是根据需要分别使用DOM0方式、DOM2方式或IE方式来添加事件处理程序。这个方法会在<code class="calibre11">EventUtil</code>对象（本章示例使用的对象）上添加一个方法，以实现跨浏览器事件处理。添加的这个<code class="calibre11">addHandler()</code>方法接收3个参数：目标元素、事件名和事件处理函数。</p>
+        <p class="calibre1">有了<code class="calibre11">addHandler()</code>，还要写一个也接收同样的3个参数的<code class="calibre11">removeHandler()</code>。这个方法的任务是移除之前添加的事件处理程序，不管是通过何种方式添加的，默认为DOM0方式。</p>
+        <p class="calibre1">以下就是包含这两个方法的<code class="calibre11">EventUtil</code>对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var eventutil = {
+  addhandler: function(element, type, handler) {
+    if (element.addeventlistener) {
+      element.addeventlistener(type, handler, false);
+    } else if (element.attachevent) {
+      element.attachevent("on" + type, handler);
+    } else {
+      element["on" + type] = handler;
+    }
+  },
+
+  removehandler: function(element, type, handler) {
+    if (element.removeeventlistener) {
+      element.removeeventlistener(type, handler, false);
+    } else if (element.detachevent) {
+      element.detachevent("on" + type, handler);
+    } else {
+      element["on" + type] = null;
+    }
+  }
+};</code></pre>
+        <p class="calibre1">两个方法都是首先检测传入元素上是否存在DOM2方式。如果有DOM2方式，就使用该方式，传入事件类型和事件处理函数，以及表示冒泡阶段的第三个参数<code class="calibre11">false</code>。否则，如果存在IE方式，则使用该方式。注意这时候必须在事件类型前加上<code class="calibre11">"on"</code>，才能保证在IE8及更早版本中有效。最后是使用DOM0方式（在现代浏览器中不会到这一步）。注意使用DOM0方式时使用了中括号计算属性名，并将事件处理程序或<code class="calibre11">null</code>赋给了这个属性。</p>
+        <p class="calibre1">可以像下面这样使用<code class="calibre11">EventUtil</code>对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn")
+let handler = function() {
+  console.log("clicked");
+};
+eventutil.addhandler(btn, "click", handler);
+
+// 其他代码
+
+eventutil.removehandler(btn, "click", handler);</code></pre>
+        <p class="calibre1">这里的<code class="calibre11">addHandler()</code>和<code class="calibre11">removeHandler()</code>方法并没有解决所有跨浏览器一致性问题，比如IE的作用域问题、多个事件处理程序执行顺序问题等。不过，这两个方法已经实现了跨浏览器添加和移除事件处理程序。另外也要注意，DOM0只支持给一个事件添加一个处理程序。好在DOM0浏览器已经很少有人使用了，所以影响应该不大。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0123.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0125.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

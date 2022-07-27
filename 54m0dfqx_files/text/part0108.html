@@ -1,0 +1,863 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0107.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0109.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_322" class="calibre9">14.3
+          <code class="calibre26">MutationObserver</code>接口</h2>
+        <p class="calibre1">不久前添加到DOM规范中的<code class="calibre11">MutationObserver</code>接口，可以在DOM被修改时异步执行回调。使用<code class="calibre11">MutationObserver</code>可以观察整个文档、DOM树的一部分，或某个元素。此外还可以观察元素属性、子节点、文本，或者前三者任意组合的变化。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            新引进<code class="calibre11">MutationObserver</code>接口是为了取代废弃的<code class="calibre11">MutationEvent</code>。</p>
+        </blockquote>
+        <h3 id="nav_point_323" class="calibre15">14.3.1 基本用法</h3>
+        <p class="calibre1">
+          <code class="calibre11">MutationObserver</code>的实例要通过调用<code class="calibre11">MutationObserver</code>构造函数并传入一个回调函数来创建：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('dom was mutated!'));</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">observe()</code>方法</strong>
+            </p>
+            <p class="calibre1">新创建的<code class="calibre11">MutationObserver</code>实例不会关联DOM的任何部分。要把这个<code class="calibre11">observer</code>与DOM关联起来，需要使用<code class="calibre11">observe()</code>方法。这个方法接收两个必需的参数：要观察其变化的DOM节点，以及一个<code class="calibre11">MutationObserverInit</code>对象。</p>
+            <p class="calibre1">
+              <code class="calibre11">MutationObserverInit</code>对象用于控制观察哪些方面的变化，是一个键/值对形式配置选项的字典。例如，下面的代码会创建一个观察者（<code class="calibre11">observer</code>）并配置它观察<code class="calibre11">&lt;body&gt;</code>元素上的属性变化：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('&lt;body&gt; attributes changed'));
+
+observer.observe(document.body, { attributes: true });</code></pre>
+            <p class="calibre1">执行以上代码后，<code class="calibre11">&lt;body&gt;</code>元素上任何属性发生变化都会被这个<code class="calibre11">MutationObserver</code>实例发现，然后就会异步执行注册的回调函数。<code class="calibre11">&lt;body&gt;</code>元素后代的修改或其他非属性修改都不会触发回调进入任务队列。可以通过以下代码来验证：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('&lt;body&gt; attributes changed'));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+console.log('changed body class');
+
+// changed body class
+// &lt;body&gt; attributes changed</code></pre>
+            <p class="calibre1">注意，回调中的<code class="calibre11">console.log()</code>是后执行的。这表明回调并非与实际的DOM变化同步执行。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">回调与<code class="calibre11">MutationRecord</code>
+              </strong>
+            </p>
+            <p class="calibre1">每个回调都会收到一个<code class="calibre11">MutationRecord</code>实例的数组。<code class="calibre11">MutationRecord</code>实例包含的信息包括发生了什么变化，以及DOM的哪一部分受到了影响。因为回调执行之前可能同时发生多个满足观察条件的事件，所以每次执行回调都会传入一个包含按顺序入队的<code class="calibre11">MutationRecord</code>实例的数组。</p>
+            <p class="calibre1">下面展示了反映一个属性变化的<code class="calibre11">MutationRecord</code>实例的数组：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.setattribute('foo', 'bar');
+// [
+//   {
+//     addednodes: nodelist [],
+//     attributename: "foo",
+//     attributenamespace: null,
+//     nextsibling: null,
+//     oldvalue: null,
+//     previoussibling: null
+//     removednodes: nodelist [],
+//     target: body
+//     type: "attributes"
+//   }
+// ]</code></pre>
+            <p class="calibre1">下面是一次涉及命名空间的类似变化：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.setattributens('baz', 'foo', 'bar');
+
+// [
+//   {
+//     addednodes: nodelist [],
+//     attributename: "foo",
+//     attributenamespace: "baz",
+//     nextsibling: null,
+//     oldvalue: null,
+//     previoussibling: null
+//     removednodes: nodelist [],
+//     target: body
+//     type: "attributes"
+//   }
+// ]</code></pre>
+            <p class="calibre1">连续修改会生成多个<code class="calibre11">MutationRecord</code>实例，下次回调执行时就会收到包含所有这些实例的数组，顺序为变化事件发生的顺序：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+document.body.classname = 'bar';
+document.body.classname = 'baz';
+
+// [mutationrecord, mutationrecord, mutationrecord]</code></pre>
+            <p class="calibre1">下表列出了<code class="calibre11">MutationRecord</code>实例的属性。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">属性</th>
+                <th class="calibre19">说明</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">target</code>
+                </td>
+                <td class="calibre21">被修改影响的目标节点</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">type</code>
+                </td>
+                <td class="calibre21">字符串，表示变化的类型：<code class="calibre27">"attributes"</code>、<code class="calibre27">"characterData"</code>或<code class="calibre27">"childList"</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">oldValue</code>
+                </td>
+                <td class="calibre21">如果在<code class="calibre27">MutationObserverInit</code>对象中启用（<code class="calibre27">attributeOldValue</code>或<code class="calibre27">characterData OldValue</code>为<code class="calibre27">true</code>），<code class="calibre27">"attributes"</code>或<code class="calibre27">"characterData"</code>的变化事件会设置这个属性为被替代的值<br class="calibre4"/>
+                  <code class="calibre27">"childList"</code>类型的变化始终将这个属性设置为<code class="calibre27">null</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">attributeName</code>
+                </td>
+                <td class="calibre21">对于<code class="calibre27">"attributes"</code>类型的变化，这里保存被修改属性的名字<br class="calibre4"/>其他变化事件会将这个属性设置为<code class="calibre27">null</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">attributeNamespace</code>
+                </td>
+                <td class="calibre21">对于使用了命名空间的<code class="calibre27">"attributes"</code>类型的变化，这里保存被修改属性的名字<br class="calibre4"/>其他变化事件会将这个属性设置为<code class="calibre27">null</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">addedNodes</code>
+                </td>
+                <td class="calibre21">对于<code class="calibre27">"childList"</code>类型的变化，返回包含变化中添加节点的<code class="calibre27">NodeList</code><br class="calibre4"/>默认为空<code class="calibre27">NodeList</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">removedNodes</code>
+                </td>
+                <td class="calibre21">对于<code class="calibre27">"childList"</code>类型的变化，返回包含变化中删除节点的<code class="calibre27">NodeList</code><br class="calibre4"/>默认为空<code class="calibre27">NodeList</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">previousSibling</code>
+                </td>
+                <td class="calibre21">对于<code class="calibre27">"childList"</code>类型的变化，返回变化节点的前一个同胞<code class="calibre27">Node</code><br class="calibre4"/>默认为<code class="calibre27">null</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">nextSibling</code>
+                </td>
+                <td class="calibre21">对于<code class="calibre27">"childList"</code>类型的变化，返回变化节点的后一个同胞<code class="calibre27">Node</code><br class="calibre4"/>默认为<code class="calibre27">null</code>
+                </td>
+              </tr>
+            </table>
+
+            <p class="calibre1">传给回调函数的第二个参数是观察变化的<code class="calibre11">MutationObserver</code>的实例，演示如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords, mutationobserver) =&gt; console.log(mutationrecords,
+mutationobserver));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+
+// [mutationrecord], mutationobserver</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">disconnect()</code>方法</strong>
+            </p>
+            <p class="calibre1">默认情况下，只要被观察的元素不被垃圾回收，<code class="calibre11">MutationObserver</code>的回调就会响应DOM变化事件，从而被执行。要提前终止执行回调，可以调用<code class="calibre11">disconnect()</code>方法。下面的例子演示了同步调用<code class="calibre11">disconnect()</code>之后，不仅会停止此后变化事件的回调，也会抛弃已经加入任务队列要异步执行的回调：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('&lt;body&gt; attributes changed'));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+
+observer.disconnect();
+
+document.body.classname = 'bar';
+
+//（没有日志输出）</code></pre>
+            <p class="calibre1">要想让已经加入任务队列的回调执行，可以使用<code class="calibre11">setTimeout()</code>让已经入列的回调执行完毕再调用<code class="calibre11">disconnect()</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('&lt;body&gt; attributes changed'));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+
+settimeout(() =&gt; {
+  observer.disconnect();
+  document.body.classname = 'bar';
+}, 0);
+
+// &lt;body&gt; attributes changed</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">复用<code class="calibre11">MutationObserver</code>
+              </strong>
+            </p>
+            <p class="calibre1">多次调用<code class="calibre11">observe()</code>方法，可以复用一个<code class="calibre11">MutationObserver</code>对象观察多个不同的目标节点。此时，<code class="calibre11">MutationRecord</code>的<code class="calibre11">target</code>属性可以标识发生变化事件的目标节点。下面的示例演示了这个过程：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+               (mutationrecords) =&gt; console.log(mutationrecords.map((x) =&gt;
+x.target)));
+
+// 向页面主体添加两个子节点
+let childa = document.createelement('div'),
+    childb = document.createelement('span');
+document.body.appendchild(childa);
+document.body.appendchild(childb);
+
+// 观察两个子节点
+observer.observe(childa, { attributes: true });
+observer.observe(childb, { attributes: true });
+
+// 修改两个子节点的属性
+childa.setattribute('foo', 'bar');
+childb.setattribute('foo', 'bar');
+
+// [&lt;div&gt;, &lt;span&gt;]</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">disconnect()</code>方法是一个“一刀切”的方案，调用它会停止观察所有目标：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+               (mutationrecords) =&gt; console.log(mutationrecords.map((x) =&gt;
+x.target)));
+
+// 向页面主体添加两个子节点
+let childa = document.createelement('div'),
+    childb = document.createelement('span');
+document.body.appendchild(childa);
+document.body.appendchild(childb);
+
+// 观察两个子节点
+observer.observe(childa, { attributes: true });
+observer.observe(childb, { attributes: true });
+
+observer.disconnect();
+
+// 修改两个子节点的属性
+childa.setattribute('foo', 'bar');
+childb.setattribute('foo', 'bar');
+
+// （没有日志输出）</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">重用<code class="calibre11">MutationObserver</code>
+              </strong>
+            </p>
+            <p class="calibre1">调用<code class="calibre11">disconnect()</code>并不会结束<code class="calibre11">MutationObserver</code>的生命。还可以重新使用这个观察者，再将它关联到新的目标节点。下面的示例在两个连续的异步块中先断开然后又恢复了观察者与<code class="calibre11">&lt;body&gt;</code>元素的关联：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(() =&gt; console.log('&lt;body&gt; attributes
+changed'));
+
+observer.observe(document.body, { attributes: true });
+
+// 这行代码会触发变化事件
+document.body.setattribute('foo', 'bar');
+
+settimeout(() =&gt; {
+  observer.disconnect();
+
+  // 这行代码不会触发变化事件
+  document.body.setattribute('bar', 'baz');
+}, 0);
+　
+　
+settimeout(() =&gt; {
+  // reattach
+  observer.observe(document.body, { attributes: true });
+
+  // 这行代码会触发变化事件
+  document.body.setattribute('baz', 'qux');
+}, 0);
+
+// &lt;body&gt; attributes changed
+// &lt;body&gt; attributes changed</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_324" class="calibre15">14.3.2
+          <code class="calibre26">MutationObserverInit</code>与观察范围</h3>
+        <p class="calibre1">
+          <code class="calibre11">MutationObserverInit</code>对象用于控制对目标节点的观察范围。粗略地讲，观察者可以观察的事件包括属性变化、文本变化和子节点变化。</p>
+        <p class="calibre1">下表列出了<code class="calibre11">MutationObserverInit</code>对象的属性。</p>
+        <table class="table" width="90%" border="1">
+          <tr class="calibre18">
+            <th class="calibre19">属性</th>
+            <th class="calibre19">说明</th>
+          </tr>
+          <tr class="calibre20">
+            <td class="calibre21">
+              <code class="calibre27">subtree</code>
+            </td>
+            <td class="calibre21">布尔值，表示除了目标节点，是否观察目标节点的子树（后代）<br class="calibre4"/>如果是<code class="calibre27">false</code>，则只观察目标节点的变化；如果是<code class="calibre27">true</code>，则观察目标节点及其整个子树<br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+          <tr class="calibre18">
+            <td class="calibre21">
+              <code class="calibre27">attributes</code>
+            </td>
+            <td class="calibre21">布尔值，表示是否观察目标节点的属性变化<br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+          <tr class="calibre20">
+            <td class="calibre21">
+              <code class="calibre27">attributeFilter</code>
+            </td>
+            <td class="calibre21">字符串数组，表示要观察哪些属性的变化<br class="calibre4"/>把这个值设置为<code class="calibre27">true</code>也会将<code class="calibre27">attributes</code>的值转换为<code class="calibre27">true</code><br class="calibre4"/>默认为观察所有属性</td>
+          </tr>
+          <tr class="calibre18">
+            <td class="calibre21">
+              <code class="calibre27">attributeOldValue</code>
+            </td>
+            <td class="calibre21">布尔值，表示<code class="calibre27">MutationRecord</code>是否记录变化之前的属性值<br class="calibre4"/>把这个值设置为<code class="calibre27">true</code>也会将<code class="calibre27">attributes</code>的值转换为<code class="calibre27">true</code><br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+          <tr class="calibre20">
+            <td class="calibre21">
+              <code class="calibre27">characterData</code>
+            </td>
+            <td class="calibre21">布尔值，表示修改字符数据是否触发变化事件<br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+          <tr class="calibre18">
+            <td class="calibre21">
+              <code class="calibre27">characterDataOldValue</code>
+            </td>
+            <td class="calibre21">布尔值，表示<code class="calibre27">MutationRecord</code>是否记录变化之前的字符数据<br class="calibre4"/>把这个值设置为<code class="calibre27">true</code>也会将<code class="calibre27">characterData</code>的值转换为<code class="calibre27">true</code><br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+          <tr class="calibre20">
+            <td class="calibre21">
+              <code class="calibre27">childList</code>
+            </td>
+            <td class="calibre21">布尔值，表示修改目标节点的子节点是否触发变化事件<br class="calibre4"/>默认为<code class="calibre27">false</code>
+            </td>
+          </tr>
+        </table>
+
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在调用<code class="calibre11">observe()</code>时，<code class="calibre11">MutationObserverInit</code>对象中的<code class="calibre11">attribute</code>、<code class="calibre11">characterData</code>和<code class="calibre11">childList</code>属性必须至少有一项为<code class="calibre11">true</code>（无论是直接设置这几个属性，还是通过设置<code class="calibre11">attributeOldValue</code>等属性间接导致它们的值转换为<code class="calibre11">true</code>）。否则会抛出错误，因为没有任何变化事件可能触发回调。</p>
+        </blockquote>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">观察属性</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">MutationObserver</code>可以观察节点属性的添加、移除和修改。要为属性变化注册回调，需要在<code class="calibre11">MutationObserverInit</code>对象中将<code class="calibre11">attributes</code>属性设置为<code class="calibre11">true</code>，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributes: true });
+
+// 添加属性
+document.body.setattribute('foo', 'bar');
+
+// 修改属性
+document.body.setattribute('foo', 'baz');
+
+// 移除属性
+document.body.removeattribute('foo');
+
+// 以上变化都被记录下来了
+// [mutationrecord, mutationrecord, mutationrecord]</code></pre>
+            <p class="calibre1">把<code class="calibre11">attributes</code>设置为<code class="calibre11">true</code>的默认行为是观察所有属性，但不会在<code class="calibre11">MutationRecord</code>对象中记录原来的属性值。如果想观察某个或某几个属性，可以使用<code class="calibre11">attributeFilter</code>属性来设置白名单，即一个属性名字符串数组：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributefilter: ['foo'] });
+
+// 添加白名单属性
+document.body.setattribute('foo', 'bar');
+
+// 添加被排除的属性
+document.body.setattribute('baz', 'qux');
+
+// 只有foo属性的变化被记录了
+// [mutationrecord]</code></pre>
+            <p class="calibre1">如果想在变化记录中保存属性原来的值，可以将<code class="calibre11">attributeOldValue</code>属性设置为<code class="calibre11">true</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords.map((x) =&gt; x.oldvalue)));
+
+observer.observe(document.body, { attributeoldvalue: true });
+
+document.body.setattribute('foo', 'bar');
+document.body.setattribute('foo', 'baz');
+document.body.setattribute('foo', 'qux');
+
+// 每次变化都保留了上一次的值
+// [null, 'bar', 'baz']</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">观察字符数据</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">MutationObserver</code>可以观察文本节点（如<code class="calibre11">Text</code>、<code class="calibre11">Comment</code>或<code class="calibre11">ProcessingInstruction</code>节点）中字符的添加、删除和修改。要为字符数据注册回调，需要在<code class="calibre11">MutationObserverInit</code>对象中将<code class="calibre11">characterData</code>属性设置为<code class="calibre11">true</code>，如下所示：<span class="zhu_shi_bian_hao">2</span></p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+// 创建要观察的文本节点
+document.body.innertext = 'foo';
+
+observer.observe(document.body.firstchild, { characterdata: true });
+
+// 赋值为相同的字符串
+document.body.innertext = 'foo';
+
+// 赋值为新字符串
+document.body.innertext = 'bar';
+
+// 通过节点设置函数赋值
+document.body.firstchild.textcontent = 'baz';
+
+// 以上变化都被记录下来了
+// [mutationrecord, mutationrecord, mutationrecord]</code></pre>
+            <p class="calibre1">将<code class="calibre11">characterData</code>属性设置为<code class="calibre11">true</code>的默认行为不会在<code class="calibre11">MutationRecord</code>对象中记录原来的字符数据。如果想在变化记录中保存原来的字符数据，可以将<code class="calibre11">characterDataOldValue</code>属性设置为<code class="calibre11">true</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords.map((x) =&gt; x.oldvalue)));
+document.body.innertext = 'foo';
+
+observer.observe(document.body.firstchild, { characterdataoldvalue: true });
+
+document.body.innertext = 'foo';
+document.body.innertext = 'bar';
+document.body.firstchild.textcontent = 'baz';
+
+// 每次变化都保留了上一次的值
+// ["foo", "foo", "bar"]</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">观察子节点</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">MutationObserver</code>可以观察目标节点子节点的添加和移除。要观察子节点，需要在<code class="calibre11">MutationObserverInit</code>对象中将<code class="calibre11">childList</code>属性设置为<code class="calibre11">true</code>。</p>
+            <p class="calibre1">下面的例子演示了添加子节点：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 清空主体
+document.body.innerhtml = '';
+
+let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { childlist: true });
+
+document.body.appendchild(document.createelement('div'));
+
+// [
+//   {
+//     addednodes: nodelist[div],
+//     attributename: null,
+//     attributenamespace: null,
+//     oldvalue: null,
+//     nextsibling: null,
+//     previoussibling: null,
+//     removednodes: nodelist[],
+//     target: body,
+//     type: "childlist",
+//   }
+// ]</code></pre>
+            <p class="calibre1">下面的例子演示了移除子节点：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 清空主体
+document.body.innerhtml = '';
+
+let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { childlist: true });
+
+document.body.appendchild(document.createelement('div'));
+
+// [
+//   {
+//     addednodes: nodelist[],
+//     attributename: null,
+//     attributenamespace: null,
+//     oldvalue: null,
+//     nextsibling: null,
+//     previoussibling: null,
+//     removednodes: nodelist[div],
+//     target: body,
+//     type: "childlist",
+//   }
+// ]</code></pre>
+            <p class="calibre1">对子节点<strong class="calibre2">重新排序</strong>（尽管调用一个方法即可实现）会报告两次变化事件，因为从技术上会涉及先移除和再添加：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 清空主体
+document.body.innerhtml = '';
+
+let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+// 创建两个初始子节点
+document.body.appendchild(document.createelement('div'));
+document.body.appendchild(document.createelement('span'));
+
+observer.observe(document.body, { childlist: true });
+
+// 交换子节点顺序
+document.body.insertbefore(document.body.lastchild, document.body.firstchild);
+
+// 发生了两次变化：第一次是节点被移除，第二次是节点被添加
+// [
+//   {
+//     addednodes: nodelist[],
+//     attributename: null,
+//     attributenamespace: null,
+//     oldvalue: null,
+//     nextsibling: null,
+//     previoussibling: div,
+//     removednodes: nodelist[span],
+//     target: body,
+//       type: childlist,
+//   },
+//   {
+//     addednodes: nodelist[span],
+//     attributename: null,
+//     attributenamespace: null,
+//     oldvalue: null,
+//     nextsibling: div,
+//     previoussibling: null,
+//     removednodes: nodelist[],
+//     target: body,
+//     type: "childlist",
+//   }
+// ]</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">观察子树</strong>
+            </p>
+            <p class="calibre1">默认情况下，<code class="calibre11">MutationObserver</code>将观察的范围限定为一个元素及其子节点的变化。可以把观察的范围扩展到这个元素的子树（所有后代节点），这需要在<code class="calibre11">MutationObserverInit</code>对象中将<code class="calibre11">subtree</code>属性设置为<code class="calibre11">true</code>。</p>
+            <p class="calibre1">下面的代码展示了观察元素及其后代节点属性的变化：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 清空主体
+document.body.innerhtml = '';
+
+let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+// 创建一个后代
+document.body.appendchild(document.createelement('div'));
+
+// 观察&lt;body&gt;元素及其子树
+observer.observe(document.body, { attributes: true, subtree: true });
+
+// 修改&lt;body&gt;元素的子树
+document.body.firstchild.setattribute('foo', 'bar');
+
+// 记录了子树变化的事件
+// [
+//   {
+//     addednodes: nodelist[],
+//     attributename: "foo",
+//     attributenamespace: null,
+//     oldvalue: null,
+//     nextsibling: null,
+//     previoussibling: null,
+//     removednodes: nodelist[],
+//     target: div,
+//     type: "attributes",
+//   }
+// ]</code></pre>
+            <p class="calibre1">有意思的是，被观察子树中的节点被移出子树之后仍然能够触发变化事件。这意味着在子树中的节点离开该子树后，即使严格来讲该节点已经脱离了原来的子树，但它仍然会触发变化事件。</p>
+            <p class="calibre1">下面的代码演示了这种情况：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 清空主体
+document.body.innerhtml = '';
+
+let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+let subtreeroot = document.createelement('div'),
+    subtreeleaf = document.createelement('span');
+
+// 创建包含两层的子树
+document.body.appendchild(subtreeroot);
+subtreeroot.appendchild(subtreeleaf);
+
+// 观察子树
+observer.observe(subtreeroot, { attributes: true, subtree: true });
+
+// 把节点转移到其他子树
+document.body.insertbefore(subtreeleaf, subtreeroot);
+
+subtreeleaf.setattribute('foo', 'bar');
+
+// 移出的节点仍然触发变化事件
+// [mutationrecord]</code></pre>
+          </li>
+        </ol>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">2</span>设置元素文本内容的标准方式是<code class="calibre11">textContent</code>属性。<code class="calibre11">Element</code>类也定义了<code class="calibre11">innerText</code>属性，与<code class="calibre11">textContent</code>类似。但<code class="calibre11">innerText</code>的定义不严谨，浏览器间的实现也存在兼容性问题，因此不建议再使用了。——译者注</p>
+        <h3 id="nav_point_325" class="calibre15">14.3.3 异步回调与记录队列</h3>
+        <p class="calibre1">
+          <code class="calibre11">MutationObserver</code>接口是出于性能考虑而设计的，其核心是异步回调与记录队列模型。为了在大量变化事件发生时不影响性能，每次变化的信息（由观察者实例决定）会保存在<code class="calibre11">MutationRecord</code>实例中，然后添加到<strong class="calibre2">记录队列</strong>。这个队列对每个<code class="calibre11">MutationObserver</code>实例都是唯一的，是所有DOM变化事件的有序列表。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">记录队列</strong>
+            </p>
+            <p class="calibre1">每次<code class="calibre11">MutationRecord</code>被添加到<code class="calibre11">MutationObserver</code>的记录队列时，仅当之前没有已排期的微任务回调时（队列中微任务长度为0），才会将观察者注册的回调（在初始化<code class="calibre11">MutationObserver</code>时传入）作为微任务调度到任务队列上。这样可以保证记录队列的内容不会被回调处理两次。</p>
+            <p class="calibre1">不过在回调的微任务异步执行期间，有可能又会发生更多变化事件。因此被调用的回调会接收到一个<code class="calibre11">MutationRecord</code>实例的数组，顺序为它们进入记录队列的顺序。回调要负责处理这个数组的每一个实例，因为函数退出之后这些实现就不存在了。回调执行后，这些<code class="calibre11">MutationRecord</code>就用不着了，因此记录队列会被清空，其内容会被丢弃。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">takeRecords()</code>方法</strong>
+            </p>
+            <p class="calibre1">调用<code class="calibre11">MutationObserver</code>实例的<code class="calibre11">takeRecords()</code>方法可以清空记录队列，取出并返回其中的所有<code class="calibre11">MutationRecord</code>实例。看这个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let observer = new mutationobserver(
+    (mutationrecords) =&gt; console.log(mutationrecords));
+
+observer.observe(document.body, { attributes: true });
+
+document.body.classname = 'foo';
+document.body.classname = 'bar';
+document.body.classname = 'baz';
+
+console.log(observer.takerecords());
+console.log(observer.takerecords());
+
+// [mutationrecord, mutationrecord, mutationrecord]
+// []</code></pre>
+            <p class="calibre1">这在希望断开与观察目标的联系，但又希望处理由于调用<code class="calibre11">disconnect()</code>而被抛弃的记录队列中的<code class="calibre11">MutationRecord</code>实例时比较有用。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_326" class="calibre15">14.3.4 性能、内存与垃圾回收</h3>
+        <p class="calibre1">DOM Level 2规范中描述的<code class="calibre11">MutationEvent</code>定义了一组会在各种DOM变化时触发的事件。由于浏览器事件的实现机制，这个接口出现了严重的性能问题。因此，DOM Level 3规定废弃了这些事件。<code class="calibre11">MutationObserver</code>接口就是为替代这些事件而设计的更实用、性能更好的方案。</p>
+        <p class="calibre1">将变化回调委托给微任务来执行可以保证事件同步触发，同时避免随之而来的混乱。为<code class="calibre11">MutationObserver</code>而实现的记录队列，可以保证即使变化事件被爆发式地触发，也不会显著地拖慢浏览器。</p>
+        <p class="calibre1">无论如何，使用<code class="calibre11">MutationObservder</code>仍然<strong class="calibre2">不是没有代价</strong>的。因此理解什么时候避免出现这种情况就很重要了。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">MutationObserver</code>的引用</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">MutationObserver</code>实例与目标节点之间的引用关系是非对称的。<code class="calibre11">MutationObserver</code>拥有对要观察的目标节点的弱引用。因为是弱引用，所以不会妨碍垃圾回收程序回收目标节点。</p>
+            <p class="calibre1">然而，目标节点却拥有对<code class="calibre11">MutationObserver</code>的强引用。如果目标节点从DOM中被移除，随后被垃圾回收，则关联的<code class="calibre11">MutationObserver</code>也会被垃圾回收。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">MutationRecord</code>的引用</strong>
+            </p>
+            <p class="calibre1">记录队列中的每个<code class="calibre11">MutationRecord</code>实例至少包含对已有DOM节点的一个引用。如果变化是<code class="calibre11">childList</code>类型，则会包含多个节点的引用。记录队列和回调处理的默认行为是耗尽这个队列，处理每个<code class="calibre11">MutationRecord</code>，然后让它们超出作用域并被垃圾回收。</p>
+            <p class="calibre1">有时候可能需要保存某个观察者的完整变化记录。保存这些<code class="calibre11">MutationRecord</code>实例，也就会保存它们引用的节点，因而会妨碍这些节点被回收。如果需要尽快地释放内存，建议从每个<code class="calibre11">MutationRecord</code>中抽取出最有用的信息，然后保存到一个新对象中，最后抛弃<code class="calibre11">MutationRecord</code>。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0107.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0109.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

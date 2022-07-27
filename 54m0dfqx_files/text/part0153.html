@@ -1,0 +1,417 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0152.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0154.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_489" class="calibre9">20.10 计时API</h2>
+        <p class="calibre1">页面性能始终是Web开发者关心的话题。<code class="calibre11">Performance</code>接口通过JavaScript API暴露了浏览器内部的度量指标，允许开发者直接访问这些信息并基于这些信息实现自己想要的功能。这个接口暴露在<code class="calibre11">window.performance</code>对象上。所有与页面相关的指标，包括已经定义和将来会定义的，都会存在于这个对象上。</p>
+        <p class="calibre1">
+          <code class="calibre11">Performance</code>接口由多个API构成：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">High Resolution Time API</li>
+          <li class="di_1ji_wu_xu_lie_biao">Performance Timeline API</li>
+          <li class="di_1ji_wu_xu_lie_biao">Navigation Timing API</li>
+          <li class="di_1ji_wu_xu_lie_biao">User Timing API</li>
+          <li class="di_1ji_wu_xu_lie_biao">Resource Timing API</li>
+          <li class="di_1ji_wu_xu_lie_biao">Paint Timing API</li>
+        </ul>
+        <p class="calibre1">有关这些规范的更多信息以及新增的性能相关规范，可以关注W3C性能工作组的GitHub项目页面。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            浏览器通常支持被废弃的Level 1和作为替代的Level 2。本节尽量介绍Level 2级规范。</p>
+        </blockquote>
+        <h3 id="nav_point_490" class="calibre15">20.10.1 High Resolution Time API</h3>
+        <p class="calibre1">
+          <code class="calibre11">Date.now()</code>方法只适用于日期时间相关操作，而且是不要求计时精度的操作。在下面的例子中，函数<code class="calibre11">foo()</code>调用前后分别记录了一个时间戳：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const t0 = date.now();
+foo();
+const t1 = date.now();
+
+const duration = t1 – t0;
+
+console.log(duration);</code></pre>
+        <p class="calibre1">考虑如下<code class="calibre11">duration</code>会包含意外值的情况。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">
+              <code class="calibre11">duration</code>是0</strong>。<code class="calibre11">Date.now()</code>只有毫秒级精度，如果<code class="calibre11">foo()</code>执行足够快，则两个时间戳的值会相等。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">
+              <code class="calibre11">duration</code>是负值或极大值</strong>。如果在<code class="calibre11">foo()</code>执行时，系统时钟被向后或向前调整了（如切换到夏令时），则捕获的时间戳不会考虑这种情况，因此时间差中会包含这些调整。</li>
+        </ul>
+        <p class="calibre1">为此，必须使用不同的计时API来精确且准确地度量时间的流逝。High Resolution Time API定义了<code class="calibre11">window.performance.now()</code>，这个方法返回一个微秒精度的浮点值。因此，使用这个方法先后捕获的时间戳更不可能出现相等的情况。而且这个方法可以保证时间戳单调增长。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const t0 = performance.now();
+const t1 = performance.now();
+
+console.log(t0);       // 1768.625000026077
+console.log(t1);       // 1768.6300000059418
+
+const duration = t1 – t0;
+
+console.log(duration); // 0.004999979864805937</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">performance.now()</code>计时器采用<strong class="calibre2">相对</strong>度量。这个计时器在执行上下文创建时从0开始计时。例如，打开页面或创建工作线程时，<code class="calibre11">performance.now()</code>就会从<code class="calibre11">0</code>开始计时。由于这个计时器在不同上下文中初始化时可能存在时间差，因此不同上下文之间如果没有共享参照点则不可能直接比较<code class="calibre11">performance.now()</code>。<code class="calibre11">performance.timeOrigin</code>属性返回计时器初始化时全局系统时钟的值。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const relativetimestamp = performance.now();
+
+const absolutetimestamp = performance.timeorigin + relativetimestamp;
+
+console.log(relativetimestamp); // 244.43500000052154
+console.log(absolutetimestamp); // 1561926208892.4001</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            通过使用<code class="calibre11">performance.now()</code>测量L1缓存与主内存的延迟差，幽灵漏洞（Spectre）可以执行缓存推断攻击。为弥补这个安全漏洞，所有的主流浏览器有的选择降低<code class="calibre11">performance.now()</code>的精度，有的选择在时间戳里混入一些随机性。WebKit博客上有一篇相关主题的不错的文章“What Spectre and Meltdown Mean For WebKit”，作者是Filip Pizlo。</p>
+        </blockquote>
+        <h3 id="nav_point_491" class="calibre15">20.10.2 Performance Timeline API</h3>
+        <p class="calibre1">Performance Timeline API使用一套用于度量客户端延迟的工具扩展了<code class="calibre11">Performance</code>接口。性能度量将会采用计算结束与开始时间差的形式。这些开始和结束时间会被记录为<code class="calibre11">DOMHighResTimeStamp</code>值，而封装这个时间戳的对象是<code class="calibre11">PerformanceEntry</code>的实例。</p>
+        <p class="calibre1">浏览器会自动记录各种<code class="calibre11">PerformanceEntry</code>对象，而使用<code class="calibre11">performance.mark()</code>也可以记录自定义的<code class="calibre11">PerformanceEntry</code>对象。在一个执行上下文中被记录的所有性能条目可以通过<code class="calibre11">performance.getEntries()</code>获取：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(performance.getentries());
+
+// [performancenavigationtiming, performanceresourcetiming, ... ]</code></pre>
+        <p class="calibre1">这个返回的集合代表浏览器的<strong class="calibre2">性能时间线</strong>（performance timeline）。每个<code class="calibre11">PerformanceEntry</code>对象都有<code class="calibre11">name</code>、<code class="calibre11">entryType</code>、<code class="calibre11">startTime</code>和<code class="calibre11">duration</code>属性：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const entry = performance.getentries()[0];
+
+console.log(entry.name);      // "https://foo.com"
+console.log(entry.entrytype); // navigation
+console.log(entry.starttime); // 0
+console.log(entry.duration);  // 182.36500001512468</code></pre>
+        <p class="calibre1">不过，<code class="calibre11">PerformanceEntry</code>实际上是一个抽象基类。所有记录条目虽然都继承<code class="calibre11">PerformanceEntry</code>，但最终还是如下某个具体类的实例：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformanceMark</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformanceMeasure</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformanceFrameTiming</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformanceNavigationTiming</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformanceResourceTiming</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">PerformancePaintTiming</code>
+          </li>
+        </ul>
+        <p class="calibre1">上面每个类都会增加大量属性，用于描述与相应条目有关的元数据。每个实例的<code class="calibre11">name</code>和<code class="calibre11">entryType</code>属性会因为各自的类不同而不同。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">User Timing API</strong>
+            </p>
+            <p class="calibre1">User Timing API用于记录和分析自定义性能条目。如前所述，记录自定义性能条目要使用<code class="calibre11">performance.mark()</code>方法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">performance.mark('foo');
+
+console.log(performance.getentriesbytype('mark')[0]);
+// performancemark {
+//   name: "foo",
+//   entrytype: "mark",
+//   starttime: 269.8800000362098,
+//   duration: 0
+// }</code></pre>
+            <p class="calibre1">在计算开始前和结束后各创建一个自定义性能条目可以计算时间差。最新的标记（mark）会被推到<code class="calibre11">getEntriesByType()</code>返回数组的开始：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">performance.mark('foo');
+for (let i = 0; i &lt; 1e6; ++i) {}
+performance.mark('bar');
+
+const [endmark, startmark] = performance.getentriesbytype('mark');
+console.log(startmark.starttime - endmark.starttime); // 1.3299999991431832</code></pre>
+            <p class="calibre1">除了自定义性能条目，还可以生成<code class="calibre11">PerformanceMeasure</code>（性能度量）条目，对应由名字作为标识的两个标记之间的持续时间。<code class="calibre11">PerformanceMeasure</code>的实例由<code class="calibre11">performance.measure()</code>方法生成：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">performance.mark('foo');
+for (let i = 0; i &lt; 1e6; ++i) {}
+performance.mark('bar');
+
+performance.measure('baz', 'foo', 'bar');
+
+const [differencemark] = performance.getentriesbytype('measure');
+
+console.log(differencemark);
+// performancemeasure {
+//   name: "baz",
+//   entrytype: "measure",
+//   starttime: 298.9800000214018,
+//   duration: 1.349999976810068
+// }</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Navigation Timing API</strong>
+            </p>
+            <p class="calibre1">Navigation Timing API提供了高精度时间戳，用于度量当前页面加载速度。浏览器会在导航事件发生时自动记录<code class="calibre11">PerformanceNavigationTiming</code>条目。这个对象会捕获大量时间戳，用于描述页面是何时以及如何加载的。</p>
+            <p class="calibre1">下面的例子计算了<code class="calibre11">loadEventStart</code>和<code class="calibre11">loadEventEnd</code>时间戳之间的差：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const [performancenavigationtimingentry] = performance.getentriesbytype('navigation');
+
+console.log(performancenavigationtimingentry);
+// performancenavigationtiming {
+//   connectend: 2.259999979287386
+//   connectstart: 2.259999979287386
+//   decodedbodysize: 122314
+//   domcomplete: 631.9899999652989
+//   domcontentloadedeventend: 300.92499998863786
+//   domcontentloadedeventstart: 298.8950000144541
+//   dominteractive: 298.88499999651685
+//   domainlookupend: 2.259999979287386
+//   domainlookupstart: 2.259999979287386
+//   duration: 632.819999998901
+//   encodedbodysize: 21107
+//   entrytype: "navigation"
+//   fetchstart: 2.259999979287386
+//   initiatortype: "navigation"
+//   loadeventend: 632.819999998901
+//   loadeventstart: 632.0149999810383
+//   name: " https://foo.com "
+//   nexthopprotocol: "h2"
+//   redirectcount: 0
+//   redirectend: 0
+//   redirectstart: 0
+//   requeststart: 7.7099999762140214
+//   responseend: 130.50999998813495
+//   responsestart: 127.16999999247491
+//   secureconnectionstart: 0
+//   servertiming: []
+//   starttime: 0
+//   transfersize: 21806
+//   type: "navigate"
+//   unloadeventend: 132.73999997181818
+//   unloadeventstart: 132.41999997990206
+//   workerstart: 0
+// }
+
+console.log(performancenavigationtimingentry.loadeventend –
+            performancenavigationtimingentry.loadeventstart);
+// 0.805000017862767</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Resource Timing API</strong>
+            </p>
+            <p class="calibre1">Resource Timing API提供了高精度时间戳，用于度量当前页面加载时请求资源的速度。浏览器会在加载资源时自动记录<code class="calibre11">PerformanceResourceTiming</code>。这个对象会捕获大量时间戳，用于描述资源加载的速度。</p>
+            <p class="calibre1">下面的例子计算了加载一个特定资源所花的时间：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const performanceresourcetimingentry = performance.getentriesbytype('resource')[0];
+
+console.log(performanceresourcetimingentry);
+// performanceresourcetiming {
+//   connectend: 138.11499997973442
+//   connectstart: 138.11499997973442
+//   decodedbodysize: 33808
+//   domainlookupend: 138.11499997973442
+//   domainlookupstart: 138.11499997973442
+//   duration: 0
+//   encodedbodysize: 33808
+//   entrytype: "resource"
+//   fetchstart: 138.11499997973442
+//   initiatortype: "link"
+//   name: "https://static.foo.com/bar.png",
+//   nexthopprotocol: "h2"
+//   redirectend: 0
+//   redirectstart: 0
+//   requeststart: 138.11499997973442
+//   responseend: 138.11499997973442
+//   responsestart: 138.11499997973442
+//   secureconnectionstart: 0
+//   servertiming: []
+//   starttime: 138.11499997973442
+//   transfersize: 0
+//   workerstart: 0
+// }
+
+console.log(performanceresourcetimingentry.responseend –
+            performanceresourcetimingentry.requeststart);
+// 493.9600000507198</code></pre>
+            <p class="calibre1">通过计算并分析不同时间的差，可以更全面地审视浏览器加载页面的过程，发现可能存在的性能瓶颈。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0152.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0154.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

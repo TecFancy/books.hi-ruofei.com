@@ -1,0 +1,292 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0126.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0128.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_396" class="calibre9">17.5 内存与性能</h2>
+        <p class="calibre1">因为事件处理程序在现代Web应用中可以实现交互，所以很多开发者会错误地在页面中大量使用它们。在创建GUI的语言如C#中，通常会给GUI上的每个按钮设置一个<code class="calibre11">onclick</code>事件处理程序。这样做不会有什么性能损耗。在JavaScript中，页面中事件处理程序的数量与页面整体性能直接相关。原因有很多。首先，每个函数都是对象，都占用内存空间，对象越多，性能越差。其次，为指定事件处理程序所需访问DOM的次数会先期造成整个页面交互的延迟。只要在使用事件处理程序时多注意一些方法，就可以改善页面性能。</p>
+        <h3 id="nav_point_397" class="calibre15">17.5.1 事件委托</h3>
+        <p class="calibre1">“过多事件处理程序”的解决方案是使用<strong class="calibre2">事件委托</strong>。事件委托利用事件冒泡，可以只使用一个事件处理程序来管理一种类型的事件。例如，<code class="calibre11">click</code>事件冒泡到<code class="calibre11">document</code>。这意味着可以为整个页面指定一个<code class="calibre11">onclick</code>事件处理程序，而不用为每个可点击元素分别指定事件处理程序。比如有以下HTML：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;ul id="mylinks"&gt;
+  &lt;li id="gosomewhere"&gt;go somewhere&lt;/li&gt;
+  &lt;li id="dosomething"&gt;do something&lt;/li&gt;
+  &lt;li id="sayhi"&gt;say hi&lt;/li&gt;
+&lt;/ul&gt;</code></pre>
+        <p class="calibre1">这里的HTML包含3个列表项，在被点击时应该执行某个操作。对此，通常的做法是像这样指定3个事件处理程序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let item1 = document.getelementbyid("gosomewhere");
+let item2 = document.getelementbyid("dosomething");
+let item3 = document.getelementbyid("sayhi");
+
+item1.addeventlistener("click", (event) =&gt; {
+  location.href = "http:// www.wrox.com";
+});
+
+item2.addeventlistener("click", (event) =&gt; {
+  document.title = "i changed the document's title";
+});
+
+item3.addeventlistener("click", (event) =&gt; {
+  console.log("hi");
+});</code></pre>
+        <p class="calibre1">如果对页面中所有需要使用<code class="calibre11">onclick</code>事件处理程序的元素都如法炮制，结果就会出现大片雷同的只为指定事件处理程序的代码。使用事件委托，只要给所有元素共同的祖先节点添加一个事件处理程序，就可以解决问题。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let list = document.getelementbyid("mylinks");
+
+list.addeventlistener("click", (event) =&gt; {
+  let target = event.target;
+
+  switch(target.id) {
+    case "dosomething":
+      document.title = "i changed the document's title";
+      break;
+
+    case "gosomewhere":
+      location.href = "http:// www.wrox.com";
+      break;
+
+    case "sayhi":
+      console.log("hi");
+      break;
+  }
+});</code></pre>
+        <p class="calibre1">这里只给<code class="calibre11">&lt;ul id="myLinks"&gt;</code>元素添加了一个<code class="calibre11">onclick</code>事件处理程序。因为所有列表项都是这个元素的后代，所以它们的事件会向上冒泡，最终都会由这个函数来处理。但事件目标是每个被点击的列表项，只要检查<code class="calibre11">event</code>对象的<code class="calibre11">id</code>属性就可以确定，然后再执行相应的操作即可。相对于前面不使用事件委托的代码，这里的代码不会导致先期延迟，因为只访问了一个DOM元素和添加了一个事件处理程序。结果对用户来说没有区别，但这种方式占用内存更少。所有使用按钮的事件（大多数鼠标事件和键盘事件）都适用于这个解决方案。</p>
+        <p class="calibre1">只要可行，就应该考虑只给<code class="calibre11">document</code>添加一个事件处理程序，通过它处理页面中所有某种类型的事件。相对于之前的技术，事件委托具有如下优点。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">document</code>对象随时可用，任何时候都可以给它添加事件处理程序（不用等待<code class="calibre11">DOMContentLoaded</code>或<code class="calibre11">load</code>事件）。这意味着只要页面渲染出可点击的元素，就可以无延迟地起作用。</li>
+          <li class="di_1ji_wu_xu_lie_biao">节省花在设置页面事件处理程序上的时间。只指定一个事件处理程序既可以节省DOM引用，也可以节省时间。</li>
+          <li class="di_1ji_wu_xu_lie_biao">减少整个页面所需的内存，提升整体性能。</li>
+        </ul>
+        <p class="calibre1">最适合使用事件委托的事件包括：<code class="calibre11">click</code>、<code class="calibre11">mousedown</code>、<code class="calibre11">mouseup</code>、<code class="calibre11">keydown</code>和<code class="calibre11">keypress</code>。<code class="calibre11">mouseover</code>和<code class="calibre11">mouseout</code>事件冒泡，但很难适当处理，且经常需要计算元素位置（因为<code class="calibre11">mouseout</code>会在光标从一个元素移动到它的一个后代节点以及移出元素之外时触发）。</p>
+        <h3 id="nav_point_398" class="calibre15">17.5.2 删除事件处理程序</h3>
+        <p class="calibre1">把事件处理程序指定给元素后，在浏览器代码和负责页面交互的JavaScript代码之间就建立了联系。这种联系建立得越多，页面性能就越差。除了通过事件委托来限制这种连接之外，还应该及时删除不用的事件处理程序。很多Web应用性能不佳都是由于无用的事件处理程序长驻内存导致的。</p>
+        <p class="calibre1">导致这个问题的原因主要有两个。第一个是删除带有事件处理程序的元素。比如通过真正的DOM方法<code class="calibre11">removeChild()</code>或<code class="calibre11">replaceChild()</code>删除节点。最常见的还是使用<code class="calibre11">innerHTML</code>整体替换页面的某一部分。这时候，被<code class="calibre11">innerHTML</code>删除的元素上如果有事件处理程序，就不会被垃圾收集程序正常清理。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="mydiv"&gt;
+  &lt;input type="button" value="click me" id="mybtn"&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+  let btn = document.getelementbyid("mybtn");
+  btn.onclick = function() {
+
+    // 执行操作
+
+    document.getelementbyid("mydiv").innerhtml = "processing...";
+    // 不好！
+  };
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">这里的按钮在<code class="calibre11">&lt;div&gt;</code>元素中。单击按钮，会将自己删除并替换为一条消息，以阻止双击发生。这是很多网站上常见的做法。问题在于，按钮被删除之后仍然关联着一个事件处理程序。在<code class="calibre11">&lt;div&gt;</code>元素上设置<code class="calibre11">innerHTML</code>会完全删除按钮，但事件处理程序仍然挂在按钮上面。某些浏览器，特别是IE8及更早版本，在这时候就会有问题了。很有可能元素的引用和事件处理程序的引用都会残留在内存中。如果知道某个元素会被删除，那么最好在删除它之前手工删除它的事件处理程序，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div id="mydiv"&gt;
+  &lt;input type="button" value="click me" id="mybtn"&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;
+  let btn = document.getelementbyid("mybtn");
+  btn.onclick = function() {
+
+    // 执行操作
+
+    btn.onclick = null;   // 删除事件处理程序
+
+    document.getelementbyid("mydiv").innerhtml = "processing...";
+  };
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">在这个重写后的例子中，设置<code class="calibre11">&lt;div&gt;</code>元素的<code class="calibre11">innerHTML</code>属性之前，按钮的事件处理程序先被删除了。这样就可以确保内存被回收，按钮也可以安全地从DOM中删掉。</p>
+        <p class="calibre1">但也要注意，在事件处理程序中删除按钮会阻止事件冒泡。只有事件目标仍然存在于文档中时，事件才会冒泡。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            事件委托也有助于解决这种问题。如果提前知道页面某一部分会被使用<code class="calibre11">innerHTML</code>删除，就不要直接给该部分中的元素添加事件处理程序了。把事件处理程序添加到更高层级的节点上同样可以处理该区域的事件。</p>
+        </blockquote>
+        <p class="calibre1">另一个可能导致内存中残留引用的问题是页面卸载。同样，IE8及更早版本在这种情况下有很多问题，不过好像所有浏览器都会受这个问题影响。如果在页面卸载后事件处理程序没有被清理，则它们仍然会残留在内存中。之后，浏览器每次加载和卸载页面（比如通过前进、后退或刷新），内存中残留对象的数量都会增加，这是因为事件处理程序不会被回收。</p>
+        <p class="calibre1">一般来说，最好在<code class="calibre11">onunload</code>事件处理程序中趁页面尚未卸载先删除所有事件处理程序。这时候也能体现使用事件委托的优势，因为事件处理程序很少，所以很容易记住要删除哪些。关于卸载页面时的清理，可以记住一点：<code class="calibre11">onload</code>事件处理程序中做了什么，最好在<code class="calibre11">onunload</code>事件处理程序中恢复。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在页面中使用<code class="calibre11">onunload</code>事件处理程序意味着页面不会被保存在往返缓存（bfcache）中。如果这对应用很重要，可以考虑只在IE中使用<code class="calibre11">onunload</code>来删除事件处理程序。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0126.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0128.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

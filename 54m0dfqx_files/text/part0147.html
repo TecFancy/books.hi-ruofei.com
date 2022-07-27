@@ -1,0 +1,394 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0146.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0148.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_458" class="calibre9">20.4 File API与Blob API</h2>
+        <p class="calibre1">Web应用程序的一个主要的痛点是无法操作用户计算机上的文件。2000年之前，处理文件的唯一方式是把<code class="calibre11">&lt;input type="file"&gt;</code>放到一个表单里，仅此而已。File API与Blob API是为了让Web开发者能以安全的方式访问客户端机器上的文件，从而更好地与这些文件交互而设计的。</p>
+        <h3 id="nav_point_459" class="calibre15">20.4.1
+          <code class="calibre26">File</code>类型</h3>
+        <p class="calibre1">File API仍然以表单中的文件输入字段为基础，但是增加了直接访问文件信息的能力。HTML5在DOM上为文件输入元素添加了<code class="calibre11">files</code>集合。当用户在文件字段中选择一个或多个文件时，这个<code class="calibre11">files</code>集合中会包含一组<code class="calibre11">File</code>对象，表示被选中的文件。每个<code class="calibre11">File</code>对象都有一些只读属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">name</code>：本地系统中的文件名。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">size</code>：以字节计的文件大小。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">type</code>：包含文件MIME类型的字符串。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">lastModifiedDate</code>：表示文件最后修改时间的字符串。这个属性只有Chome实现了。</li>
+        </ul>
+        <p class="calibre1">例如，通过监听<code class="calibre11">change</code>事件然后遍历<code class="calibre11">files</code>集合可以取得每个选中文件的信息：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fileslist = document.getelementbyid("files-list");
+fileslist.addeventlistener("change", (event) =&gt; {
+  let files = event.target.files,
+      i = 0,
+      len = files.length;
+
+  while (i &lt; len) {
+    const f = files[i];
+    console.log(`${f.name} (${f.type}, ${f.size} bytes)`);
+    i++;
+  }
+});</code></pre>
+        <p class="calibre1">这个例子简单地在控制台输出了每个文件的信息。仅就这个能力而言，已经可以说是Web应用向前迈进的一大步了。不过，File API还提供了<code class="calibre11">FileReader</code>类型，让我们可以实际从文件中读取数据。</p>
+        <h3 id="nav_point_460" class="calibre15">20.4.2
+          <code class="calibre26">FileReader</code>类型</h3>
+        <p class="calibre1">
+          <code class="calibre11">FileReader</code>类型表示一种异步文件读取机制。可以把<code class="calibre11">FileReader</code>想象成类似于<code class="calibre11">XMLHttpRequest</code>，只不过是用于从文件系统读取文件，而不是从服务器读取数据。<code class="calibre11">FileReader</code>类型提供了几个读取文件数据的方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">readAsText(file, encoding)</code>：从文件中读取纯文本内容并保存在<code class="calibre11">result</code>属性中。第二个参数表示编码，是可选的。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">readAsDataURL(file)</code>：读取文件并将内容的数据URI保存在<code class="calibre11">result</code>属性中。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">readAsBinaryString(file)</code>：读取文件并将每个字符的二进制数据保存在<code class="calibre11">result</code>属性中。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">readAsArrayBuffer(file)</code>：读取文件并将文件内容以<code class="calibre11">ArrayBuffer</code>形式保存在<code class="calibre11">result</code>属性。</li>
+        </ul>
+        <p class="calibre1">这些读取数据的方法为处理文件数据提供了极大的灵活性。例如，为了向用户显示图片，可以将图片读取为数据URI，而为了解析文件内容，可以将文件读取为文本。</p>
+        <p class="calibre1">因为这些读取方法是异步的，所以每个<code class="calibre11">FileReader</code>会发布几个事件，其中3个最有用的事件是<code class="calibre11">progress</code>、<code class="calibre11">error</code>和<code class="calibre11">load</code>，分别表示还有更多数据、发生了错误和读取完成。</p>
+        <p class="calibre1">
+          <code class="calibre11">progress</code>事件每50毫秒就会触发一次，其与XHR的<code class="calibre11">progress</code>事件具有相同的信息：<code class="calibre11">lengthComputable</code>、<code class="calibre11">loaded</code>和<code class="calibre11">total</code>。此外，在<code class="calibre11">progress</code>事件中可以读取<code class="calibre11">FileReader</code>的<code class="calibre11">result</code>属性，即使其中尚未包含全部数据。</p>
+        <p class="calibre1">
+          <code class="calibre11">error</code>事件会在由于某种原因无法读取文件时触发。触发<code class="calibre11">error</code>事件时，<code class="calibre11">FileReader</code>的<code class="calibre11">error</code>属性会包含错误信息。这个属性是一个对象，只包含一个属性：<code class="calibre11">code</code>。这个错误码的值可能是1（未找到文件）、2（安全错误）、3（读取被中断）、4（文件不可读）或5（编码错误）。</p>
+        <p class="calibre1">
+          <code class="calibre11">load</code>事件会在文件成功加载后触发。如果<code class="calibre11">error</code>事件被触发，则不会再触发<code class="calibre11">load</code>事件。下面的例子演示了所有这3个事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fileslist = document.getelementbyid("files-list");
+fileslist.addeventlistener("change", (event) =&gt; {
+  let info = "",
+      output = document.getelementbyid("output"),
+      progress = document.getelementbyid("progress"),
+      files = event.target.files,
+      type = "default",
+      reader = new filereader();
+
+  if (/image/.test(files[0].type)) {
+    reader.readasdataurl(files[0]);
+    type = "image";
+  } else {
+    reader.readastext(files[0]);
+    type = "text";
+  }
+
+  reader.onerror = function() {
+    output.innerhtml = "could not read file, error code is " +
+        reader.error.code;
+  };
+
+  reader.onprogress = function(event) {
+    if (event.lengthcomputable) {
+      progress.innerhtml = `${event.loaded}/${event.total}`;
+    }
+  };
+
+  reader.onload = function() {
+    let html = "";
+
+    switch(type) {
+      case "image":
+        html = `&lt;img src="${reader.result}"&gt;`;
+        break;
+      case "text":
+        html = reader.result;
+        break;
+    }
+    output.innerhtml = html;
+  };
+});</code></pre>
+        <p class="calibre1">以上代码从表单字段中读取一个文件，并将其内容显示在了网页上。如果文件的MIME类型表示它是一个图片，那么就将其读取后保存为数据URI，在<code class="calibre11">load</code>事件触发时将数据URI作为图片插入页面中。如果文件不是图片，则读取后将其保存为文本并原样输出到网页上。<code class="calibre11">progress</code>事件用于跟踪和显示读取文件的进度，而<code class="calibre11">error</code>事件用于监控错误。</p>
+        <p class="calibre1">如果想提前结束文件读取，则可以在过程中调用<code class="calibre11">abort()</code>方法，从而触发<code class="calibre11">abort</code>事件。在<code class="calibre11">load</code>、<code class="calibre11">error</code>和<code class="calibre11">abort</code>事件触发后，还会触发<code class="calibre11">loadend</code>事件。<code class="calibre11">loadend</code>事件表示在上述3种情况下，所有读取操作都已经结束。<code class="calibre11">readAsText()</code>和<code class="calibre11">readAsDataURL()</code>方法已经得到了所有主流浏览器支持。</p>
+        <h3 id="nav_point_461" class="calibre15">20.4.3
+          <code class="calibre26">FileReaderSync</code>类型</h3>
+        <p class="calibre1">顾名思义，<code class="calibre11">FileReaderSync</code>类型就是<code class="calibre11">FileReader</code>的<strong class="calibre2">同步</strong>版本。这个类型拥有与<code class="calibre11">FileReader</code>相同的方法，只有在整个文件都加载到内存之后才会继续执行。<code class="calibre11">FileReaderSync</code>只在工作线程中可用，因为如果读取整个文件耗时太长则会影响全局。</p>
+        <p class="calibre1">假设通过<code class="calibre11">postMessage()</code>向工作线程发送了一个<code class="calibre11">File</code>对象。以下代码会让工作线程同步将文件读取到内存中，然后将文件的数据URL发回来：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// worker.js
+
+self.omessage = (messageevent) =&gt; {
+  const syncreader = new filereadersync();
+  console.log(syncreader); // filereadersync {}
+
+  // 读取文件时阻塞工作线程
+  const result = syncreader.readasdataurl(messageevent.data);
+
+  // pdf文件的示例响应
+  console.log(result); // data:application/pdf;base64,jvberi0xljqk...
+
+  // 把url发回去
+  self.postmessage(result);
+};</code></pre>
+        <h3 id="nav_point_462" class="calibre15">20.4.4
+          <code class="calibre26">Blob</code>与部分读取</h3>
+        <p class="calibre1">某些情况下，可能需要读取部分文件而不是整个文件。为此，<code class="calibre11">File</code>对象提供了一个名为<code class="calibre11">slice()</code>的方法。<code class="calibre11">slice()</code>方法接收两个参数：起始字节和要读取的字节数。这个方法返回一个<code class="calibre11">Blob</code>的实例，而<code class="calibre11">Blob</code>实际上是<code class="calibre11">File</code>的超类。</p>
+        <p class="calibre1">blob表示<strong class="calibre2">二进制大对象</strong>（binary larget object），是JavaScript对不可修改二进制数据的封装类型。包含字符串的数组、<code class="calibre11">ArrayBuffers</code>、<code class="calibre11">ArrayBufferViews</code>，甚至其他<code class="calibre11">Blob</code>都可以用来创建blob。<code class="calibre11">Blob</code>构造函数可以接收一个<code class="calibre11">options</code>参数，并在其中指定MIME类型：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(new blob(['foo']));
+// blob {size: 3, type: ""}
+
+console.log(new blob(['{"a": "b"}'], { type: 'application/json' }));
+// {size: 10, type: "application/json"}
+
+console.log(new blob(['&lt;p&gt;foo&lt;/p&gt;', '&lt;p&gt;bar&lt;/p&gt;'], { type: 'text/html' }));
+// {size: 20, type: "text/html"}</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">Blob</code>对象有一个<code class="calibre11">size</code>属性和一个<code class="calibre11">type</code>属性，还有一个<code class="calibre11">slice()</code>方法用于进一步切分数据。另外也可以使用<code class="calibre11">FileReader</code>从<code class="calibre11">Blob</code>中读取数据。下面的例子只会读取文件的前32字节：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fileslist = document.getelementbyid("files-list");
+fileslist.addeventlistener("change", (event) =&gt; {
+  let info = "",
+    output = document.getelementbyid("output"),
+    progress = document.getelementbyid("progress"),
+    files = event.target.files,
+    reader = new filereader(),
+    blob = blobslice(files[0], 0, 32);
+  if (blob) {
+    reader.readastext(blob);
+
+    reader.onerror = function() {
+      output.innerhtml = "could not read file, error code is " +
+                 reader.error.code;
+    };
+    reader.onload = function() {
+      output.innerhtml = reader.result;
+    };
+  } else {
+    console.log("your browser doesn't support slice().");
+  }
+});</code></pre>
+        <p class="calibre1">只读取部分文件可以节省时间，特别是在只需要数据特定部分比如文件头的时候。</p>
+        <h3 id="nav_point_463" class="calibre15">20.4.5 对象URL与<code class="calibre26">Blob</code>
+        </h3>
+        <p class="calibre1">对象URL有时候也称作Blob URL，是指引用存储在<code class="calibre11">File</code>或<code class="calibre11">Blob</code>中数据的URL。对象URL的优点是不用把文件内容读取到JavaScript也可以使用文件。只要在适当位置提供对象URL即可。要创建对象URL，可以使用<code class="calibre11">window.URL.createObjectURL()</code>方法并传入<code class="calibre11">File</code>或<code class="calibre11">Blob</code>对象。这个函数返回的值是一个指向内存中地址的字符串。因为这个字符串是URL，所以可以在DOM中直接使用。例如，以下代码使用对象URL在页面中显示了一张图片：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fileslist = document.getelementbyid("files-list");
+fileslist.addeventlistener("change", (event) =&gt; {
+  let info = "",
+    output = document.getelementbyid("output"),
+    progress = document.getelementbyid("progress"),
+    files = event.target.files,
+    reader = new filereader(),
+    url = window.url.createobjecturl(files[0]);
+  if (url) {
+    if (/image/.test(files[0].type)) {
+      output.innerhtml = `&lt;img src="${url}"&gt;`;
+    } else {
+      output.innerhtml = "not an image.";
+    }
+  } else {
+    output.innerhtml = "your browser doesn't support object urls.";
+  }
+});</code></pre>
+        <p class="calibre1">如果把对象URL直接放到<code class="calibre11">&lt;img&gt;</code>标签，就不需要把数据先读到JavaScript中了。<code class="calibre11">&lt;img&gt;</code>标签可以直接从相应的内存位置把数据读取到页面上。</p>
+        <p class="calibre1">使用完数据之后，最好能释放与之关联的内存。只要对象URL在使用中，就不能释放内存。如果想表明不再使用某个对象URL，则可以把它传给<code class="calibre11">window.URL.revokeObjectURL()</code>。页面卸载时，所有对象URL占用的内存都会被释放。不过，最好在不使用时就立即释放内存，以便尽可能保持页面占用最少资源。</p>
+        <h3 id="nav_point_464" class="calibre15">20.4.6 读取拖放文件</h3>
+        <p class="calibre1">组合使用HTML5拖放API与File API可以创建读取文件信息的有趣功能。在页面上创建放置目标后，可以从桌面上把文件拖动并放到放置目标。这样会像拖放图片或链接一样触发<code class="calibre11">drop</code>事件。被放置的文件可以通过事件的<code class="calibre11">event.dataTransfer.files</code>属性读到，这个属性保存着一组<code class="calibre11">File</code>对象，就像文本输入字段一样。</p>
+        <p class="calibre1">下面的例子会把拖放到页面放置目标上的文件信息打印出来：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let droptarget = document.getelementbyid("droptarget");
+function handleevent(event) {
+  let info = "",
+    output = document.getelementbyid("output"),
+    files, i, len;
+  event.preventdefault();
+
+  if (event.type == "drop") {
+    files = event.datatransfer.files;
+    i = 0;
+    len = files.length;
+
+    while (i &lt; len) {
+      info += `${files[i].name} (${files[i].type}, ${files[i].size} bytes)&lt;br&gt;`;
+      i++;
+    }
+
+    output.innerhtml = info;
+  }
+}
+droptarget.addeventlistener("dragenter", handleevent);
+droptarget.addeventlistener("dragover", handleevent);
+droptarget.addeventlistener("drop", handleevent);</code></pre>
+        <p class="calibre1">与后面要介绍的拖放的例子一样，必须取消<code class="calibre11">dragenter</code>、<code class="calibre11">dragover</code>和<code class="calibre11">drop</code>的默认行为。在<code class="calibre11">drop</code>事件处理程序中，可以通过<code class="calibre11">event.dataTransfer.files</code>读到文件，此时可以获取文件的相关信息。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0146.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0148.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0106.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0108.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_317" class="calibre9">14.2 DOM编程</h2>
+        <p class="calibre1">很多时候，操作DOM是很直观的。通过HTML代码能实现的，也一样能通过JavaScript实现。但有时候，DOM也没有看起来那么简单。浏览器能力的参差不齐和各种问题，也会导致DOM的某些方面会复杂一些。</p>
+        <h3 id="nav_point_318" class="calibre15">14.2.1 动态脚本</h3>
+        <p class="calibre1">
+          <code class="calibre11">&lt;script&gt;</code>元素用于向网页中插入JavaScript代码，可以是<code class="calibre11">src</code>属性包含的外部文件，也可以是作为该元素内容的源代码。动态脚本就是在页面初始加载时不存在，之后又通过DOM包含的脚本。与对应的HTML元素一样，有两种方式通过<code class="calibre11">&lt;script&gt;</code>动态为网页添加脚本：引入外部文件和直接插入源代码。</p>
+        <p class="calibre1">动态加载外部文件很容易实现，比如下面的<code class="calibre11">&lt;script&gt;</code>元素：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script src="foo.js"&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">可以像这样通过DOM编程创建这个节点：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let script = document.createelement("script");
+script.src = "foo.js";
+document.body.appendchild(script);</code></pre>
+        <p class="calibre1">这里的DOM代码实际上完全照搬了它要表示的HTML代码。注意，在上面最后一行把<code class="calibre11">&lt;script&gt;</code>元素添加到页面之前，是不会开始下载外部文件的。当然也可以把它添加到<code class="calibre11">&lt;head&gt;</code>元素，同样可以实现动态脚本加载。这个过程可以抽象为一个函数，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function loadscript(url) {
+  let script = document.createelement("script");
+  script.src = url;
+  document.body.appendchild(script);
+}</code></pre>
+        <p class="calibre1">然后，就可以像下面这样加载外部JavaScript文件了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">loadscript("client.js");</code></pre>
+        <p class="calibre1">加载之后，这个脚本就可以对页面执行操作了。这里有个问题：怎么能知道脚本什么时候加载完？这个问题并没有标准答案。第17章会讨论一些与加载相关的事件，具体情况取决于使用的浏览器。</p>
+        <p class="calibre1">另一个动态插入JavaScript的方式是嵌入源代码，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script&gt;
+  function sayhi() {
+    alert("hi");
+  }
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">使用DOM，可以实现以下逻辑：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let script = document.createelement("script");
+script.appendchild(document.createtextnode("function sayhi(){alert('hi');}"));
+document.body.appendchild(script);</code></pre>
+        <p class="calibre1">以上代码可以在<code class="calibre11">Firefox</code>、<code class="calibre11">Safari</code>、<code class="calibre11">Chrome</code>和<code class="calibre11">Opera</code>中运行。不过在旧版本的IE中可能会导致问题。这是因为IE对<code class="calibre11">&lt;script&gt;</code>元素做了特殊处理，不允许常规DOM访问其子节点。但<code class="calibre11">&lt;script&gt;</code>元素上有一个<code class="calibre11">text</code>属性，可以用来添加JavaScript代码，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var script = document.createelement("script");
+script.text = "function sayhi(){alert('hi');}";
+document.body.appendchild(script);</code></pre>
+        <p class="calibre1">这样修改后，上面的代码可以在IE、Firefox、Opera和Safari 3及更高版本中运行。Safari 3之前的版本不能正确支持这个<code class="calibre11">text</code>属性，但这些版本却支持文本节点赋值。对于早期的Safari版本，需要使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var script = document.createelement("script");
+var code = "function sayhi(){alert('hi');}";
+try {
+  script.appendchild(document.createtextnode("code"));
+} catch (ex){
+  script.text = "code";
+}
+document.body.appendchild(script);</code></pre>
+        <p class="calibre1">这里先尝试使用标准的DOM文本节点插入方式，因为除IE之外的浏览器都支持这种方式。IE此时会抛出错误，那么可以在捕获错误之后再使用<code class="calibre11">text</code>属性来插入JavaScript代码。于是，我们就可以抽象出一个跨浏览器的函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function loadscriptstring(code){
+  var script = document.createelement("script");
+  script.type = "text/javascript";
+  try {
+    script.appendchild(document.createtextnode(code));
+  } catch (ex){
+    script.text = code;
+  }
+  document.body.appendchild(script);
+}</code></pre>
+        <p class="calibre1">这个函数可以这样调用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">loadscriptstring("function sayhi(){alert('hi');}");</code></pre>
+        <p class="calibre1">以这种方式加载的代码会在全局作用域中执行，并在调用返回后立即生效。基本上，这就相当于在全局作用域中把源代码传给<code class="calibre11">eval()</code>方法。</p>
+        <p class="calibre1">注意，通过<code class="calibre11">innerHTML</code>属性创建的<code class="calibre11">&lt;script&gt;</code>元素永远不会执行。浏览器会尽责地创建<code class="calibre11">&lt;script&gt;</code>元素，以及其中的脚本文本，但解析器会给这个<code class="calibre11">&lt;script&gt;</code>元素打上永不执行的标签。只要是使用<code class="calibre11">innerHTML</code>创建的<code class="calibre11">&lt;script&gt;</code>元素，以后也没有办法强制其执行。</p>
+        <h3 id="nav_point_319" class="calibre15">14.2.2 动态样式</h3>
+        <p class="calibre1">CSS样式在HTML页面中可以通过两个元素加载。<code class="calibre11">&lt;link&gt;</code>元素用于包含CSS外部文件，而<code class="calibre11">&lt;style&gt;</code>元素用于添加嵌入样式。与动态脚本类似，动态样式也是页面初始加载时并不存在，而是在之后才添加到页面中的。</p>
+        <p class="calibre1">来看下面这个典型的<code class="calibre11">&lt;link&gt;</code>元素：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;link rel="stylesheet" type="text/css" href="styles.css"&gt;</code></pre>
+        <p class="calibre1">这个元素很容易使用DOM编程创建出来：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let link = document.createelement("link");
+link.rel = "stylesheet";
+link.type = "text/css";
+link.href = "styles.css";
+let head = document.getelementsbytagname("head")[0];
+head.appendchild(link);</code></pre>
+        <p class="calibre1">以上代码在所有主流浏览器中都能正常运行。注意应该把<code class="calibre11">&lt;link&gt;</code>元素添加到<code class="calibre11">&lt;head&gt;</code>元素而不是<code class="calibre11">&lt;body&gt;</code>元素，这样才能保证所有浏览器都能正常运行。这个过程可以抽象为以下通用函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function loadstyles(url){
+  let link = document.createelement("link");
+  link.rel = "stylesheet";
+  link.type = "text/css";
+  link.href = url;
+  let head = document.getelementsbytagname("head")[0];
+  head.appendchild(link);
+}</code></pre>
+        <p class="calibre1">然后就可以这样调用这个<code class="calibre11">loadStyles()</code>函数了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">loadstyles("styles.css");</code></pre>
+        <p class="calibre1">通过外部文件加载样式是一个异步过程。因此，样式的加载和正执行的JavaScript代码并没有先后顺序。一般来说，也没有必要知道样式什么时候加载完成。</p>
+        <p class="calibre1">另一种定义样式的方式是使用<code class="calibre11">&lt;script&gt;</code>元素包含嵌入的CSS规则，例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;style type="text/css"&gt;
+body {
+  background-color: red;
+}
+&lt;/style&gt;</code></pre>
+        <p class="calibre1">逻辑上，下列DOM代码会有同样的效果：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let style = document.createelement("style");
+style.type = "text/css";
+style.appendchild(document.createtextnode("body{background-color:red}"));
+let head = document.getelementsbytagname("head")[0];
+head.appendchild(style);</code></pre>
+        <p class="calibre1">以上代码在Firefox、Safari、Chrome和Opera中都可以运行，但IE除外。IE对<code class="calibre11">&lt;style&gt;</code>节点会施加限制，不允许访问其子节点，这一点与它对<code class="calibre11">&lt;script&gt;</code>元素施加的限制一样。事实上，IE在执行到给<code class="calibre11">&lt;style&gt;</code>添加子节点的代码时，会抛出与给<code class="calibre11">&lt;script&gt;</code>添加子节点时同样的错误。对于IE，解决方案是访问元素的<code class="calibre11">styleSheet</code>属性，这个属性又有一个<code class="calibre11">cssText</code>属性，然后给这个属性添加CSS代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let style = document.createelement("style");
+style.type = "text/css";
+try{
+  style.appendchild(document.createtextnode("body{background-color:red}"));
+} catch (ex){
+  style.stylesheet.csstext = "body{background-color:red}";
+}
+let head = document.getelementsbytagname("head")[0];
+head.appendchild(style);</code></pre>
+        <p class="calibre1">与动态添加脚本源代码类似，这里也使用了<code class="calibre11">try...catch</code>语句捕获IE抛出的错误，然后再以IE特有的方式来设置样式。这是最终的通用函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function loadstylestring(css){
+  let style = document.createelement("style");
+  style.type = "text/css";
+  try{
+    style.appendchild(document.createtextnode(css));
+  } catch (ex){
+    style.stylesheet.csstext = css;
+  }
+  let head = document.getelementsbytagname("head")[0];
+    head.appendchild(style);
+}</code></pre>
+        <p class="calibre1">可以这样调用这个函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">loadstylestring("body{background-color:red}");</code></pre>
+        <p class="calibre1">这样添加的样式会立即生效，因此所有变化会立即反映出来。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            对于IE，要小心使用<code class="calibre11">styleSheet.cssText</code>。如果重用同一个<code class="calibre11">&lt;style&gt;</code>元素并设置该属性超过一次，则可能导致浏览器崩溃。同样，将<code class="calibre11">cssText</code>设置为空字符串也可能导致浏览器崩溃。</p>
+        </blockquote>
+        <h3 id="nav_point_320" class="calibre15">14.2.3 操作表格</h3>
+        <p class="calibre1">表格是HTML中最复杂的结构之一。通过DOM编程创建<code class="calibre11">&lt;table&gt;</code>元素，通常要涉及大量标签，包括表行、表元、表题，等等。因此，通过DOM编程创建和修改表格时可能要写很多代码。假设要通过DOM来创建以下HTML表格：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;table border="1" width="100%"&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;cell 1,1&lt;/td&gt;
+      &lt;td&gt;cell 2,1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;cell 1,2&lt;/td&gt;
+      &lt;td&gt;cell 2,2&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+        <p class="calibre1">下面就是以DOM编程方式重建这个表格的代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建表格
+let table = document.createelement("table");
+table.border = 1;
+table.width = "100%";
+
+// 创建表体
+let tbody = document.createelement("tbody");
+table.appendchild(tbody);
+
+// 创建第一行
+let row1 = document.createelement("tr");
+tbody.appendchild(row1);
+let cell1_1 = document.createelement("td");
+cell1_1.appendchild(document.createtextnode("cell 1,1"));
+row1.appendchild(cell1_1);
+let cell2_1 = document.createelement("td");
+cell2_1.appendchild(document.createtextnode("cell 2,1"));
+row1.appendchild(cell2_1);
+
+// 创建第二行
+let row2 = document.createelement("tr");
+tbody.appendchild(row2);
+let cell1_2 = document.createelement("td");
+cell1_2.appendchild(document.createtextnode("cell 1,2"));
+row2.appendchild(cell1_2);
+let cell2_2= document.createelement("td");
+cell2_2.appendchild(document.createtextnode("cell 2,2"));
+row2.appendchild(cell2_2);
+
+// 把表格添加到文档主体
+document.body.appendchild(table);</code></pre>
+        <p class="calibre1">以上代码相当烦琐，也不好理解。为了方便创建表格，HTML DOM给<code class="calibre11">&lt;table&gt;</code>、<code class="calibre11">&lt;tbody&gt;</code>和<code class="calibre11">&lt;tr&gt;</code>元素添加了一些属性和方法。</p>
+        <p class="calibre1">
+          <code class="calibre11">&lt;table&gt;</code>元素添加了以下属性和方法：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">caption</code>，指向<code class="calibre11">&lt;caption&gt;</code>元素的指针（如果存在）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">tBodies</code>，包含<code class="calibre11">&lt;tbody&gt;</code>元素的<code class="calibre11">HTMLCollection</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">tFoot</code>，指向<code class="calibre11">&lt;tfoot&gt;</code>元素（如果存在）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">tHead</code>，指向<code class="calibre11">&lt;thead&gt;</code>元素（如果存在）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">rows</code>，包含表示所有行的<code class="calibre11">HTMLCollection</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">createTHead()</code>，创建<code class="calibre11">&lt;thead&gt;</code>元素，放到表格中，返回引用；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">createTFoot()</code>，创建<code class="calibre11">&lt;tfoot&gt;</code>元素，放到表格中，返回引用；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">createCaption()</code>，创建<code class="calibre11">&lt;caption&gt;</code>元素，放到表格中，返回引用；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteTHead()</code>，删除<code class="calibre11">&lt;thead&gt;</code>元素；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteTFoot()</code>，删除<code class="calibre11">&lt;tfoot&gt;</code>元素；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteCaption()</code>，删除<code class="calibre11">&lt;caption&gt;</code>元素；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteRow(<i class="calibre6">pos</i>)</code>，删除给定位置的行；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">insertRow(<i class="calibre6">pos</i>)</code>，在行集合中给定位置插入一行。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">&lt;tbody&gt;</code>元素添加了以下属性和方法：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">rows</code>，包含<code class="calibre11">&lt;tbody&gt;</code>元素中所有行的<code class="calibre11">HTMLCollection</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteRow(<i class="calibre6">pos</i>)</code>，删除给定位置的行；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">insertRow(<i class="calibre6">pos</i>)</code>，在行集合中给定位置插入一行，返回该行的引用。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">&lt;tr&gt;</code>元素添加了以下属性和方法：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">cells</code>，包含<code class="calibre11">&lt;tr&gt;</code>元素所有表元的<code class="calibre11">HTMLCollection</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteCell(<i class="calibre6">pos</i>)</code>，删除给定位置的表元；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">insertCell(<i class="calibre6">pos</i>)</code>，在表元集合给定位置插入一个表元，返回该表元的引用。</li>
+        </ul>
+        <p class="calibre1">这些属性和方法极大地减少了创建表格所需的代码量。例如，使用这些方法重写前面的代码之后是这样的（加粗代码表示更新的部分）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建表格
+let table = document.createelement("table");
+table.border = 1;
+table.width = "100%";
+
+// 创建表体
+let tbody = document.createelement("tbody");
+table.appendchild(tbody);
+
+// 创建第一行
+tbody.insertrow(0);
+tbody.rows[0].insertcell(0);
+tbody.rows[0].cells[0].appendchild(document.createtextnode("cell 1,1"));
+tbody.rows[0].insertcell(1);
+tbody.rows[0].cells[1].appendchild(document.createtextnode("cell 2,1"));
+
+// 创建第二行
+tbody.insertrow(1);
+tbody.rows[1].insertcell(0);
+tbody.rows[1].cells[0].appendchild(document.createtextnode("cell 1,2"));
+tbody.rows[1].insertcell(1);
+tbody.rows[1].cells[1].appendchild(document.createtextnode("cell 2,2"));
+
+// 把表格添加到文档主体
+document.body.appendchild(table);</code></pre>
+        <p class="calibre1">这里创建<code class="calibre11">&lt;table&gt;</code>和<code class="calibre11">&lt;tbody&gt;</code>元素的代码没有变。变化的是创建两行的部分，这次使用了HTML DOM表格的属性和方法。创建第一行时，在<code class="calibre11">&lt;tbody&gt;</code>元素上调用了<code class="calibre11">insertRow()</code>方法。传入参数<code class="calibre11">0</code>，表示把这一行放在什么位置。然后，使用<code class="calibre11">tbody.rows[0]</code>来引用这一行，因为这一行刚刚创建并被添加到了<code class="calibre11">&lt;tbody&gt;</code>的位置<code class="calibre11">0</code>。</p>
+        <p class="calibre1">创建表元的方式也与之类似。在<code class="calibre11">&lt;tr&gt;</code>元素上调用<code class="calibre11">insertCell()</code>方法，传入参数<code class="calibre11">0</code>，表示把这个表元放在什么位置上。然后，使用<code class="calibre11">tbody.rows[0].cells[0]</code>来引用这个表元，因为这个表元刚刚创建并被添加到了<code class="calibre11">&lt;tr&gt;</code>的位置<code class="calibre11">0</code>。</p>
+        <p class="calibre1">虽然以上两种代码在技术上都是正确的，但使用这些属性和方法创建表格让代码变得更有逻辑性，也更容易理解。</p>
+        <h3 id="nav_point_321" class="calibre15">14.2.4 使用<code class="calibre26">NodeList</code>
+        </h3>
+        <p class="calibre1">理解<code class="calibre11">NodeList</code>对象和相关的<code class="calibre11">NamedNodeMap</code>、<code class="calibre11">HTMLCollection</code>，是理解DOM编程的关键。这3个集合类型都是“实时的”，意味着文档结构的变化会实时地在它们身上反映出来，因此它们的值始终代表最新的状态。实际上，<code class="calibre11">NodeList</code>就是基于DOM文档的实时查询。例如，下面的代码会导致无穷循环：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.getelementsbytagname("div");
+
+for (let i = 0; i &lt; divs.length; ++i){
+  let div = document.createelement("div");
+  document.body.appendchild(div);
+}</code></pre>
+        <p class="calibre1">第一行取得了包含文档中所有<code class="calibre11">&lt;div&gt;</code>元素的<code class="calibre11">HTMLCollection</code>。因为这个集合是“实时的”，所以任何时候只要向页面中添加一个新<code class="calibre11">&lt;div&gt;</code>元素，再查询这个集合就会多一项。因为浏览器不希望保存每次创建的集合，所以就会在每次访问时更新集合。这样就会出现前面使用循环的例子中所演示的问题。每次循环开始，都会求值<code class="calibre11">i &lt; divs.length</code>。这意味着要执行获取所有<code class="calibre11">&lt;div&gt;</code>元素的查询。因为循环体中会创建并向文档添加一个新<code class="calibre11">&lt;div&gt;</code>元素，所以每次循环<code class="calibre11">divs.length</code>的值也会递增。因为两个值都会递增，所以<code class="calibre11">i</code>将永远不会等于<code class="calibre11">divs.length</code>。</p>
+        <p class="calibre1">使用ES6迭代器并不会解决这个问题，因为迭代的是一个永远增长的实时集合。以下代码仍然会导致无穷循环：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let div of document.getelementsbytagname("div")){
+  let newdiv = document.createelement("div");
+  document.body.appendchild(newdiv);
+}</code></pre>
+        <p class="calibre1">任何时候要迭代<code class="calibre11">NodeList</code>，最好再初始化一个变量保存当时查询时的长度，然后用循环变量与这个变量进行比较，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.getelementsbytagname("div");
+
+for (let i = 0, len = divs.length; i &lt; len; ++i) {
+  let div = document.createelement("div");
+  document.body.appendchild(div);
+}</code></pre>
+        <p class="calibre1">在这个例子中，又初始化了一个保存集合长度的变量<code class="calibre11">len</code>。因为<code class="calibre11">len</code>保存着循环开始时集合的长度，而这个值不会随集合增大动态增长，所以就可以避免前面例子中出现的无穷循环。本章还会使用这种技术来演示迭代<code class="calibre11">NodeList</code>对象的首选方式。</p>
+        <p class="calibre1">另外，如果不想再初始化一个变量，也可以像下面这样反向迭代集合：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.getelementsbytagname("div");
+
+for (let i = divs.length - 1; i &gt;= 0; --i) {
+  let div = document.createelement("div");
+  document.body.appendchild(div);
+}</code></pre>
+        <p class="calibre1">一般来说，最好限制操作<code class="calibre11">NodeList</code>的次数。因为每次查询都会搜索整个文档，所以最好把查询到的<code class="calibre11">NodeList</code>缓存起来。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0106.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0108.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

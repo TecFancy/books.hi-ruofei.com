@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0051.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0053.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_151" class="calibre9">6.8 迭代与扩展操作</h2>
+        <p class="calibre1">ECMAScript 6新增的迭代器和扩展操作符对集合引用类型特别有用。这些新特性让集合类型之间相互操作、复制和修改变得异常方便。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            第7章会更详细地介绍迭代器和生成器。</p>
+        </blockquote>
+        <p class="calibre1">如本章前面所示，有4种原生集合类型定义了默认迭代器：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Array</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">所有定型数组</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Map</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Set</code>
+          </li>
+        </ul>
+        <p class="calibre1">很简单，这意味着上述所有类型都支持顺序迭代，都可以传入<code class="calibre11">for-of</code>循环：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let iterablethings = [
+  array.of(1, 2),
+  typedarr = int16array.of(3, 4),
+  new map([[5, 6], [7, 8]]),
+  new set([9, 10])
+];
+
+for (const iterablething of iterablethings) {
+  for (const x of iterablething) {
+    console.log(x);
+  }
+}
+
+// 1
+// 2
+// 3
+// 4
+// [5, 6]
+// [7, 8]
+// 9
+// 10</code></pre>
+        <p class="calibre1">这也意味着所有这些类型都兼容扩展操作符。扩展操作符在对可迭代对象执行浅复制时特别有用，只需简单的语法就可以复制整个对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr1 = [1, 2, 3];
+let arr2 = [...arr1];
+
+console.log(arr1);          // [1, 2, 3]
+console.log(arr2);          // [1, 2, 3]
+console.log(arr1 === arr2); // false</code></pre>
+        <p class="calibre1">对于期待可迭代对象的构造函数，只要传入一个可迭代对象就可以实现复制：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let map1 = new map([[1, 2], [3, 4]]);
+let map2 = new map(map1);
+
+console.log(map1); // map {1 =&gt; 2, 3 =&gt; 4}
+console.log(map2); // map {1 =&gt; 2, 3 =&gt; 4}</code></pre>
+        <p class="calibre1">当然，也可以构建数组的部分元素：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr1 = [1, 2, 3];
+let arr2 = [0, ...arr1, 4, 5];
+
+console.log(arr2); // [0, 1, 2, 3, 4, 5]</code></pre>
+        <p class="calibre1">浅复制意味着只会复制对象引用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr1 = [{}];
+let arr2 = [...arr1];
+
+arr1[0].foo = 'bar';
+console.log(arr2[0]); // { foo: 'bar' }</code></pre>
+        <p class="calibre1">上面的这些类型都支持多种构建方法，比如<code class="calibre11">Array.of()</code>和<code class="calibre11">Array.from()</code>静态方法。在与扩展操作符一起使用时，可以非常方便地实现互操作：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let arr1 = [1, 2, 3];
+
+// 把数组复制到定型数组
+let typedarr1 = int16array.of(...arr1);
+let typedarr2 = int16array.from(arr1);
+console.log(typedarr1);   // int16array [1, 2, 3]
+console.log(typedarr2);   // int16array [1, 2, 3]
+
+// 把数组复制到映射
+let map = new map(arr1.map((x) =&gt; [x, 'val' + x]));
+console.log(map);   // map {1 =&gt; 'val 1', 2 =&gt; 'val 2', 3 =&gt; 'val 3'}
+
+// 把数组复制到集合
+let set = new set(typedarr2);
+console.log(set);   // set {1, 2, 3}
+
+// 把集合复制回数组
+let arr2 = [...set];
+console.log(arr2);  // [1, 2, 3]</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0051.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0053.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

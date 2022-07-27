@@ -1,0 +1,267 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0044.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0046.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_112" class="calibre9">6.1 Object</h2>
+        <p class="calibre1">到目前为止，大多数引用值的示例使用的是<code class="calibre11">Object</code>类型。<code class="calibre11">Object</code>是ECMAScript中最常用的类型之一。虽然<code class="calibre11">Object</code>的实例没有多少功能，但很适合存储和在应用程序间交换数据。</p>
+        <p class="calibre1">显式地创建<code class="calibre11">Object</code>的实例有两种方式。第一种是使用<code class="calibre11">new</code>操作符和<code class="calibre11">Object</code>构造函数，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let person = new object();
+person.name = "nicholas";
+person.age = 29;</code></pre>
+        <p class="calibre1">另一种方式是使用<strong class="calibre2">对象字面量</strong>（object literal）表示法。对象字面量是对象定义的简写形式，目的是为了简化包含大量属性的对象的创建。比如，下面的代码定义了与前面示例相同的<code class="calibre11">person</code>对象，但使用的是对象字面量表示法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let person = {
+  name: "nicholas",
+  age: 29
+};</code></pre>
+        <p class="calibre1">在这个例子中，左大括号（<code class="calibre11">{</code>）表示对象字面量开始，因为它出现在一个<strong class="calibre2">表达式上下文</strong>（expression context）中。在ECMAScript中，表达式上下文指的是期待返回值的上下文。赋值操作符表示后面要期待一个值，因此左大括号表示一个表达式的开始。同样是左大括号，如果出现在<strong class="calibre2">语句上下文</strong>（statement context）中，比如<code class="calibre11">if</code>语句的条件后面，则表示一个语句块的开始。</p>
+        <p class="calibre1">接下来指定了<code class="calibre11">name</code>属性，后跟一个冒号，然后是属性的值。逗号用于在对象字面量中分隔属性，因此字符串<code class="calibre11">"Nicholas"</code>后面有一个逗号，而<code class="calibre11">29</code>后面没有，因为<code class="calibre11">age</code>是这个对象的最后一个属性。在最后一个属性后面加上逗号在非常老的浏览器中会导致报错，但所有现代浏览器都支持这种写法。</p>
+        <p class="calibre1">在对象字面量表示法中，属性名可以是字符串或数值，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let person = {
+  "name": "nicholas",
+  "age": 29,
+  5: true
+};</code></pre>
+        <p class="calibre1">这个例子会得到一个带有属性<code class="calibre11">name</code>、<code class="calibre11">age</code>和<code class="calibre11">5</code>的对象。注意，数值属性会自动转换为字符串。</p>
+        <p class="calibre1">当然也可以用对象字面量表示法来定义一个只有默认属性和方法的对象，只要使用一对大括号，中间留空就行了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let person = {}; // 与new object()相同
+person.name = "nicholas";
+person.age = 29;</code></pre>
+        <p class="calibre1">这个例子跟本节开始的第一个例子是等效的，虽然看起来有点怪。对象字面量表示法通常只在为了让属性一目了然时才使用。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在使用对象字面量表示法定义对象时，并不会实际调用<code class="calibre11">Object</code>构造函数。</p>
+        </blockquote>
+        <p class="calibre1">虽然使用哪种方式创建<code class="calibre11">Object</code>实例都可以，但实际上开发者更倾向于使用对象字面量表示法。这是因为对象字面量代码更少，看起来也更有封装所有相关数据的感觉。事实上，对象字面量已经成为给函数传递大量可选参数的主要方式，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function displayinfo(args) {
+  let output = "";
+
+  if (typeof args.name == "string"){
+    output += "name: " + args.name + "\n";
+  }
+
+  if (typeof args.age == "number") {
+    output += "age: " + args.age + "\n";
+  }
+
+  alert(output);
+}
+
+displayinfo({
+  name: "nicholas",
+  age: 29
+});
+
+displayinfo({
+  name: "greg"
+});</code></pre>
+        <p class="calibre1">这里，函数<code class="calibre11">displayInfo()</code>接收一个名为<code class="calibre11">args</code>的参数。这个参数可能有属性<code class="calibre11">name</code>或<code class="calibre11">age</code>，也可能两个属性都有或者都没有。函数内部会使用<code class="calibre11">typeof</code>操作符测试每个属性是否存在，然后根据属性有无构造并显示一条消息。然后，这个函数被调用了两次，每次都通过一个对象字面量传入了不同的数据。两种情况下，函数都正常运行。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            这种模式非常适合函数有大量可选参数的情况。一般来说，命名参数更直观，但在可选参数过多的时候就显得笨拙了。最好的方式是对必选参数使用命名参数，再通过一个对象字面量来封装多个可选参数。</p>
+        </blockquote>
+        <p class="calibre1">虽然属性一般是通过<strong class="calibre2">点语法</strong>来存取的，这也是面向对象语言的惯例，但也可以使用中括号来存取属性。在使用中括号时，要在括号内使用属性名的字符串形式，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(person["name"]); // "nicholas"
+console.log(person.name);    // "nicholas"</code></pre>
+        <p class="calibre1">从功能上讲，这两种存取属性的方式没有区别。使用中括号的主要优势就是可以通过变量访问属性，就像下面这个例子中一样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let propertyname = "name";
+console.log(person[propertyname]); // "nicholas"</code></pre>
+        <p class="calibre1">另外，如果属性名中包含可能会导致语法错误的字符，或者包含关键字/保留字时，也可以使用中括号语法。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">person["first name"] = "nicholas";</code></pre>
+        <p class="calibre1">因为<code class="calibre11">"first name"</code>中包含一个空格，所以不能使用点语法来访问。不过，属性名中是可以包含非字母数字字符的，这时候只要用中括号语法存取它们就行了。</p>
+        <p class="calibre1">通常，点语法是首选的属性存取方式，除非访问属性时必须使用变量。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            第8章将更全面、深入地介绍<code class="calibre11">Object</code>类型。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0044.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0046.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

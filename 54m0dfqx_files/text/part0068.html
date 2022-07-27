@@ -1,0 +1,356 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0067.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0069.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_218" class="calibre9">9.3 代理模式</h2>
+        <p class="calibre1">使用代理可以在代码中实现一些有用的编程模式。</p>
+        <h3 id="nav_point_219" class="calibre15">9.3.1 跟踪属性访问</h3>
+        <p class="calibre1">通过捕获<code class="calibre11">get</code>、<code class="calibre11">set</code>和<code class="calibre11">has</code>等操作，可以知道对象属性什么时候被访问、被查询。把实现相应捕获器的某个对象代理放到应用中，可以监控这个对象何时在何处被访问过：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const user = {
+  name: 'jake'
+};
+
+const proxy = new proxy(user, {
+  get(target, property, receiver) {
+    console.log(`getting ${property}`);
+
+    return reflect.get(...arguments);
+  },
+  set(target, property, value, receiver) {
+    console.log(`setting ${property}=${value}`);
+
+    return reflect.set(...arguments);
+  }
+});
+
+proxy.name;     // getting name
+proxy.age = 27; // setting age=27</code></pre>
+        <h3 id="nav_point_220" class="calibre15">9.3.2 隐藏属性</h3>
+        <p class="calibre1">代理的内部实现对外部代码是不可见的，因此要隐藏目标对象上的属性也轻而易举。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const hiddenproperties = ['foo', 'bar'];
+const targetobject = {
+  foo: 1,
+  bar: 2,
+  baz: 3
+};
+const proxy = new proxy(targetobject, {
+  get(target, property) {
+    if (hiddenproperties.includes(property)) {
+      return undefined;
+    } else {
+      return reflect.get(...arguments);
+    }
+  },
+  has(target, property) {
+    if (hiddenproperties.includes(property)) {
+      return false;
+    } else {
+      return reflect.has(...arguments);
+    }
+  }
+});
+
+// get()
+console.log(proxy.foo);  // undefined
+console.log(proxy.bar);  // undefined
+console.log(proxy.baz);  // 3
+
+// has()
+console.log('foo' in proxy);  // false
+console.log('bar' in proxy);  // false
+console.log('baz' in proxy);  // true</code></pre>
+        <h3 id="nav_point_221" class="calibre15">9.3.3 属性验证</h3>
+        <p class="calibre1">因为所有赋值操作都会触发<code class="calibre11">set()</code>捕获器，所以可以根据所赋的值决定是允许还是拒绝赋值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const target = {
+  onlynumbersgohere: 0
+};
+
+const proxy = new proxy(target, {
+  set(target, property, value) {
+    if (typeof value !== 'number') {
+      return false;
+    } else {
+      return reflect.set(...arguments);
+    }
+  }
+});
+
+proxy.onlynumbersgohere = 1;
+console.log(proxy.onlynumbersgohere);  // 1
+proxy.onlynumbersgohere = '2';
+console.log(proxy.onlynumbersgohere);  // 1</code></pre>
+        <h3 id="nav_point_222" class="calibre15">9.3.4 函数与构造函数参数验证</h3>
+        <p class="calibre1">跟保护和验证对象属性类似，也可对函数和构造函数参数进行审查。比如，可以让函数只接收某种类型的值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function median(...nums) {
+  return nums.sort()[math.floor(nums.length / 2)];
+}
+
+const proxy = new proxy(median, {
+  apply(target, thisarg, argumentslist) {
+    for (const arg of argumentslist) {
+      if (typeof arg !== 'number') {
+        throw 'non-number argument provided';
+      }
+    }
+    return reflect.apply(...arguments);
+  }
+});
+
+console.log(proxy(4, 7, 1));  // 4
+console.log(proxy(4, '7', 1));
+// error: non-number argument provided</code></pre>
+        <p class="calibre1">类似地，可以要求实例化时必须给构造函数传参：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class user {
+  constructor(id) {
+    this.id_ = id;
+  }
+}
+
+const proxy = new proxy(user, {
+  construct(target, argumentslist, newtarget) {
+    if (argumentslist[0] === undefined) {
+      throw 'user cannot be instantiated without id';
+    } else {
+      return reflect.construct(...arguments);
+    }
+  }
+});
+
+new proxy(1);
+
+new proxy();
+// error: user cannot be instantiated without id</code></pre>
+        <h3 id="nav_point_223" class="calibre15">9.3.5 数据绑定与可观察对象</h3>
+        <p class="calibre1">通过代理可以把运行时中原本不相关的部分联系到一起。这样就可以实现各种模式，从而让不同的代码互操作。</p>
+        <p class="calibre1">比如，可以将被代理的类绑定到一个全局实例集合，让所有创建的实例都被添加到这个集合中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const userlist = [];
+
+class user {
+  constructor(name) {
+    this.name_ = name;
+  }
+}
+
+const proxy = new proxy(user, {
+  construct() {
+    const newuser = reflect.construct(...arguments);
+    userlist.push(newuser);
+    return newuser;
+  }
+});
+
+new proxy('john');
+new proxy('jacob');
+new proxy('jingleheimerschmidt');
+
+console.log(userlist); // [user {}, user {}, user{}]</code></pre>
+        <p class="calibre1">另外，还可以把集合绑定到一个事件分派程序，每次插入新实例时都会发送消息：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const userlist = [];
+
+function emit(newvalue) {
+  console.log(newvalue);
+}
+
+const proxy = new proxy(userlist, {
+  set(target, property, value, receiver) {
+    const result = reflect.set(...arguments);
+    if (result) {
+      emit(reflect.get(target, property, receiver));
+    }
+    return result;
+  }
+});
+
+proxy.push('john');
+// john
+proxy.push('jacob');
+// jacob</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0067.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0069.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

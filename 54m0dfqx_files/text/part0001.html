@@ -1,0 +1,2596 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0000.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0002.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <p class="toc-level">
+          <a href="part0002.html#nav_point_0" class="calibre5">版权声明</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0003.html#nav_point_1" class="calibre5">献词</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0004.html#nav_point_2" class="calibre5">译者序</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0005.html#nav_point_3" class="calibre5">序</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0006.html#nav_point_4" class="calibre5">前言</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0007.html#nav_point_5" class="calibre5">读者对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0008.html#nav_point_6" class="calibre5">本书内容</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0009.html#nav_point_7" class="calibre5">组织结构</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0010.html#nav_point_8" class="calibre5">预备条件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0011.html#nav_point_9" class="calibre5">电子书及附录</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0012.html#nav_point_10" class="calibre5">致谢</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0013.html#nav_point_11" class="calibre5">第 1 章 什么是JavaScript</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0014.html#nav_point_12" class="calibre5">1.1 简短的历史回顾</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0015.html#nav_point_13" class="calibre5">1.2 JavaScript实现</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0015.html#nav_point_14" class="calibre5">1.2.1 ECMAScript</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0015.html#nav_point_15" class="calibre5">1.2.2 DOM</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0015.html#nav_point_16" class="calibre5">1.2.3 BOM</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0016.html#nav_point_17" class="calibre5">1.3 JavaScript版本</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0017.html#nav_point_18" class="calibre5">1.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0018.html#nav_point_19" class="calibre5">第 2 章 HTML中的JavaScript</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0019.html#nav_point_20" class="calibre5">2.1 &lt;script&gt;元素</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_21" class="calibre5">2.1.1 标签占位符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_22" class="calibre5">2.1.2 推迟执行脚本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_23" class="calibre5">2.1.3 异步执行脚本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_24" class="calibre5">2.1.4 动态加载脚本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_25" class="calibre5">2.1.5 XHTML中的变化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0019.html#nav_point_26" class="calibre5">2.1.6 废弃的语法</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0020.html#nav_point_27" class="calibre5">2.2 行内代码与外部文件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0021.html#nav_point_28" class="calibre5">2.3 文档模式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0022.html#nav_point_29" class="calibre5">2.4 &lt;noscript&gt;元素</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0023.html#nav_point_30" class="calibre5">2.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0024.html#nav_point_31" class="calibre5">第 3 章 语言基础</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0025.html#nav_point_32" class="calibre5">3.1 语法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0025.html#nav_point_33" class="calibre5">3.1.1 区分大小写</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0025.html#nav_point_34" class="calibre5">3.1.2 标识符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0025.html#nav_point_35" class="calibre5">3.1.3 注释</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0025.html#nav_point_36" class="calibre5">3.1.4 严格模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0025.html#nav_point_37" class="calibre5">3.1.5 语句</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0026.html#nav_point_38" class="calibre5">3.2 关键字与保留字</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0027.html#nav_point_39" class="calibre5">3.3 变量</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0027.html#nav_point_40" class="calibre5">3.3.1 var关键字</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0027.html#nav_point_41" class="calibre5">3.3.2 let声明</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0027.html#nav_point_42" class="calibre5">3.3.3 const声明</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0027.html#nav_point_43" class="calibre5">3.3.4 声明风格及最佳实践</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0028.html#nav_point_44" class="calibre5">3.4 数据类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_45" class="calibre5">3.4.1 typeof操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_46" class="calibre5">3.4.2 Undefined类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_47" class="calibre5">3.4.3 Null类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_48" class="calibre5">3.4.4 Boolean类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_49" class="calibre5">3.4.5 Number类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_50" class="calibre5">3.4.6 String类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_51" class="calibre5">3.4.7 Symbol类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0028.html#nav_point_52" class="calibre5">3.4.8 Object类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0029.html#nav_point_53" class="calibre5">3.5 操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_54" class="calibre5">3.5.1 一元操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_55" class="calibre5">3.5.2 位操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_56" class="calibre5">3.5.3 布尔操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_57" class="calibre5">3.5.4 乘性操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_58" class="calibre5">3.5.5 指数操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_59" class="calibre5">3.5.6 加性操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_60" class="calibre5">3.5.7 关系操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_61" class="calibre5">3.5.8 相等操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_62" class="calibre5">3.5.9 条件操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_63" class="calibre5">3.5.10 赋值操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0029.html#nav_point_64" class="calibre5">3.5.11 逗号操作符</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0030.html#nav_point_65" class="calibre5">3.6 语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_66" class="calibre5">3.6.1 if语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_67" class="calibre5">3.6.2 do-while语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_68" class="calibre5">3.6.3 while语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_69" class="calibre5">3.6.4 for语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_70" class="calibre5">3.6.5 for-in语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_71" class="calibre5">3.6.6 for-of语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_72" class="calibre5">3.6.7 标签语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_73" class="calibre5">3.6.8 break和continue语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_74" class="calibre5">3.6.9 with语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0030.html#nav_point_75" class="calibre5">3.6.10 switch语句</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0031.html#nav_point_76" class="calibre5">3.7 函数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0032.html#nav_point_77" class="calibre5">3.8 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0033.html#nav_point_78" class="calibre5">第 4 章 变量、作用域与内存</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0034.html#nav_point_79" class="calibre5">4.1 原始值与引用值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0034.html#nav_point_80" class="calibre5">4.1.1 动态属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0034.html#nav_point_81" class="calibre5">4.1.2 复制值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0034.html#nav_point_82" class="calibre5">4.1.3 传递参数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0034.html#nav_point_83" class="calibre5">4.1.4 确定类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0035.html#nav_point_84" class="calibre5">4.2 执行上下文与作用域</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0035.html#nav_point_85" class="calibre5">4.2.1 作用域链增强</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0035.html#nav_point_86" class="calibre5">4.2.2 变量声明</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0036.html#nav_point_87" class="calibre5">4.3 垃圾回收</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0036.html#nav_point_88" class="calibre5">4.3.1 标记清理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0036.html#nav_point_89" class="calibre5">4.3.2 引用计数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0036.html#nav_point_90" class="calibre5">4.3.3 性能</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0036.html#nav_point_91" class="calibre5">4.3.4 内存管理</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0037.html#nav_point_92" class="calibre5">4.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0038.html#nav_point_93" class="calibre5">第 5 章 基本引用类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0039.html#nav_point_94" class="calibre5">5.1 Date</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0039.html#nav_point_95" class="calibre5">5.1.1 继承的方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0039.html#nav_point_96" class="calibre5">5.1.2 日期格式化方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0039.html#nav_point_97" class="calibre5">5.1.3 日期/时间组件方法</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0040.html#nav_point_98" class="calibre5">5.2 RegExp</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0040.html#nav_point_99" class="calibre5">5.2.1 RegExp实例属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0040.html#nav_point_100" class="calibre5">5.2.2 RegExp实例方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0040.html#nav_point_101" class="calibre5">5.2.3 RegExp构造函数属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0040.html#nav_point_102" class="calibre5">5.2.4 模式局限</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0041.html#nav_point_103" class="calibre5">5.3 原始值包装类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0041.html#nav_point_104" class="calibre5">5.3.1 Boolean</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0041.html#nav_point_105" class="calibre5">5.3.2 Number</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0041.html#nav_point_106" class="calibre5">5.3.3 String</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0042.html#nav_point_107" class="calibre5">5.4 单例内置对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0042.html#nav_point_108" class="calibre5">5.4.1 Global</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0042.html#nav_point_109" class="calibre5">5.4.2 Math</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0043.html#nav_point_110" class="calibre5">5.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0044.html#nav_point_111" class="calibre5">第 6 章 集合引用类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0045.html#nav_point_112" class="calibre5">6.1 Object</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0046.html#nav_point_113" class="calibre5">6.2 Array</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_114" class="calibre5">6.2.1 创建数组</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_115" class="calibre5">6.2.2 数组空位</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_116" class="calibre5">6.2.3 数组索引</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_117" class="calibre5">6.2.4 检测数组</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_118" class="calibre5">6.2.5 迭代器方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_119" class="calibre5">6.2.6 复制和填充方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_120" class="calibre5">6.2.7 转换方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_121" class="calibre5">6.2.8 栈方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_122" class="calibre5">6.2.9 队列方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_123" class="calibre5">6.2.10 排序方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_124" class="calibre5">6.2.11 操作方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_125" class="calibre5">6.2.12 搜索和位置方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_126" class="calibre5">6.2.13 迭代方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0046.html#nav_point_127" class="calibre5">6.2.14 归并方法</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0047.html#nav_point_128" class="calibre5">6.3 定型数组</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0047.html#nav_point_129" class="calibre5">6.3.1 历史</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0047.html#nav_point_130" class="calibre5">6.3.2 ArrayBuffer</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0047.html#nav_point_131" class="calibre5">6.3.3 DataView</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0047.html#nav_point_132" class="calibre5">6.3.4 定型数组</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0048.html#nav_point_133" class="calibre5">6.4 Map</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0048.html#nav_point_134" class="calibre5">6.4.1 基本API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0048.html#nav_point_135" class="calibre5">6.4.2 顺序与迭代</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0048.html#nav_point_136" class="calibre5">6.4.3 选择Object还是Map</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0049.html#nav_point_137" class="calibre5">6.5 WeakMap</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0049.html#nav_point_138" class="calibre5">6.5.1 基本API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0049.html#nav_point_139" class="calibre5">6.5.2 弱键</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0049.html#nav_point_140" class="calibre5">6.5.3 不可迭代键</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0049.html#nav_point_141" class="calibre5">6.5.4 使用弱映射</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0050.html#nav_point_142" class="calibre5">6.6 Set</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0050.html#nav_point_143" class="calibre5">6.6.1 基本API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0050.html#nav_point_144" class="calibre5">6.6.2 顺序与迭代</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0050.html#nav_point_145" class="calibre5">6.6.3 定义正式集合操作</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0051.html#nav_point_146" class="calibre5">6.7 WeakSet</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0051.html#nav_point_147" class="calibre5">6.7.1 基本API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0051.html#nav_point_148" class="calibre5">6.7.2 弱值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0051.html#nav_point_149" class="calibre5">6.7.3 不可迭代值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0051.html#nav_point_150" class="calibre5">6.7.4 使用弱集合</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0052.html#nav_point_151" class="calibre5">6.8 迭代与扩展操作</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0053.html#nav_point_152" class="calibre5">6.9 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0054.html#nav_point_153" class="calibre5">第 7 章 迭代器与生成器</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0055.html#nav_point_154" class="calibre5">7.1 理解迭代</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0056.html#nav_point_155" class="calibre5">7.2 迭代器模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0056.html#nav_point_156" class="calibre5">7.2.1 可迭代协议</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0056.html#nav_point_157" class="calibre5">7.2.2 迭代器协议</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0056.html#nav_point_158" class="calibre5">7.2.3 自定义迭代器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0056.html#nav_point_159" class="calibre5">7.2.4 提前终止迭代器</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0057.html#nav_point_160" class="calibre5">7.3 生成器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0057.html#nav_point_161" class="calibre5">7.3.1 生成器基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0057.html#nav_point_162" class="calibre5">7.3.2 通过yield中断执行</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0057.html#nav_point_163" class="calibre5">7.3.3 生成器作为默认迭代器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0057.html#nav_point_164" class="calibre5">7.3.4 提前终止生成器</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0058.html#nav_point_165" class="calibre5">7.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0059.html#nav_point_166" class="calibre5">第 8 章 对象、类与面向对象编程</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0060.html#nav_point_167" class="calibre5">8.1 理解对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_168" class="calibre5">8.1.1 属性的类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_169" class="calibre5">8.1.2 定义多个属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_170" class="calibre5">8.1.3 读取属性的特性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_171" class="calibre5">8.1.4 合并对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_172" class="calibre5">8.1.5 对象标识及相等判定</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_173" class="calibre5">8.1.6 增强的对象语法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0060.html#nav_point_174" class="calibre5">8.1.7 对象解构</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0061.html#nav_point_175" class="calibre5">8.2 创建对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0061.html#nav_point_176" class="calibre5">8.2.1 概述</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0061.html#nav_point_177" class="calibre5">8.2.2 工厂模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0061.html#nav_point_178" class="calibre5">8.2.3 构造函数模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0061.html#nav_point_179" class="calibre5">8.2.4 原型模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0061.html#nav_point_180" class="calibre5">8.2.5 对象迭代</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0062.html#nav_point_181" class="calibre5">8.3 继承</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_182" class="calibre5">8.3.1 原型链</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_183" class="calibre5">8.3.2 盗用构造函数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_184" class="calibre5">8.3.3 组合继承</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_185" class="calibre5">8.3.4 原型式继承</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_186" class="calibre5">8.3.5 寄生式继承</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0062.html#nav_point_187" class="calibre5">8.3.6 寄生式组合继承</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0063.html#nav_point_188" class="calibre5">8.4 类</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0063.html#nav_point_189" class="calibre5">8.4.1 类定义</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0063.html#nav_point_190" class="calibre5">8.4.2 类构造函数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0063.html#nav_point_191" class="calibre5">8.4.3 实例、原型和类成员</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0063.html#nav_point_192" class="calibre5">8.4.4 继承</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0064.html#nav_point_193" class="calibre5">8.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0065.html#nav_point_194" class="calibre5">第 9 章 代理与反射</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0066.html#nav_point_195" class="calibre5">9.1 代理基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_196" class="calibre5">9.1.1 创建空代理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_197" class="calibre5">9.1.2 定义捕获器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_198" class="calibre5">9.1.3 捕获器参数和反射API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_199" class="calibre5">9.1.4 捕获器不变式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_200" class="calibre5">9.1.5 可撤销代理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_201" class="calibre5">9.1.6 实用反射API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_202" class="calibre5">9.1.7 代理另一个代理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0066.html#nav_point_203" class="calibre5">9.1.8 代理的问题与不足</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0067.html#nav_point_204" class="calibre5">9.2 代理捕获器与反射方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_205" class="calibre5">9.2.1 get()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_206" class="calibre5">9.2.2 set()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_207" class="calibre5">9.2.3 has()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_208" class="calibre5">9.2.4 defineProperty()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_209" class="calibre5">9.2.5 getOwnPropertyDescriptor()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_210" class="calibre5">9.2.6 deleteProperty()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_211" class="calibre5">9.2.7 ownKeys()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_212" class="calibre5">9.2.8 getPrototypeOf()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_213" class="calibre5">9.2.9 setPrototypeOf()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_214" class="calibre5">9.2.10 isExtensible()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_215" class="calibre5">9.2.11 preventExtensions()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_216" class="calibre5">9.2.12 apply()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0067.html#nav_point_217" class="calibre5">9.2.13 construct()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0068.html#nav_point_218" class="calibre5">9.3 代理模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0068.html#nav_point_219" class="calibre5">9.3.1 跟踪属性访问</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0068.html#nav_point_220" class="calibre5">9.3.2 隐藏属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0068.html#nav_point_221" class="calibre5">9.3.3 属性验证</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0068.html#nav_point_222" class="calibre5">9.3.4 函数与构造函数参数验证</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0068.html#nav_point_223" class="calibre5">9.3.5 数据绑定与可观察对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0069.html#nav_point_224" class="calibre5">9.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0070.html#nav_point_225" class="calibre5">第 10 章 函数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0071.html#nav_point_226" class="calibre5">10.1 箭头函数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0072.html#nav_point_227" class="calibre5">10.2 函数名</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0073.html#nav_point_228" class="calibre5">10.3 理解参数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0073.html#nav_point_229" class="calibre5">箭头函数中的参数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0074.html#nav_point_230" class="calibre5">10.4 没有重载</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0075.html#nav_point_231" class="calibre5">10.5 默认参数值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0075.html#nav_point_232" class="calibre5">默认参数作用域与暂时性死区</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0076.html#nav_point_233" class="calibre5">10.6 参数扩展与收集</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0076.html#nav_point_234" class="calibre5">10.6.1 扩展参数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0076.html#nav_point_235" class="calibre5">10.6.2 收集参数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0077.html#nav_point_236" class="calibre5">10.7 函数声明与函数表达式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0078.html#nav_point_237" class="calibre5">10.8 函数作为值</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0079.html#nav_point_238" class="calibre5">10.9 函数内部</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0079.html#nav_point_239" class="calibre5">10.9.1 arguments</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0079.html#nav_point_240" class="calibre5">10.9.2 this</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0079.html#nav_point_241" class="calibre5">10.9.3 caller</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0079.html#nav_point_242" class="calibre5">10.9.4 new.target</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0080.html#nav_point_243" class="calibre5">10.10 函数属性与方法</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0081.html#nav_point_244" class="calibre5">10.11 函数表达式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0082.html#nav_point_245" class="calibre5">10.12 递归</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0083.html#nav_point_246" class="calibre5">10.13 尾调用优化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0083.html#nav_point_247" class="calibre5">10.13.1 尾调用优化的条件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0083.html#nav_point_248" class="calibre5">10.13.2 尾调用优化的代码</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0084.html#nav_point_249" class="calibre5">10.14 闭包</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0084.html#nav_point_250" class="calibre5">10.14.1 this对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0084.html#nav_point_251" class="calibre5">10.14.2 内存泄漏</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0085.html#nav_point_252" class="calibre5">10.15 立即调用的函数表达式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0086.html#nav_point_253" class="calibre5">10.16 私有变量</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0086.html#nav_point_254" class="calibre5">10.16.1 静态私有变量</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0086.html#nav_point_255" class="calibre5">10.16.2 模块模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0086.html#nav_point_256" class="calibre5">10.16.3 模块增强模式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0087.html#nav_point_257" class="calibre5">10.17 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0088.html#nav_point_258" class="calibre5">第 11 章 期约与异步函数</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0089.html#nav_point_259" class="calibre5">11.1 异步编程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0089.html#nav_point_260" class="calibre5">11.1.1 同步与异步</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0089.html#nav_point_261" class="calibre5">11.1.2 以往的异步编程模式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0090.html#nav_point_262" class="calibre5">11.2 期约</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0090.html#nav_point_263" class="calibre5">11.2.1 Promises/A+规范</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0090.html#nav_point_264" class="calibre5">11.2.2 期约基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0090.html#nav_point_265" class="calibre5">11.2.3 期约的实例方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0090.html#nav_point_266" class="calibre5">11.2.4 期约连锁与期约合成</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0090.html#nav_point_267" class="calibre5">11.2.5 期约扩展</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0091.html#nav_point_268" class="calibre5">11.3 异步函数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0091.html#nav_point_269" class="calibre5">11.3.1 异步函数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0091.html#nav_point_270" class="calibre5">11.3.2 停止和恢复执行</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0091.html#nav_point_271" class="calibre5">11.3.3 异步函数策略</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0092.html#nav_point_272" class="calibre5">11.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0093.html#nav_point_273" class="calibre5">第 12 章 BOM</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0094.html#nav_point_274" class="calibre5">12.1 window对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_275" class="calibre5">12.1.1 Global作用域</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_276" class="calibre5">12.1.2 窗口关系</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_277" class="calibre5">12.1.3 窗口位置与像素比</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_278" class="calibre5">12.1.4 窗口大小</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_279" class="calibre5">12.1.5 视口位置</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_280" class="calibre5">12.1.6 导航与打开新窗口</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_281" class="calibre5">12.1.7 定时器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0094.html#nav_point_282" class="calibre5">12.1.8 系统对话框</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0095.html#nav_point_283" class="calibre5">12.2 location对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0095.html#nav_point_284" class="calibre5">12.2.1 查询字符串</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0095.html#nav_point_285" class="calibre5">12.2.2 操作地址</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0096.html#nav_point_286" class="calibre5">12.3 navigator对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0096.html#nav_point_287" class="calibre5">12.3.1 检测插件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0096.html#nav_point_288" class="calibre5">12.3.2 注册处理程序</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0097.html#nav_point_289" class="calibre5">12.4 screen对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0098.html#nav_point_290" class="calibre5">12.5 history对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0098.html#nav_point_291" class="calibre5">12.5.1 导航</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0098.html#nav_point_292" class="calibre5">12.5.2 历史状态管理</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0099.html#nav_point_293" class="calibre5">12.6 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0100.html#nav_point_294" class="calibre5">第 13 章 客户端检测</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0101.html#nav_point_295" class="calibre5">13.1 能力检测</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0101.html#nav_point_296" class="calibre5">13.1.1 安全能力检测</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0101.html#nav_point_297" class="calibre5">13.1.2 基于能力检测进行浏览器分析</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0102.html#nav_point_298" class="calibre5">13.2 用户代理检测</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0102.html#nav_point_299" class="calibre5">13.2.1 用户代理的历史</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0102.html#nav_point_300" class="calibre5">13.2.2 浏览器分析</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0103.html#nav_point_301" class="calibre5">13.3 软件与硬件检测</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0103.html#nav_point_302" class="calibre5">13.3.1 识别浏览器与操作系统</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0103.html#nav_point_303" class="calibre5">13.3.2 浏览器元数据</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0103.html#nav_point_304" class="calibre5">13.3.3 硬件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0104.html#nav_point_305" class="calibre5">13.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0105.html#nav_point_306" class="calibre5">第 14 章 DOM</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0106.html#nav_point_307" class="calibre5">14.1 节点层级</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_308" class="calibre5">14.1.1 Node类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_309" class="calibre5">14.1.2 Document类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_310" class="calibre5">14.1.3 Element类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_311" class="calibre5">14.1.4 Text类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_312" class="calibre5">14.1.5 Comment类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_313" class="calibre5">14.1.6 CDATASection类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_314" class="calibre5">14.1.7 DocumentType类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_315" class="calibre5">14.1.8 DocumentFragment类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0106.html#nav_point_316" class="calibre5">14.1.9 Attr类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0107.html#nav_point_317" class="calibre5">14.2 DOM编程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0107.html#nav_point_318" class="calibre5">14.2.1 动态脚本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0107.html#nav_point_319" class="calibre5">14.2.2 动态样式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0107.html#nav_point_320" class="calibre5">14.2.3 操作表格</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0107.html#nav_point_321" class="calibre5">14.2.4 使用NodeList</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0108.html#nav_point_322" class="calibre5">14.3 MutationObserver接口</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0108.html#nav_point_323" class="calibre5">14.3.1 基本用法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0108.html#nav_point_324" class="calibre5">14.3.2 MutationObserverInit与观察范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0108.html#nav_point_325" class="calibre5">14.3.3 异步回调与记录队列</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0108.html#nav_point_326" class="calibre5">14.3.4 性能、内存与垃圾回收</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0109.html#nav_point_327" class="calibre5">14.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0110.html#nav_point_328" class="calibre5">第 15 章 DOM扩展</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0111.html#nav_point_329" class="calibre5">15.1 Selectors API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0111.html#nav_point_330" class="calibre5">15.1.1 querySelector()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0111.html#nav_point_331" class="calibre5">15.1.2 querySelectorAll()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0111.html#nav_point_332" class="calibre5">15.1.3 matches()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0112.html#nav_point_333" class="calibre5">15.2 元素遍历</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0113.html#nav_point_334" class="calibre5">15.3 HTML5</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_335" class="calibre5">15.3.1 CSS类扩展</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_336" class="calibre5">15.3.2 焦点管理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_337" class="calibre5">15.3.3 HTMLDocument扩展</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_338" class="calibre5">15.3.4 字符集属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_339" class="calibre5">15.3.5 自定义数据属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_340" class="calibre5">15.3.6 插入标记</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0113.html#nav_point_341" class="calibre5">15.3.7 scrollIntoView()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0114.html#nav_point_342" class="calibre5">15.4 专有扩展</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0114.html#nav_point_343" class="calibre5">15.4.1 children属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0114.html#nav_point_344" class="calibre5">15.4.2 contains()方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0114.html#nav_point_345" class="calibre5">15.4.3 插入标记</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0114.html#nav_point_346" class="calibre5">15.4.4 滚动</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0115.html#nav_point_347" class="calibre5">15.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0116.html#nav_point_348" class="calibre5">第 16 章 DOM2和DOM3</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0117.html#nav_point_349" class="calibre5">16.1 DOM的演进</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0117.html#nav_point_350" class="calibre5">16.1.1 XML命名空间</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0117.html#nav_point_351" class="calibre5">16.1.2 其他变化</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0118.html#nav_point_352" class="calibre5">16.2 样式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0118.html#nav_point_353" class="calibre5">16.2.1 存取元素样式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0118.html#nav_point_354" class="calibre5">16.2.2 操作样式表</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0118.html#nav_point_355" class="calibre5">16.2.3 元素尺寸</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0119.html#nav_point_356" class="calibre5">16.3 遍历</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0119.html#nav_point_357" class="calibre5">16.3.1 NodeIterator</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0119.html#nav_point_358" class="calibre5">16.3.2 TreeWalker</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0120.html#nav_point_359" class="calibre5">16.4 范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_360" class="calibre5">16.4.1 DOM范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_361" class="calibre5">16.4.2 简单选择</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_362" class="calibre5">16.4.3 复杂选择</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_363" class="calibre5">16.4.4 操作范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_364" class="calibre5">16.4.5 范围插入</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_365" class="calibre5">16.4.6 范围折叠</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_366" class="calibre5">16.4.7 范围比较</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_367" class="calibre5">16.4.8 复制范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0120.html#nav_point_368" class="calibre5">16.4.9 清理</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0121.html#nav_point_369" class="calibre5">16.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0122.html#nav_point_370" class="calibre5">第 17 章 事件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0123.html#nav_point_371" class="calibre5">17.1 事件流</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0123.html#nav_point_372" class="calibre5">17.1.1 事件冒泡</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0123.html#nav_point_373" class="calibre5">17.1.2 事件捕获</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0123.html#nav_point_374" class="calibre5">17.1.3 DOM事件流</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0124.html#nav_point_375" class="calibre5">17.2 事件处理程序</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0124.html#nav_point_376" class="calibre5">17.2.1 HTML事件处理程序</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0124.html#nav_point_377" class="calibre5">17.2.2 DOM0事件处理程序</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0124.html#nav_point_378" class="calibre5">17.2.3 DOM2事件处理程序</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0124.html#nav_point_379" class="calibre5">17.2.4 IE事件处理程序</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0124.html#nav_point_380" class="calibre5">17.2.5 跨浏览器事件处理程序</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0125.html#nav_point_381" class="calibre5">17.3 事件对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0125.html#nav_point_382" class="calibre5">17.3.1 DOM事件对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0125.html#nav_point_383" class="calibre5">17.3.2 IE事件对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0125.html#nav_point_384" class="calibre5">17.3.3 跨浏览器事件对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0126.html#nav_point_385" class="calibre5">17.4 事件类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_386" class="calibre5">17.4.1 用户界面事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_387" class="calibre5">17.4.2 焦点事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_388" class="calibre5">17.4.3 鼠标和滚轮事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_389" class="calibre5">17.4.4 键盘与输入事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_390" class="calibre5">17.4.5 合成事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_391" class="calibre5">17.4.6 变化事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_392" class="calibre5">17.4.7 HTML5事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_393" class="calibre5">17.4.8 设备事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_394" class="calibre5">17.4.9 触摸及手势事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0126.html#nav_point_395" class="calibre5">17.4.10 事件参考</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0127.html#nav_point_396" class="calibre5">17.5 内存与性能</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0127.html#nav_point_397" class="calibre5">17.5.1 事件委托</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0127.html#nav_point_398" class="calibre5">17.5.2 删除事件处理程序</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0128.html#nav_point_399" class="calibre5">17.6 模拟事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0128.html#nav_point_400" class="calibre5">17.6.1 DOM事件模拟</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0128.html#nav_point_401" class="calibre5">17.6.2 IE事件模拟</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0129.html#nav_point_402" class="calibre5">17.7 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0130.html#nav_point_403" class="calibre5">第 18 章 动画与Canvas图形</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0131.html#nav_point_404" class="calibre5">18.1 使用requestAnimationFrame</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0131.html#nav_point_405" class="calibre5">18.1.1 早期定时动画</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0131.html#nav_point_406" class="calibre5">18.1.2 时间间隔的问题</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0131.html#nav_point_407" class="calibre5">18.1.3 requestAnimationFrame</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0131.html#nav_point_408" class="calibre5">18.1.4 cancelAnimationFrame</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0131.html#nav_point_409" class="calibre5">18.1.5 通过requestAnimationFrame节流</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0132.html#nav_point_410" class="calibre5">18.2 基本的画布功能</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0133.html#nav_point_411" class="calibre5">18.3 2D绘图上下文</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_412" class="calibre5">18.3.1 填充和描边</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_413" class="calibre5">18.3.2 绘制矩形</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_414" class="calibre5">18.3.3 绘制路径</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_415" class="calibre5">18.3.4 绘制文本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_416" class="calibre5">18.3.5 变换</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_417" class="calibre5">18.3.6 绘制图像</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_418" class="calibre5">18.3.7 阴影</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_419" class="calibre5">18.3.8 渐变</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_420" class="calibre5">18.3.9 图案</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_421" class="calibre5">18.3.10 图像数据</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0133.html#nav_point_422" class="calibre5">18.3.11 合成</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0134.html#nav_point_423" class="calibre5">18.4 WebGL</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0134.html#nav_point_424" class="calibre5">18.4.1 WebGL上下文</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0134.html#nav_point_425" class="calibre5">18.4.2 WebGL基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0134.html#nav_point_426" class="calibre5">18.4.3 WebGL1与WebGL2</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0135.html#nav_point_427" class="calibre5">18.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0136.html#nav_point_428" class="calibre5">第 19 章 表单脚本</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0137.html#nav_point_429" class="calibre5">19.1 表单基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0137.html#nav_point_430" class="calibre5">19.1.1 提交表单</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0137.html#nav_point_431" class="calibre5">19.1.2 重置表单</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0137.html#nav_point_432" class="calibre5">19.1.3 表单字段</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0138.html#nav_point_433" class="calibre5">19.2 文本框编程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0138.html#nav_point_434" class="calibre5">19.2.1 选择文本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0138.html#nav_point_435" class="calibre5">19.2.2 输入过滤</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0138.html#nav_point_436" class="calibre5">19.2.3 自动切换</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0138.html#nav_point_437" class="calibre5">19.2.4 HTML5约束验证API</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0139.html#nav_point_438" class="calibre5">19.3 选择框编程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0139.html#nav_point_439" class="calibre5">19.3.1 选项处理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0139.html#nav_point_440" class="calibre5">19.3.2 添加选项</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0139.html#nav_point_441" class="calibre5">19.3.3 移除选项</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0139.html#nav_point_442" class="calibre5">19.3.4 移动和重排选项</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0140.html#nav_point_443" class="calibre5">19.4 表单序列化</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0141.html#nav_point_444" class="calibre5">19.5 富文本编辑</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0141.html#nav_point_445" class="calibre5">19.5.1 使用contenteditable</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0141.html#nav_point_446" class="calibre5">19.5.2 与富文本交互</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0141.html#nav_point_447" class="calibre5">19.5.3 富文件选择</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0141.html#nav_point_448" class="calibre5">19.5.4 通过表单提交富文本</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0142.html#nav_point_449" class="calibre5">19.6 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0143.html#nav_point_450" class="calibre5">第 20 章 JavaScript API</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0144.html#nav_point_451" class="calibre5">20.1 Atomics与SharedArrayBuffer</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0144.html#nav_point_452" class="calibre5">20.1.1 SharedArrayBuffer</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0144.html#nav_point_453" class="calibre5">20.1.2 原子操作基础</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0145.html#nav_point_454" class="calibre5">20.2 跨上下文消息</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0146.html#nav_point_455" class="calibre5">20.3 Encoding API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0146.html#nav_point_456" class="calibre5">20.3.1 文本编码</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0146.html#nav_point_457" class="calibre5">20.3.2 文本解码</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0147.html#nav_point_458" class="calibre5">20.4 File API与Blob API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_459" class="calibre5">20.4.1 File类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_460" class="calibre5">20.4.2 FileReader类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_461" class="calibre5">20.4.3 FileReaderSync类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_462" class="calibre5">20.4.4 Blob与部分读取</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_463" class="calibre5">20.4.5 对象URL与Blob</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0147.html#nav_point_464" class="calibre5">20.4.6 读取拖放文件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0148.html#nav_point_465" class="calibre5">20.5 媒体元素</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0148.html#nav_point_466" class="calibre5">20.5.1 属性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0148.html#nav_point_467" class="calibre5">20.5.2 事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0148.html#nav_point_468" class="calibre5">20.5.3 自定义媒体播放器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0148.html#nav_point_469" class="calibre5">20.5.4 检测编解码器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0148.html#nav_point_470" class="calibre5">20.5.5 音频类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0149.html#nav_point_471" class="calibre5">20.6 原生拖放</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_472" class="calibre5">20.6.1 拖放事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_473" class="calibre5">20.6.2 自定义放置目标</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_474" class="calibre5">20.6.3 dataTransfer对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_475" class="calibre5">20.6.4 dropEffect与effectAllowed</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_476" class="calibre5">20.6.5 可拖动能力</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0149.html#nav_point_477" class="calibre5">20.6.6 其他成员</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0150.html#nav_point_478" class="calibre5">20.7 Notifications API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0150.html#nav_point_479" class="calibre5">20.7.1 通知权限</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0150.html#nav_point_480" class="calibre5">20.7.2 显示和隐藏通知</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0150.html#nav_point_481" class="calibre5">20.7.3 通知生命周期回调</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0151.html#nav_point_482" class="calibre5">20.8 Page Visibility API</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0152.html#nav_point_483" class="calibre5">20.9 Streams API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0152.html#nav_point_484" class="calibre5">20.9.1 理解流</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0152.html#nav_point_485" class="calibre5">20.9.2 可读流</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0152.html#nav_point_486" class="calibre5">20.9.3 可写流</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0152.html#nav_point_487" class="calibre5">20.9.4 转换流</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0152.html#nav_point_488" class="calibre5">20.9.5 通过管道连接流</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0153.html#nav_point_489" class="calibre5">20.10 计时API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0153.html#nav_point_490" class="calibre5">20.10.1 High Resolution Time API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0153.html#nav_point_491" class="calibre5">20.10.2 Performance Timeline API</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0154.html#nav_point_492" class="calibre5">20.11 Web组件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0154.html#nav_point_493" class="calibre5">20.11.1 HTML模板</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0154.html#nav_point_494" class="calibre5">20.11.2 影子DOM</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0154.html#nav_point_495" class="calibre5">20.11.3 自定义元素</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0155.html#nav_point_496" class="calibre5">20.12 Web Cryptography API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0155.html#nav_point_497" class="calibre5">20.12.1 生成随机数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0155.html#nav_point_498" class="calibre5">20.12.2 使用SubtleCrypto对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0156.html#nav_point_499" class="calibre5">20.13 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0157.html#nav_point_500" class="calibre5">第 21 章 错误处理与调试</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0158.html#nav_point_501" class="calibre5">21.1 浏览器错误报告</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0158.html#nav_point_502" class="calibre5">21.1.1 桌面控制台</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0158.html#nav_point_503" class="calibre5">21.1.2 移动控制台</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0159.html#nav_point_504" class="calibre5">21.2 错误处理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_505" class="calibre5">21.2.1 try/catch语句</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_506" class="calibre5">21.2.2 抛出错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_507" class="calibre5">21.2.3 error事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_508" class="calibre5">21.2.4 错误处理策略</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_509" class="calibre5">21.2.5 识别错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_510" class="calibre5">21.2.6 区分重大与非重大错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0159.html#nav_point_511" class="calibre5">21.2.7 把错误记录到服务器中</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0160.html#nav_point_512" class="calibre5">21.3 调试技术</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_513" class="calibre5">21.3.1 把消息记录到控制台</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_514" class="calibre5">21.3.2 理解控制台运行时</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_515" class="calibre5">21.3.3 使用JavaScript调试器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_516" class="calibre5">21.3.4 在页面中打印消息</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_517" class="calibre5">21.3.5 补充控制台方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0160.html#nav_point_518" class="calibre5">21.3.6 抛出错误</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0161.html#nav_point_519" class="calibre5">21.4 旧版IE的常见错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0161.html#nav_point_520" class="calibre5">21.4.1 无效字符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0161.html#nav_point_521" class="calibre5">21.4.2 未找到成员</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0161.html#nav_point_522" class="calibre5">21.4.3 未知运行时错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0161.html#nav_point_523" class="calibre5">21.4.4 语法错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0161.html#nav_point_524" class="calibre5">21.4.5 系统找不到指定资源</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0162.html#nav_point_525" class="calibre5">21.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0163.html#nav_point_526" class="calibre5">第 22 章 处理XML</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0164.html#nav_point_527" class="calibre5">22.1 浏览器对XML DOM的支持</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0164.html#nav_point_528" class="calibre5">22.1.1 DOM Level 2 Core</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0164.html#nav_point_529" class="calibre5">22.1.2 DOMParser类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0164.html#nav_point_530" class="calibre5">22.1.3 XMLSerializer类型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0165.html#nav_point_531" class="calibre5">22.2 浏览器对XPath的支持</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0165.html#nav_point_532" class="calibre5">22.2.1 DOM Level 3 XPath</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0165.html#nav_point_533" class="calibre5">22.2.2 单个节点结果</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0165.html#nav_point_534" class="calibre5">22.2.3 简单类型结果</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0165.html#nav_point_535" class="calibre5">22.2.4 默认类型结果</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0165.html#nav_point_536" class="calibre5">22.2.5 命名空间支持</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0166.html#nav_point_537" class="calibre5">22.3 浏览器对XSLT的支持</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0166.html#nav_point_538" class="calibre5">22.3.1 XSLTProcessor类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0166.html#nav_point_539" class="calibre5">22.3.2 使用参数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0166.html#nav_point_540" class="calibre5">22.3.3 重置处理器</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0167.html#nav_point_541" class="calibre5">22.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0168.html#nav_point_542" class="calibre5">第 23 章 JSON</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0169.html#nav_point_543" class="calibre5">23.1 语法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0169.html#nav_point_544" class="calibre5">23.1.1 简单值</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0169.html#nav_point_545" class="calibre5">23.1.2 对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0169.html#nav_point_546" class="calibre5">23.1.3 数组</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0170.html#nav_point_547" class="calibre5">23.2 解析与序列化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0170.html#nav_point_548" class="calibre5">23.2.1 JSON对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0170.html#nav_point_549" class="calibre5">23.2.2 序列化选项</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0170.html#nav_point_550" class="calibre5">23.2.3 解析选项</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0171.html#nav_point_551" class="calibre5">23.3 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0172.html#nav_point_552" class="calibre5">第 24 章 网络请求与远程资源</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0173.html#nav_point_553" class="calibre5">24.1 XMLHttpRequest对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0173.html#nav_point_554" class="calibre5">24.1.1 使用XHR</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0173.html#nav_point_555" class="calibre5">24.1.2 HTTP头部</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0173.html#nav_point_556" class="calibre5">24.1.3 GET请求</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0173.html#nav_point_557" class="calibre5">24.1.4 POST请求</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0173.html#nav_point_558" class="calibre5">24.1.5 XMLHttpRequest Level 2</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0174.html#nav_point_559" class="calibre5">24.2 进度事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0174.html#nav_point_560" class="calibre5">24.2.1 load事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0174.html#nav_point_561" class="calibre5">24.2.2 progress事件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0175.html#nav_point_562" class="calibre5">24.3 跨源资源共享</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0175.html#nav_point_563" class="calibre5">24.3.1 预检请求</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0175.html#nav_point_564" class="calibre5">24.3.2 凭据请求</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0176.html#nav_point_565" class="calibre5">24.4 替代性跨源技术</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0176.html#nav_point_566" class="calibre5">24.4.1 图片探测</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0176.html#nav_point_567" class="calibre5">24.4.2 JSONP</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0177.html#nav_point_568" class="calibre5">24.5 Fetch API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_569" class="calibre5">24.5.1 基本用法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_570" class="calibre5">24.5.2 常见Fetch请求模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_571" class="calibre5">24.5.3 Headers对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_572" class="calibre5">24.5.4 Request对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_573" class="calibre5">24.5.5 Response对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0177.html#nav_point_574" class="calibre5">24.5.6 Request、Response及Body混入</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0178.html#nav_point_575" class="calibre5">24.6 Beacon API</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0179.html#nav_point_576" class="calibre5">24.7 Web Socket</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0179.html#nav_point_577" class="calibre5">24.7.1 API</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0179.html#nav_point_578" class="calibre5">24.7.2 发送和接收数据</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0179.html#nav_point_579" class="calibre5">24.7.3 其他事件</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0180.html#nav_point_580" class="calibre5">24.8 安全</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0181.html#nav_point_581" class="calibre5">24.9 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0182.html#nav_point_582" class="calibre5">第 25 章 客户端存储</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0183.html#nav_point_583" class="calibre5">25.1 cookie</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0183.html#nav_point_584" class="calibre5">25.1.1 限制</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0183.html#nav_point_585" class="calibre5">25.1.2 cookie的构成</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0183.html#nav_point_586" class="calibre5">25.1.3 JavaScript中的cookie</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0183.html#nav_point_587" class="calibre5">25.1.4 子cookie</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0183.html#nav_point_588" class="calibre5">25.1.5 使用cookie的注意事项</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0184.html#nav_point_589" class="calibre5">25.2 Web Storage</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0184.html#nav_point_590" class="calibre5">25.2.1 Storage类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0184.html#nav_point_591" class="calibre5">25.2.2 sessionStorage对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0184.html#nav_point_592" class="calibre5">25.2.3 localStorage对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0184.html#nav_point_593" class="calibre5">25.2.4 存储事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0184.html#nav_point_594" class="calibre5">25.2.5 限制</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0185.html#nav_point_595" class="calibre5">25.3 IndexedDB</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_596" class="calibre5">25.3.1 数据库</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_597" class="calibre5">25.3.2 对象存储</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_598" class="calibre5">25.3.3 事务</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_599" class="calibre5">25.3.4 插入对象</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_600" class="calibre5">25.3.5 通过游标查询</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_601" class="calibre5">25.3.6 键范围</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_602" class="calibre5">25.3.7 设置游标方向</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_603" class="calibre5">25.3.8 索引</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_604" class="calibre5">25.3.9 并发问题</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0185.html#nav_point_605" class="calibre5">25.3.10 限制</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0186.html#nav_point_606" class="calibre5">25.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0187.html#nav_point_607" class="calibre5">第 26 章 模块</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0188.html#nav_point_608" class="calibre5">26.1 理解模块模式</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_609" class="calibre5">26.1.1 模块标识符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_610" class="calibre5">26.1.2 模块依赖</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_611" class="calibre5">26.1.3 模块加载</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_612" class="calibre5">26.1.4 入口</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_613" class="calibre5">26.1.5 异步依赖</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_614" class="calibre5">26.1.6 动态依赖</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_615" class="calibre5">26.1.7 静态分析</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0188.html#nav_point_616" class="calibre5">26.1.8 循环依赖</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0189.html#nav_point_617" class="calibre5">26.2 凑合的模块系统</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0190.html#nav_point_618" class="calibre5">26.3 使用ES6之前的模块加载器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0190.html#nav_point_619" class="calibre5">26.3.1 CommonJS</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0190.html#nav_point_620" class="calibre5">26.3.2 异步模块定义</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0190.html#nav_point_621" class="calibre5">26.3.3 通用模块定义</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0190.html#nav_point_622" class="calibre5">26.3.4 模块加载器终将没落</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0191.html#nav_point_623" class="calibre5">26.4 使用ES6模块</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_624" class="calibre5">26.4.1 模块标签及定义</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_625" class="calibre5">26.4.2 模块加载</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_626" class="calibre5">26.4.3 模块行为</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_627" class="calibre5">26.4.4 模块导出</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_628" class="calibre5">26.4.5 模块导入</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_629" class="calibre5">26.4.6 模块转移导出</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_630" class="calibre5">26.4.7 工作者模块</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0191.html#nav_point_631" class="calibre5">26.4.8 向后兼容</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0192.html#nav_point_632" class="calibre5">26.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0193.html#nav_point_633" class="calibre5">第 27 章 工作者线程</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0194.html#nav_point_634" class="calibre5">27.1 工作者线程简介</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0194.html#nav_point_635" class="calibre5">27.1.1 工作者线程与线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0194.html#nav_point_636" class="calibre5">27.1.2 工作者线程的类型</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0194.html#nav_point_637" class="calibre5">27.1.3 WorkerGlobalScope</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0195.html#nav_point_638" class="calibre5">27.2 专用工作者线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_639" class="calibre5">27.2.1 专用工作者线程的基本概念</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_640" class="calibre5">27.2.2 专用工作者线程与隐式MessagePorts</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_641" class="calibre5">27.2.3 专用工作者线程的生命周期</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_642" class="calibre5">27.2.4 配置Worker选项</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_643" class="calibre5">27.2.5 在JavaScript行内创建工作者线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_644" class="calibre5">27.2.6 在工作者线程中动态执行脚本</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_645" class="calibre5">27.2.7 委托任务到子工作者线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_646" class="calibre5">27.2.8 处理工作者线程错误</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_647" class="calibre5">27.2.9 与专用工作者线程通信</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_648" class="calibre5">27.2.10 工作者线程数据传输</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0195.html#nav_point_649" class="calibre5">27.2.11 线程池</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0196.html#nav_point_650" class="calibre5">27.3 共享工作者线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0196.html#nav_point_651" class="calibre5">27.3.1 共享工作者线程简介</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0196.html#nav_point_652" class="calibre5">27.3.2 理解共享工作者线程的生命周期</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0196.html#nav_point_653" class="calibre5">27.3.3 连接到共享工作者线程</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0197.html#nav_point_654" class="calibre5">27.4 服务工作者线程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_655" class="calibre5">27.4.1 服务工作者线程基础</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_656" class="calibre5">27.4.2 服务工作者线程缓存</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_657" class="calibre5">27.4.3 服务工作者线程客户端</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_658" class="calibre5">27.4.4 服务工作者线程与一致性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_659" class="calibre5">27.4.5 理解服务工作者线程的生命周期</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_660" class="calibre5">27.4.6 控制反转与服务工作者线程持久化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_661" class="calibre5">27.4.7 通过updateViaCache管理服务文件缓存</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_662" class="calibre5">27.4.8 强制性服务工作者线程操作</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_663" class="calibre5">27.4.9 服务工作者线程消息</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_664" class="calibre5">27.4.10 拦截fetch事件</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0197.html#nav_point_665" class="calibre5">27.4.11 推送通知</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0198.html#nav_point_666" class="calibre5">27.5 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0199.html#nav_point_667" class="calibre5">第 28 章 最佳实践</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0200.html#nav_point_668" class="calibre5">28.1 可维护性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0200.html#nav_point_669" class="calibre5">28.1.1 什么是可维护的代码</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0200.html#nav_point_670" class="calibre5">28.1.2 编码规范</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0200.html#nav_point_671" class="calibre5">28.1.3 松散耦合</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0200.html#nav_point_672" class="calibre5">28.1.4 编码惯例</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0201.html#nav_point_673" class="calibre5">28.2 性能</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0201.html#nav_point_674" class="calibre5">28.2.1 作用域意识</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0201.html#nav_point_675" class="calibre5">28.2.2 选择正确的方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0201.html#nav_point_676" class="calibre5">28.2.3 语句最少化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0201.html#nav_point_677" class="calibre5">28.2.4 优化DOM交互</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0202.html#nav_point_678" class="calibre5">28.3 部署</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0202.html#nav_point_679" class="calibre5">28.3.1 构建流程</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0202.html#nav_point_680" class="calibre5">28.3.2 验证</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0202.html#nav_point_681" class="calibre5">28.3.3 压缩</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0203.html#nav_point_682" class="calibre5">28.4 小结</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0204.html#nav_point_683" class="calibre5">附录 A ES2018和ES2019</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0205.html#nav_point_684" class="calibre5">A.1 异步迭代</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_685" class="calibre5">A.1.1 创建并使用异步迭代器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_686" class="calibre5">A.1.2 理解异步迭代器队列</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_687" class="calibre5">A.1.3 处理异步迭代器的reject()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_688" class="calibre5">A.1.4 使用next()手动异步迭代</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_689" class="calibre5">A.1.5 顶级异步循环</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0205.html#nav_point_690" class="calibre5">A.1.6 实现可观察对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0206.html#nav_point_691" class="calibre5">A.2 对象字面量的剩余操作符和扩展操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0206.html#nav_point_692" class="calibre5">A.2.1 剩余操作符</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0206.html#nav_point_693" class="calibre5">A.2.2 扩展操作符</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0207.html#nav_point_694" class="calibre5">A.3 Promise.prototype.finally()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0208.html#nav_point_695" class="calibre5">A.4 正则表达式相关特性</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0208.html#nav_point_696" class="calibre5">A.4.1 dotAll标志</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0208.html#nav_point_697" class="calibre5">A.4.2 向后查找断言</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0208.html#nav_point_698" class="calibre5">A.4.3 命名捕获组</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0208.html#nav_point_699" class="calibre5">A.4.4 Unicode属性转义</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0209.html#nav_point_700" class="calibre5">A.5 数组打平方法</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0209.html#nav_point_701" class="calibre5">A.5.1 Array.prototype.flatten()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0209.html#nav_point_702" class="calibre5">A.5.2 Array.prototype.flatMap()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0210.html#nav_point_703" class="calibre5">A.6 Object.fromEntries()</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0211.html#nav_point_704" class="calibre5">A.7 字符串修理方法</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0212.html#nav_point_705" class="calibre5">A.8 Symbol.prototype.description</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0213.html#nav_point_706" class="calibre5">A.9 可选的catch绑定</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0214.html#nav_point_707" class="calibre5">A.10 其他新增内容</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0215.html#nav_point_708" class="calibre5">附录 B 严格模式</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0216.html#nav_point_709" class="calibre5">B.1 选择使用</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0217.html#nav_point_710" class="calibre5">B.2 变量</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0218.html#nav_point_711" class="calibre5">B.3 对象</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0219.html#nav_point_712" class="calibre5">B.4 函数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0219.html#nav_point_713" class="calibre5">B.4.1 函数参数</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0219.html#nav_point_714" class="calibre5">B.4.2 eval()</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0219.html#nav_point_715" class="calibre5">B.4.3 eval与arguments</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0220.html#nav_point_716" class="calibre5">B.5 this强制转型</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0221.html#nav_point_717" class="calibre5">B.6 类与模块</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0222.html#nav_point_718" class="calibre5">B.7 其他变化</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0223.html#nav_point_719" class="calibre5">附录 C JavaScript库和框架</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0224.html#nav_point_720" class="calibre5">C.1 框架</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_721" class="calibre5">C.1.1 React</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_722" class="calibre5">C.1.2 Angular</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_723" class="calibre5">C.1.3 Vue</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_724" class="calibre5">C.1.4 Ember</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_725" class="calibre5">C.1.5 Meteor</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0224.html#nav_point_726" class="calibre5">C.1.6 Backbone.js</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0225.html#nav_point_727" class="calibre5">C.2 通用库</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_728" class="calibre5">C.2.1 jQuery</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_729" class="calibre5">C.2.2 Google Closure Library</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_730" class="calibre5">C.2.3 Underscore.js</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_731" class="calibre5">C.2.4 Lodash</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_732" class="calibre5">C.2.5 Prototype</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_733" class="calibre5">C.2.6 Dojo Toolkit</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_734" class="calibre5">C.2.7 MooTools</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0225.html#nav_point_735" class="calibre5">C.2.8 qooxdoo</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0226.html#nav_point_736" class="calibre5">C.3 动画与特效</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0226.html#nav_point_737" class="calibre5">C.3.1 D3</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0226.html#nav_point_738" class="calibre5">C.3.2 three.js</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0226.html#nav_point_739" class="calibre5">C.3.3 moo.fx</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0226.html#nav_point_740" class="calibre5">C.3.4 Lightbox</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0227.html#nav_point_741" class="calibre5">附录 D JavaScript工具</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0228.html#nav_point_742" class="calibre5">D.1 包管理</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0228.html#nav_point_743" class="calibre5">D.1.1 npm</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0228.html#nav_point_744" class="calibre5">D.1.2 Bower</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0228.html#nav_point_745" class="calibre5">D.1.3 JSPM</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0228.html#nav_point_746" class="calibre5">D.1.4 Yarn</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0229.html#nav_point_747" class="calibre5">D.2 模块加载器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0229.html#nav_point_748" class="calibre5">D.2.1 SystemJS</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0229.html#nav_point_749" class="calibre5">D.2.2 RequireJS</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0230.html#nav_point_750" class="calibre5">D.3 模块打包器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0230.html#nav_point_751" class="calibre5">D.3.1 Webpack</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0230.html#nav_point_752" class="calibre5">D.3.2 JSPM</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0230.html#nav_point_753" class="calibre5">D.3.3 Browserify</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0230.html#nav_point_754" class="calibre5">D.3.4 Rollup</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0231.html#nav_point_755" class="calibre5">D.4 编译/转译工具及静态类型系统</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0231.html#nav_point_756" class="calibre5">D.4.1 Babel</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0231.html#nav_point_757" class="calibre5">D.4.2 Google Closure Compiler</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0231.html#nav_point_758" class="calibre5">D.4.3 CoffeeScript</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0231.html#nav_point_759" class="calibre5">D.4.4 TypeScript</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0231.html#nav_point_760" class="calibre5">D.4.5 Flow</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0232.html#nav_point_761" class="calibre5">D.5 高性能脚本工具</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0232.html#nav_point_762" class="calibre5">D.5.1 WebAssembly</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0232.html#nav_point_763" class="calibre5">D.5.2 asm.js</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0232.html#nav_point_764" class="calibre5">D.5.3 Emscripten与LLVM</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0233.html#nav_point_765" class="calibre5">D.6 编辑器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0233.html#nav_point_766" class="calibre5">D.6.1 Sublime Text</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0233.html#nav_point_767" class="calibre5">D.6.2 Atom</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0233.html#nav_point_768" class="calibre5">D.6.3 Brackets</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0233.html#nav_point_769" class="calibre5">D.6.4 Visual Studio Code</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0233.html#nav_point_770" class="calibre5">D.6.5 WebStorm</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0234.html#nav_point_771" class="calibre5">D.7 构建工具、自动化系统和任务运行器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0234.html#nav_point_772" class="calibre5">D.7.1 Grunt</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0234.html#nav_point_773" class="calibre5">D.7.2 Gulp</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0234.html#nav_point_774" class="calibre5">D.7.3 Brunch</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0234.html#nav_point_775" class="calibre5">D.7.4 npm</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0235.html#nav_point_776" class="calibre5">D.8 代码检查和格式化</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0235.html#nav_point_777" class="calibre5">D.8.1 ESLint</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0235.html#nav_point_778" class="calibre5">D.8.2 Google Closure Compiler</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0235.html#nav_point_779" class="calibre5">D.8.3 JSLint</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0235.html#nav_point_780" class="calibre5">D.8.4 JSHint</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0235.html#nav_point_781" class="calibre5">D.8.5 ClangFormat</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0236.html#nav_point_782" class="calibre5">D.9 压缩工具</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0236.html#nav_point_783" class="calibre5">D.9.1 Uglify</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0236.html#nav_point_784" class="calibre5">D.9.2 Google Closure Compiler</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0236.html#nav_point_785" class="calibre5">D.9.3 JSMin</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0236.html#nav_point_786" class="calibre5">D.9.4 Dojo ShrinkSafe</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0237.html#nav_point_787" class="calibre5">D.10 单元测试</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0237.html#nav_point_788" class="calibre5">D.10.1 Mocha</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0237.html#nav_point_789" class="calibre5">D.10.2 Jasmine</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0237.html#nav_point_790" class="calibre5">D.10.3 qUnit</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0237.html#nav_point_791" class="calibre5">D.10.4 JsUnit</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0237.html#nav_point_792" class="calibre5">D.10.5 Dojo Object Harness</a>
+        </p>
+        <p class="toc-level1">
+          <a href="part0238.html#nav_point_793" class="calibre5">D.11 文档生成器</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_794" class="calibre5">D.11.1 ESDoc</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_795" class="calibre5">D.11.2 documentation.js</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_796" class="calibre5">D.11.3 Docco</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_797" class="calibre5">D.11.4 JsDoc Toolkit</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_798" class="calibre5">D.11.5 YUI Doc</a>
+        </p>
+        <p class="toc-level2">
+          <a href="part0238.html#nav_point_799" class="calibre5">D.11.6 AjaxDoc</a>
+        </p>
+        <p class="toc-level">
+          <a href="part0239.html#nav_point_800" class="calibre5">作者简介</a>
+        </p><br class="calibre4" id="calibre_pb_3"/>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0000.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0002.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

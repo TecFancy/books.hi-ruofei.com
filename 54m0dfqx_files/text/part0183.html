@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0182.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0184.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_583" class="calibre9">25.1 cookie</h2>
+        <p class="calibre1">HTTP cookie通常也叫作<strong class="calibre2">cookie</strong>，最初用于在客户端存储会话信息。这个规范要求服务器在响应HTTP请求时，通过发送<code class="calibre11">Set-Cookie</code>
+          HTTP头部包含会话信息。例如，下面是包含这个头部的一个HTTP响应：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http/1.1 200 ok
+content-type: text/html
+set-cookie: name=value
+other-header: other-header-value</code></pre>
+        <p class="calibre1">这个HTTP响应会设置一个名为<code class="calibre11">"name"</code>，值为<code class="calibre11">"value"</code>的cookie。名和值在发送时都会经过URL编码。浏览器会存储这些会话信息，并在之后的每个请求中都会通过HTTP头部cookie再将它们发回服务器，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">get /index.jsl http/1.1
+cookie: name=value
+other-header: other-header-value</code></pre>
+        <p class="calibre1">这些发送回服务器的额外信息可用于唯一标识发送请求的客户端。</p>
+        <h3 id="nav_point_584" class="calibre15">25.1.1 限制</h3>
+        <p class="calibre1">cookie是与特定域绑定的。设置cookie后，它会与请求一起发送到创建它的域。这个限制能保证cookie中存储的信息只对被认可的接收者开放，不被其他域访问。</p>
+        <p class="calibre1">因为cookie存储在客户端机器上，所以为保证它不会被恶意利用，浏览器会施加限制。同时，cookie也不会占用太多磁盘空间。</p>
+        <p class="calibre1">通常，只要遵守以下大致的限制，就不会在任何浏览器中碰到问题：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">不超过300个cookie；</li>
+          <li class="di_1ji_wu_xu_lie_biao">每个cookie不超过4096字节；</li>
+          <li class="di_1ji_wu_xu_lie_biao">每个域不超过20个cookie；</li>
+          <li class="di_1ji_wu_xu_lie_biao">每个域不超过81 920字节。</li>
+        </ul>
+        <p class="calibre1">每个域能设置的cookie总数也是受限的，但不同浏览器的限制不同。例如：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">最新版IE和Edge限制每个域不超过50个cookie；</li>
+          <li class="di_1ji_wu_xu_lie_biao">最新版Firefox限制每个域不超过150个cookie；</li>
+          <li class="di_1ji_wu_xu_lie_biao">最新版Opera限制每个域不超过180个cookie；</li>
+          <li class="di_1ji_wu_xu_lie_biao">Safari和Chrome对每个域的cookie数没有硬性限制。</li>
+        </ul>
+        <p class="calibre1">如果cookie总数超过了单个域的上限，浏览器就会删除之前设置的cookie。IE和Opera会按照最近最少使用（LRU，Least Recently Used）原则删除之前的cookie，以便为新设置的cookie腾出空间。Firefox好像会随机删除之前的cookie，因此为避免不确定的结果，最好不要超出限制。</p>
+        <p class="calibre1">浏览器也会限制cookie的大小。大多数浏览器对cookie的限制是不超过4096字节，上下可以有一个字节的误差。为跨浏览器兼容，最好保证cookie的大小不超过4095字节。这个大小限制适用于一个域的所有cookie，而不是单个cookie。</p>
+        <p class="calibre1">如果创建的cookie超过最大限制，则该cookie会被静默删除。注意，一个字符通常会占1字节。如果使用多字节字符（如UTF-8 Unicode字符），则每个字符最多可能占4字节。</p>
+        <h3 id="nav_point_585" class="calibre15">25.1.2 cookie的构成</h3>
+        <p class="calibre1">cookie在浏览器中是由以下参数构成的。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">名称</strong>：唯一标识cookie的名称。cookie名不区分大小写，因此<code class="calibre11">myCookie</code>和<code class="calibre11">MyCookie</code>是同一个名称。不过，实践中最好将cookie名当成区分大小写来对待，因为一些服务器软件可能这样对待它们。cookie名必须经过URL编码。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">值</strong>：存储在cookie里的字符串值。这个值必须经过URL编码。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">域</strong>：cookie有效的域。发送到这个域的所有请求都会包含对应的cookie。这个值可能包含子域（如www.wrox.com），也可以不包含（如.wrox.com表示对wrox.com的所有子域都有效）。如果不明确设置，则默认为设置cookie的域。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">路径</strong>：请求URL中包含这个路径才会把cookie发送到服务器。例如，可以指定cookie只能由http://www.wrox.com/books/访问，因此访问http://www.wrox.com/下的页面就不会发送cookie，即使请求的是同一个域。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">过期时间</strong>：表示何时删除cookie的时间戳（即什么时间之后就不发送到服务器了）。默认情况下，浏览器会话结束后会删除所有cookie。不过，也可以设置删除cookie的时间。这个值是GMT格式（Wdy, DD-Mon-YYYY HH:MM:SS GMT），用于指定删除cookie的具体时间。这样即使关闭浏览器cookie也会保留在用户机器上。把过期时间设置为过去的时间会立即删除cookie。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">安全标志</strong>：设置之后，只在使用SSL安全连接的情况下才会把cookie发送到服务器。例如，请求https://www.wrox.com会发送cookie，而请求http://www.wrox.com则不会。</li>
+        </ul>
+        <p class="calibre1">这些参数在<code class="calibre11">Set-Cookie</code>头部中使用分号加空格隔开，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http/1.1 200 ok
+content-type: text/html
+set-cookie: name=value; expires=mon, 22-jan-07 07:10:24 gmt; domain=.wrox.com
+other-header: other-header-value</code></pre>
+        <p class="calibre1">这个头部设置一个名为<code class="calibre11">"name"</code>的cookie，这个cookie在2007年1月22日7:10:24过期，对www.wrox.com及其他wrox.com的子域（如p2p.wrox.com）有效。</p>
+        <p class="calibre1">安全标志se<code class="calibre11">c</code>ure是cookie中唯一的非名/值对，只需一个<code class="calibre11">secure</code>就可以了。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http/1.1 200 ok
+content-type: text/html
+set-cookie: name=value; domain=.wrox.com; path=/; secure
+other-header: other-header-value</code></pre>
+        <p class="calibre1">这里创建的cookie对所有wrox.com的子域及该域中的所有页面有效（通过<code class="calibre11">path=/</code>指定）。不过，这个cookie只能在SSL连接上发送，因为设置了<code class="calibre11">secure</code>标志。</p>
+        <p class="calibre1">要知道，域、路径、过期时间和<code class="calibre11">secure</code>标志用于告诉浏览器什么情况下应该在请求中包含cookie。这些参数并不会随请求发送给服务器，实际发送的只有cookie的名/值对。</p>
+        <h3 id="nav_point_586" class="calibre15">25.1.3 JavaScript中的cookie</h3>
+        <p class="calibre1">在JavaScript中处理cookie比较麻烦，因为接口过于简单，只有BOM的<code class="calibre11">document.cookie</code>属性。根据用法不同，该属性的表现迥异。要使用该属性获取值时，<code class="calibre11">document.cookie</code>返回包含页面中所有有效cookie的字符串（根据域、路径、过期时间和安全设置），以分号分隔，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">name1=value1;name2=value2;name3=value3</code></pre>
+        <p class="calibre1">所有名和值都是URL编码的，因此必须使用<code class="calibre11">decodeURIComponent()</code>解码。</p>
+        <p class="calibre1">在设置值时，可以通过<code class="calibre11">document.cookie</code>属性设置新的cookie字符串。这个字符串在被解析后会添加到原有cookie中。设置<code class="calibre11">document.cookie</code>不会覆盖之前存在的任何cookie，除非设置了已有的cookie。设置cookie的格式如下，与<code class="calibre11">Set-Cookie</code>头部的格式一样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">name=value; expires=expiration_time; path=domain_path; domain=domain_name; secure</code></pre>
+        <p class="calibre1">在所有这些参数中，只有cookie的名称和值是必需的。下面是个简单的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.cookie = "name=nicholas";</code></pre>
+        <p class="calibre1">这行代码会创建一个名为<code class="calibre11">"name"</code>的会话cookie，其值为<code class="calibre11">"Nicholas"</code>。这个cookie在每次客户端向服务器发送请求时都会被带上，在浏览器关闭时就会被删除。虽然这样直接设置也可以，因为不需要在名称或值中编码任何字符，但最好还是使用<code class="calibre11">encodeURIComponent()</code>对名称和值进行编码，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.cookie = encodeuricomponent("name") + "=" +
+                  encodeuricomponent("nicholas");</code></pre>
+        <p class="calibre1">要为创建的cookie指定额外的信息，只要像<code class="calibre11">Set-Cookie</code>头部一样直接在后面追加相同格式的字符串即可：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.cookie = encodeuricomponent("name") + "=" +
+                  encodeuricomponent("nicholas") + "; domain=.wrox.com; path=/";</code></pre>
+        <p class="calibre1">因为在JavaScript中读写cookie不是很直观，所以可以通过辅助函数来简化相应的操作。与cookie相关的基本操作有读、写和删除。这些在<code class="calibre11">CookieUtil</code>对象中表示如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class cookieutil {
+  static get(name) {
+    let cookiename = `${encodeuricomponent(name)}=`,
+        cookiestart = document.cookie.indexof(cookiename),
+        cookievalue = null;
+
+    if (cookiestart &gt; -1){
+      let cookieend = document.cookie.indexof(";", cookiestart);
+      if (cookieend == -1){
+        cookieend = document.cookie.length;
+      }
+      cookievalue = decodeuricomponent(document.cookie.substring(cookiestart
+          + cookiename.length, cookieend));
+      }
+
+      return cookievalue;
+    }
+
+    static set(name, value, expires, path, domain, secure) {
+      let cookietext =
+        `${encodeuricomponent(name)}=${encodeuricomponent(value)}`
+
+      if (expires instanceof date) {
+        cookietext += `; expires=${expires.togmtstring()}`;
+      }
+
+      if (path) {
+        cookietext += `; path=${path}`;
+      }
+
+      if (domain) {
+        cookietext += `; domain=${domain}`;
+      }
+
+      if (secure) {
+        cookietext += "; secure";
+      }
+
+      document.cookie = cookietext;
+    }
+
+    static unset(name, path, domain, secure) {
+      cookieutil.set(name, "", new date(0), path, domain, secure);
+  }
+};</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">CookieUtil.get()</code>方法用于取得给定名称的cookie值。为此，需要在<code class="calibre11">document.cookie</code>返回的字符串中查找是否存在名称后面加上等号。如果找到了，则使用<code class="calibre11">indexOf()</code>再查找该位置后面的分号（表示该cookie的末尾）。如果没有找到分号，说明这个cookie在字符串末尾，因此字符串剩余部分都是cookie的值。取得cookie值后使用<code class="calibre11">decodeURIComponent()</code>解码，然后返回。如果没有找到cookie，则返回<code class="calibre11">null</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">CookieUtil.set()</code>方法用于设置页面上的cookie，接收多个参数：cookie名称、cookie值、可选的<code class="calibre11">Date</code>对象（表示何时删除cookie）、可选的URL路径、可选的域以及可选的布尔值（表示是否添加<code class="calibre11">secure</code>标志）。这些参数以它们的使用频率为序，只有前两个是必需的。在方法内部，使用了<code class="calibre11">encodeURIComponent()</code>对名称和值进行编码，然后再依次检查其他参数。如果<code class="calibre11">expires</code>参数是<code class="calibre11">Date</code>对象，则使用<code class="calibre11">Date</code>对象的<code class="calibre11">toGMTString()</code>方法添加一个<code class="calibre11">expires</code>选项来获得正确的日期格式。剩下的代码就是简单地追加cookie字符串，最终设置给<code class="calibre11">document.cookie</code>。</p>
+        <p class="calibre1">没有直接删除已有cookie的方法。为此，需要再次设置同名cookie（包括相同路径、域和安全选项），但要将其过期时间设置为某个过去的时间。<code class="calibre11">CookieUtil.unset()</code>方法实现了这些处理。这个方法接收4个参数：要删除cookie的名称、可选的路径、可选的域和可选的安全标志。</p>
+        <p class="calibre1">这些参数会传给<code class="calibre11">CookieUtil.set()</code>，将cookie值设置为空字符串，将过期时间设置为1970年1月1日（以0毫秒初始化的<code class="calibre11">Date</code>对象的值）。这样可以保证删除cookie。</p>
+        <p class="calibre1">可以像下面这样使用这些方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 设置cookie
+cookieutil.set("name", "nicholas");
+cookieutil.set("book", "professional javascript");
+
+// 读取cookie
+alert(cookieutil.get("name")); // "nicholas"
+alert(cookieutil.get("book")); // "professional javascript"
+
+// 删除cookie
+cookieutil.unset("name");
+cookieutil.unset("book");
+
+// 设置有路径、域和过期时间的cookie
+cookieutil.set("name", "nicholas", "/books/projs/", "www.wrox.com",
+               new date("january 1, 2010"));
+
+// 删除刚刚设置的cookie
+cookieutil.unset("name", "/books/projs/", "www.wrox.com");
+
+// 设置安全cookie
+cookieutil.set("name", "nicholas", null, null, null, true);</code></pre>
+        <p class="calibre1">这些方法通过处理解析和cookie字符串构建，简化了使用cookie存储数据的操作。</p>
+        <h3 id="nav_point_587" class="calibre15">25.1.4 子cookie</h3>
+        <p class="calibre1">为绕过浏览器对每个域cookie数的限制，有些开发者提出了<strong class="calibre2">子cookie</strong>的概念。子cookie是在单个cookie存储的小块数据，本质上是使用cookie的值在单个cookie中存储多个名/值对。最常用的子cookie模式如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">name=name1=value1&amp;name2=value2&amp;name3=value3&amp;name4=value4&amp;name5=value5</code></pre>
+        <p class="calibre1">子cookie的格式类似于查询字符串。这些值可以存储为单个cookie，而不用单独存储为自己的名/值对。结果就是网站或Web应用程序能够在单域cookie数限制下存储更多的结构化数据。</p>
+        <p class="calibre1">要操作子cookie，就需要再添加一些辅助方法。解析和序列化子cookie的方式不一样，且因为对子cookie的使用而变得更复杂。比如，要取得某个子cookie，就需要先取得cookie，然后在解码值之前需要先像下面这样找到子cookie：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class subcookieutil {
+  static get(name, subname) {
+    let subcookies = subcookieutil.getall(name);
+    return subcookies ? subcookies[subname] : null;
+  }
+
+  static getall(name) {
+    let cookiename = encodeuricomponent(name) + "=",
+        cookiestart = document.cookie.indexof(cookiename),
+        cookievalue = null,
+        cookieend,
+        subcookies,
+        parts,
+        result = {};
+
+    if (cookiestart &gt; -1) {
+      cookieend = document.cookie.indexof(";", cookiestart);
+      if (cookieend == -1) {
+        cookieend = document.cookie.length;
+      }
+      cookievalue = document.cookie.substring(cookiestart +
+                                              cookiename.length, cookieend);
+      if (cookievalue.length &gt; 0) {
+        subcookies = cookievalue.split("&amp;");
+
+        for (let i = 0, len = subcookies.length; i &lt; len; i++) {
+          parts = subcookies[i].split("=");
+          result[decodeuricomponent(parts[0])] =
+            decodeuricomponent(parts[1]);
+        }
+
+        return result;
+      }
+    }
+    return null;
+  }
+
+  // 省略其他代码
+};</code></pre>
+        <p class="calibre1">取得子cookie有两个方法：<code class="calibre11">get()</code>和<code class="calibre11">getAll()</code>。<code class="calibre11">get()</code>用于取得一个子cookie的值，<code class="calibre11">getAll()</code>用于取得所有子cookie，并以对象形式返回，对象的属性是子cookie的名称，值是子cookie的值。<code class="calibre11">get()</code>方法接收两个参数：cookie的名称和子cookie的名称。这个方法先调用<code class="calibre11">getAll()</code>取得所有子cookie，然后返回要取得的子cookie（如果不存在则返回<code class="calibre11">null</code>）。</p>
+        <p class="calibre1">
+          <code class="calibre11">SubCookieUtil.getAll()</code>方法在解析cookie值方面与<code class="calibre11">CookieUtil.get()</code>方法非常相似。不同的是<code class="calibre11">SubCookieUtil.getAll()</code>方法不会立即解码cookie的值，而是先用和号（<code class="calibre11">&amp;</code>）拆分，将所有子cookie保存到数组。然后，再基于等号（<code class="calibre11">=</code>）拆分每个子cookie，使<code class="calibre11">parts</code>数组的第一个元素是子cookie的名称，第二个元素是子cookie的值。两个元素都使用<code class="calibre11">decodeURIComponent()</code>解码，并添加到<code class="calibre11">result</code>对象，最后返回<code class="calibre11">result</code>对象。如果cookie不存在则返回<code class="calibre11">null</code>。</p>
+        <p class="calibre1">可以像下面这样使用这些方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 假设document.cookie=data=name=nicholas&amp;book=professional%20javascript
+
+// 取得所有子cookie
+let data = subcookieutil.getall("data");
+alert(data.name); // "nicholas"
+alert(data.book); // "professional javascript"
+
+// 取得个别子cookie
+alert(subcookieutil.get("data", "name")); // "nicholas"
+alert(subcookieutil.get("data", "book")); // "professional javascript"</code></pre>
+        <p class="calibre1">要写入子cookie，可以使用另外两个方法：<code class="calibre11">set()</code>和<code class="calibre11">setAll()</code>。这两个方法的实现如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class subcookieutil {
+  // 省略之前的代码
+
+  static set(name, subname, value, expires, path, domain, secure) {
+    let subcookies = subcookieutil.getall(name) || {};
+    subcookies[subname] = value;
+    subcookieutil.setall(name, subcookies, expires, path, domain, secure);
+  }
+
+  static setall(name, subcookies, expires, path, domain, secure) {
+    let cookietext = encodeuricomponent(name) + "=",
+        subcookieparts = new array(),
+        subname;
+    for (subname in subcookies){
+      if (subname.length &gt; 0 &amp;&amp; subcookies.hasownproperty(subname)){
+        subcookieparts.push(
+          '${encodeuricomponent(subname)}=${encodeuricomponent(subcookies[subname])}');
+      }
+    }
+
+    if (cookieparts.length &gt; 0) {
+      cookietext += subcookieparts.join("&amp;");
+
+      if (expires instanceof date) {
+        cookietext += `; expires=${expires.togmtstring()}`;
+      }
+
+      if (path) {
+        cookietext += `; path=${path}`;
+      }
+
+      if (domain) {
+        cookietext += `; domain=${domain}`;
+      }
+
+      if (secure) {
+        cookietext += "; secure";
+      }
+    } else {
+      cookietext += `; expires=${(new date(0)).togmtstring()}`;
+    }
+    document.cookie = cookietext;
+  }
+
+  // 省略其他代码
+};</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">set()</code>方法接收7个参数：cookie的名称、子cookie的名称、子cookie的值、可选的<code class="calibre11">Date</code>对象用于设置cookie的过期时间、可选的cookie路径、可选的cookie域和可选的布尔值<code class="calibre11">secure</code>标志。所有可选的参数都作用于cookie本身，而不是子cookie。为了在同一个cookie中存储多个子cookie，路径、域和<code class="calibre11">secure</code>标志也必须相同。过期时间作用于整个cookie，可以在写入个别子cookie时另行设置。在这个方法内部，第一步是取得给定cookie名称下包含的所有子cookie。逻辑或操作符（<code class="calibre11">||</code>）在这里用于在<code class="calibre11">getAll()</code>返回<code class="calibre11">null</code>的情况下将<code class="calibre11">subcookies</code>设置为新对象。然后，在<code class="calibre11">subcookies</code>上设置完子<code class="calibre11">cookie</code>的值，再将参数传给<code class="calibre11">setAll()</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">setAll()</code>方法接收6个参数：cookie的名称、包含所有子cookie的对象，然后是<code class="calibre11">set()</code>方法中使用的4个可选参数。这个方法会在<code class="calibre11">for-in</code>循环中迭代第二个参数的属性。为保证只存储合适的数据，这里使用了<code class="calibre11">hasOwnProperty()</code>方法确保只有实例属性才会序列化为子cookie。因为存在属性名等于空字符串的可能，所以在添加到<code class="calibre11">subcookieParts</code>数组之前也要检查属性名的长度。<code class="calibre11">subcookieParts</code>数组包含了子cookie的名/值对，这样我们可以方便地使用<code class="calibre11">join()</code>方法用和号将它们拼接成字符串。剩下的逻辑与<code class="calibre11">CookieUtil.set()</code>一样。</p>
+        <p class="calibre1">可以像下面这样使用这些方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 假设document.cookie=data=name=nicholas&amp;book=professional%20javascript
+
+// 设置两个子cookie
+subcookieutil.set("data", "name", "nicholas");
+subcookieutil.set("data", "book", "professional javascript");
+
+// 设置所有子cookie并传入过期时间
+subcookieutil.setall("data", { name: "nicholas", book: "professional javascript" },
+    new date("january 1, 2010"));
+
+// 修改"name"的值并修改整个cookie的过期时间
+subcookieutil.set("data", "name", "michael", new date("february 1, 2010"));</code></pre>
+        <p class="calibre1">最后一组子cookie相关的方法是要删除子cookie的。常规cookie可以通过直接设置过期时间为某个过去的时间删除，但删除子cookie没有这么简单。为了删除子cookie，需要先取得所有子cookie，把要删除的那个删掉，然后再把剩下的子cookie设置回去。下面是相关方法的实现：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class subcookieutil {
+  // 省略之前的代码
+
+  static unset(name, subname, path, domain, secure) {
+    let subcookies = subcookieutil.getall(name);
+    if (subcookies){
+      delete subcookies[subname]; // 删除
+      subcookieutil.setall(name, subcookies, null, path, domain, secure);
+    }
+  }
+
+  static unsetall(name, path, domain, secure) {
+    subcookieutil.setall(name, null, new date(0), path, domain, secure);
+  }
+}</code></pre>
+        <p class="calibre1">这里定义的这两个方法有两个不同的目的。<code class="calibre11">unset()</code>方法用于从cookie中删除一个子cookie，其他子cookie不受影响；而<code class="calibre11">unsetAll()</code>方法与<code class="calibre11">CookieUtil.unset()</code>一样，会删除整个cookie。与<code class="calibre11">set()</code>和<code class="calibre11">setAll()</code>一样，路径、域和<code class="calibre11">secure</code>标志必须与创建cookie时使用的一样。可以像下面这样使用这两个方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 只删除"name"子cookie
+subcookieutil.unset("data", "name");
+
+// 删除整个cookie
+subcookieutil.unsetall("data");</code></pre>
+        <p class="calibre1">如果实际开发中担心碰到每个域的cookie限制，则可以考虑使用子cookie这个方案。此时要特别注意cookie的大小，不要超过对单个cookie大小的限制。</p>
+        <h3 id="nav_point_588" class="calibre15">25.1.5 使用cookie的注意事项</h3>
+        <p class="calibre1">还有一种叫作<strong class="calibre2">HTTP-only</strong>的cookie。HTTP-only可以在浏览器设置，也可以在服务器设置，但只能在服务器上读取，这是因为JavaScript无法取得这种cookie的值。</p>
+        <p class="calibre1">因为所有cookie都会作为请求头部由浏览器发送给服务器，所以在cookie中保存大量信息可能会影响特定域浏览器请求的性能。保存的cookie越大，请求完成的时间就越长。即使浏览器对cookie大小有限制，最好还是尽可能只通过cookie保存必要信息，以避免性能问题。</p>
+        <p class="calibre1">对cookie的限制及其特性决定了cookie并不是存储大量数据的理想方式。因此，其他客户端存储技术出现了。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            不要在cookie中存储重要或敏感的信息。cookie数据不是保存在安全的环境中，因此任何人都可能获得。应该避免把信用卡号或个人地址等信息保存在cookie中。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0182.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0184.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0164.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0166.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_531" class="calibre9">22.2 浏览器对XPath的支持</h2>
+        <p class="calibre1">XPath是为了在DOM文档中定位特定节点而创建的，因此它对XML处理很重要。在DOM Level 3之前，XPath相关的API没有被标准化。DOM Level 3开始着手标准化XPath。很多浏览器实现了DOM Level 3 XPath标准，但IE决定按照自己的方式实现。</p>
+        <h3 id="nav_point_532" class="calibre15">22.2.1 DOM Level 3 XPath</h3>
+        <p class="calibre1">DOM Level 3 XPath规范定义了接口，用于在DOM中求值XPath表达式。要确定浏览器是否支持DOM Level 3 XPath，可以使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let supportsxpath = document.implementation.hasfeature("xpath", "3.0");</code></pre>
+        <p class="calibre1">虽然这个规范定义了不少类型，但其中最重要的两个是<code class="calibre11">XPathEvaluator</code>和<code class="calibre11">XPathResult</code>。<code class="calibre11">XPathEvaluator</code>用于在特定上下文中求值XPath表达式，包含三个方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">createExpression(<i class="calibre6">expression, nsresolver</i>)</code>，用于根据XPath表达式及相应的命名空间计算得到一个<code class="calibre11">XPathExpression</code>，<code class="calibre11">XPathExpression</code>是查询的编译版本。这适合于同样的查询要运行多次的情况。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">createNSResolver(<i class="calibre6">node</i>)</code>，基于<code class="calibre11">
+              <i class="calibre6">node</i>
+            </code>的命名空间创建新的<code class="calibre11">XPathNSResolver</code>对象。当对使用名称空间的XML文档求值时，需要<code class="calibre11">XPathNSResolver</code>对象。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">evaluate(<i class="calibre6">expression, context, nsresolver, type, result</i>)</code>，根据给定的上下文和命名空间对XPath进行求值。其他参数表示如何返回结果。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">Document</code>类型通常是通过<code class="calibre11">XPathEvaluator</code>接口实现的，因此可以创建<code class="calibre11">XPathEvaluator</code>的实例，或使用<code class="calibre11">Document</code>实例上的方法（包括XML和HTML文档）。</p>
+        <p class="calibre1">在上述三个方法中，使用最频繁的是<code class="calibre11">evaluate()</code>。这个方法接收五个参数：XPath表达式、上下文节点、命名空间解析器、返回的结果类型和<code class="calibre11">XPathResult</code>对象（用于填充结果，通常是<code class="calibre11">null</code>，因为结果也可能是函数值）。第三个参数，命名空间解析器，只在XML代码使用XML命名空间的情况下有必要。如果没有使用命名空间，这个参数也应该是<code class="calibre11">null</code>。第四个参数要返回值的类型是如下10个常量值之一。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.ANY_TYPE</code>：返回适合XPath表达式的数据类型。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.NUMBER_TYPE</code>：返回数值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.STRING_TYPE</code>：返回字符串值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.BOOLEAN_TYPE</code>：返回布尔值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.UNORDERED_NODE_ITERATOR_TYPE</code>：返回匹配节点的集合，但集合中节点的顺序可能与它们在文档中的顺序不一致。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.ORDERED_NODE_ITERATOR_TYPE</code>：返回匹配节点的集合，集合中节点的顺序与它们在文档中的顺序一致。这是非常常用的结果类型。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE</code>：返回节点集合的快照，在文档外部捕获节点，因此对文档的进一步修改不会影响该节点集合。集合中节点的顺序可能与它们在文档中的顺序不一致。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.ORDERED_NODE_SNAPSHOT_TYPE</code>：返回节点集合的快照，在文档外部捕获节点，因此对文档的进一步修改不会影响这个节点集合。集合中节点的顺序与它们在文档中的顺序一致。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.ANY_UNORDERED_NODE_TYPE</code>：返回匹配节点的集合，但集合中节点的顺序可能与它们在文档中的顺序不一致。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">XPathResult.FIRST_ORDERED_NODE_TYPE</code>：返回只有一个节点的节点集合，包含文档中第一个匹配的节点。</li>
+        </ul>
+        <p class="calibre1">指定的结果类型决定了如何获取结果的值。下面是一个典型的示例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.ordered_node_iterator_type, null);
+
+if (result !== null) {
+  let element = result.iteratenext();
+  while(element) {
+    console.log(element.tagname);
+    node = result.iteratenext();
+  }
+}</code></pre>
+        <p class="calibre1">这个例子使用了<code class="calibre11">XPathResult.ORDERED_NODE_ITERATOR_TYPE</code>结果类型，也是最常用的类型。如果没有节点匹配XPath表达式，<code class="calibre11">evaluate()</code>方法返回<code class="calibre11">null</code>；否则，返回<code class="calibre11">XPathResult</code>对象。返回的<code class="calibre11">XPathResult</code>对象上有相应的属性和方法用于获取特定类型的结果。如果结果是节点迭代器，无论有序还是无序，都必须使用<code class="calibre11">iterateNext()</code>方法获取结果中每个匹配的节点。在没有更多匹配节点时，<code class="calibre11">iterateNext()</code>返回<code class="calibre11">null</code>。</p>
+        <p class="calibre1">如果指定了快照结果类型（无论有序还是无序），都必须使用<code class="calibre11">snapshotItem()</code>方法和<code class="calibre11">snapshotLength</code>属性获取结果，如以下代码所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.ordered_node_snapshot_type, null);
+if (result !== null) {
+  for (let i = 0, len=result.snapshotlength; i &lt; len; i++) {
+    console.log(result.snapshotitem(i).tagname);
+  }
+}</code></pre>
+        <p class="calibre1">这个例子中，<code class="calibre11">snapshotLength</code>返回快照中节点的数量，而<code class="calibre11">snapshotItem()</code>返回快照中给定位置的节点（类似于<code class="calibre11">NodeList</code>中的<code class="calibre11">length</code>和<code class="calibre11">item()</code>）。</p>
+        <h3 id="nav_point_533" class="calibre15">22.2.2 单个节点结果</h3>
+        <p class="calibre1">
+          <code class="calibre11">XPathResult.FIRST_ORDERED_NODE_TYPE</code>结果类型返回匹配的第一个节点，可以通过结果的<code class="calibre11">singleNodeValue</code>属性获取。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.first_ordered_node_type, null);
+
+if (result !== null) {
+  console.log(result.singlenodevalue.tagname);
+}</code></pre>
+        <p class="calibre1">与其他查询一样，如果没有匹配的节点，<code class="calibre11">evaluate()</code>返回<code class="calibre11">null</code>。如果有一个匹配的节点，则要使用<code class="calibre11">singleNodeValue</code>属性取得该节点。这对<code class="calibre11">XPathResult.FIRST_ORDERED_NODE_TYPE</code>也一样。</p>
+        <h3 id="nav_point_534" class="calibre15">22.2.3 简单类型结果</h3>
+        <p class="calibre1">使用布尔值、数值和字符串<code class="calibre11">XPathResult</code>类型，可以根据XPath获取简单、非节点数据类型。这些结果类型返回的值需要分别使用<code class="calibre11">booleanValue</code>、<code class="calibre11">numberValue</code>和<code class="calibre11">stringValue</code>属性获取。对于布尔值类型，如果至少有一个节点匹配XPath表达式，<code class="calibre11">booleanValue</code>就是<code class="calibre11">true</code>；否则，<code class="calibre11">booleanValue</code>为<code class="calibre11">false</code>。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.boolean_type, null);
+console.log(result.booleanvalue);</code></pre>
+        <p class="calibre1">在这个例子中，如果有任何节点匹配<code class="calibre11">"employee/name"</code>，<code class="calibre11">booleanValue</code>属性就等于<code class="calibre11">true</code>。</p>
+        <p class="calibre1">对于数值类型，XPath表达式必须使用返回数值的XPath函数，如<code class="calibre11">count()</code>可以计算匹配给定模式的节点数。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("count(employee/name)", xmldom.documentelement,
+                  null, xpathresult.number_type, null);
+console.log(result.numbervalue);</code></pre>
+        <p class="calibre1">以上代码会输出匹配<code class="calibre11">"employee/name"</code>的节点数量（比如<code class="calibre11">2</code>）。如果在这里没有指定XPath函数，<code class="calibre11">numberValue</code>就等于<code class="calibre11">NaN</code>。</p>
+        <p class="calibre1">对于字符串类型，<code class="calibre11">evaluate()</code>方法查找匹配XPath表达式的第一个节点，然后返回其第一个子节点的值，前提是第一个子节点是文本节点。如果不是，就返回空字符串。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.string_type, null);
+console.log(result.stringvalue);</code></pre>
+        <p class="calibre1">这个例子输出了与<code class="calibre11">"employee/name"</code>匹配的第一个元素中第一个文本节点包含的文本字符串。</p>
+        <h3 id="nav_point_535" class="calibre15">22.2.4 默认类型结果</h3>
+        <p class="calibre1">所有XPath表达式都会自动映射到特定类型的结果。设置特定结果类型会限制表达式的输出。不过，可以使用<code class="calibre11">XPathResult.ANY_TYPE</code>类型让求值自动返回默认类型结果。通常，默认类型结果是布尔值、数值、字符串或无序节点迭代器。要确定返回的结果类型，可以访问求值结果的<code class="calibre11">resultType</code>属性，如下例所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = xmldom.evaluate("employee/name", xmldom.documentelement, null,
+                  xpathresult.any_type, null);
+
+if (result !== null) {
+  switch(result.resulttype) {
+    case xpathresult.string_type:
+      // 处理字符串类型
+      break;
+
+    case xpathresult.number_type:
+      // 处理数值类型
+      break;
+
+    case xpathresult.boolean_type:
+      // 处理布尔值类型
+      break;
+
+    case xpathresult.unordered_node_iterator_type:
+      // 处理无序节点迭代器类型
+      break;
+
+    default:
+      // 处理其他可能的结果类型
+
+  }
+}</code></pre>
+        <p class="calibre1">使用<code class="calibre11">XPathResult.ANY_TYPE</code>可以让使用XPath变得更自然，但在返回结果后则需要增加额外的判断和处理。</p>
+        <h3 id="nav_point_536" class="calibre15">22.2.5 命名空间支持</h3>
+        <p class="calibre1">对于使用命名空间的XML文档，必须告诉<code class="calibre11">XPathEvaluator</code>命名空间信息，才能进行正确求值。处理命名空间的方式有很多，看下面的示例XML代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;?xml version="1.0" ?&gt;
+&lt;wrox:books xmlns:wrox="http://www.wrox.com/"&gt;
+  &lt;wrox:book&gt;
+    &lt;wrox:title&gt;professional javascript for web developers&lt;/wrox:title&gt;
+    &lt;wrox:author&gt;nicholas c. zakas&lt;/wrox:author&gt;
+  &lt;/wrox:book&gt;
+  &lt;wrox:book&gt;
+    &lt;wrox:title&gt;professional ajax&lt;/wrox:title&gt;
+    &lt;wrox:author&gt;nicholas c. zakas&lt;/wrox:author&gt;
+    &lt;wrox:author&gt;jeremy mcpeak&lt;/wrox:author&gt;
+    &lt;wrox:author&gt;joe fawcett&lt;/wrox:author&gt;
+  &lt;/wrox:book&gt;
+&lt;/wrox:books&gt;</code></pre>
+        <p class="calibre1">在这个XML文档中，所有元素的命名空间都属于http://www.wrox.com/，都以<code class="calibre11">wrox</code>前缀标识。如果想使用XPath查询该文档，就需要指定使用的命名空间，否则求值会失败。</p>
+        <p class="calibre1">第一种处理命名空间的方式是通过<code class="calibre11">createNSResolver()</code>方法创建<code class="calibre11">XPathNSResolver</code>对象。这个方法只接收一个参数，即包含命名空间定义的文档节点。对上面的例子而言，这个节点就是<code class="calibre11">document</code>元素<code class="calibre11">&lt;wrox:books&gt;</code>，其<code class="calibre11">xmlns</code>属性定义了命名空间。为此，可以将该节点传给<code class="calibre11">createNSResolver()</code>，然后得到的结果就可以在<code class="calibre11">evaluate()</code>方法中使用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let nsresolver = xmldom.creatensresolver(xmldom.documentelement);
+
+let result = xmldom.evaluate("wrox:book/wrox:author",
+               xmldom.documentelement, nsresolver,
+               xpathresult.ordered_node_snapshot_type, null);
+
+console.log(result.snapshotlength);</code></pre>
+        <p class="calibre1">把<code class="calibre11">nsresolver</code>传给<code class="calibre11">evaluate()</code>之后，可以确保XPath表达式中使用的<code class="calibre11">wrox</code>前缀能够被正确理解。假如不使用<code class="calibre11">XPathNSResolver</code>，同样的表达式就会导致错误。</p>
+        <p class="calibre1">第二种处理命名空间的方式是定义一个接收命名空间前缀并返回相应URI的函数，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let nsresolver = function(prefix) {
+  switch(prefix) {
+    case "wrox": return "http://www.wrox.com/";
+    // 其他前缀及返回值
+  }
+};
+
+let result = xmldom.evaluate("count(wrox:book/wrox:author)",
+        xmldom.documentelement, nsresolver, xpathresult.number_type, null);
+
+console.log(result.numbervalue);</code></pre>
+        <p class="calibre1">在并不知晓文档的哪个节点包含命名空间定义时，可以采用这种定义命名空间解析函数的方式。只要知道前缀和URI，就可以定义这样一个函数，然后把它作为第三个参数传给<code class="calibre11">evaluate()</code>。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0164.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0166.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

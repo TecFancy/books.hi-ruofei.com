@@ -1,0 +1,443 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0172.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0174.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_553" class="calibre9">24.1
+          <code class="calibre26">XMLHttpRequest</code>对象</h2>
+        <p class="calibre1">IE5是第一个引入XHR对象的浏览器。这个对象是通过ActiveX对象实现并包含在MSXML库中的。为此，XHR对象的3个版本在浏览器中分别被暴露为<code class="calibre11">MSXML2.XMLHttp</code>、<code class="calibre11">MSXML2.XMLHttp.3.0</code>和<code class="calibre11">MXSML2.XMLHttp.6.0</code>。</p>
+        <p class="calibre1">所有现代浏览器都通过<code class="calibre11">XMLHttpRequest</code>构造函数原生支持XHR对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();</code></pre>
+        <h3 id="nav_point_554" class="calibre15">24.1.1 使用XHR</h3>
+        <p class="calibre1">使用XHR对象首先要调用<code class="calibre11">open()</code>方法，这个方法接收3个参数：请求类型（<code class="calibre11">"get"</code>、<code class="calibre11">"post"</code>等）、请求URL，以及表示请求是否异步的布尔值。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.open("get", "example.php", false);</code></pre>
+        <p class="calibre1">这行代码就可以向example.php发送一个同步的GET请求。关于这行代码需要说明几点。首先，这里的URL是相对于代码所在页面的，当然也可以使用绝对URL。其次，调用<code class="calibre11">open()</code>不会实际发送请求，只是为发送请求做好准备。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            只能访问同源URL，也就是域名相同、端口相同、协议相同。如果请求的URL与发送请求的页面在任何方面有所不同，则会抛出安全错误。</p>
+        </blockquote>
+        <p class="calibre1">要发送定义好的请求，必须像下面这样调用<code class="calibre11">send()</code>方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.open("get", "example.txt", false);
+xhr.send(null);</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">send()</code>方法接收一个参数，是作为请求体发送的数据。如果不需要发送请求体，则必须传<code class="calibre11">null</code>，因为这个参数在某些浏览器中是必需的。调用<code class="calibre11">send()</code>之后，请求就会发送到服务器。</p>
+        <p class="calibre1">因为这个请求是同步的，所以JavaScript代码会等待服务器响应之后再继续执行。收到响应后，XHR对象的以下属性会被填充上数据。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">responseText</code>：作为响应体返回的文本。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">responseXML</code>：如果响应的内容类型是<code class="calibre11">"text/xml"</code>或<code class="calibre11">"application/xml"</code>，那就是包含响应数据的XML DOM文档。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">status</code>：响应的HTTP状态。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">statusText</code>：响应的HTTP状态描述。</li>
+        </ul>
+        <p class="calibre1">收到响应后，第一步要检查<code class="calibre11">status</code>属性以确保响应成功返回。一般来说，HTTP状态码为<img src="../images/00051.gif" alt="2xx" class="calibre12"/>表示成功。此时，<code class="calibre11">responseText</code>或<code class="calibre11">responseXML</code>（如果内容类型正确）属性中会有内容。如果HTTP状态码是304，则表示资源未修改过，是从浏览器缓存中直接拿取的。当然这也意味着响应有效。为确保收到正确的响应，应该检查这些状态，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.open("get", "example.txt", false);
+xhr.send(null);
+
+if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+  alert(xhr.responsetext);
+} else {
+  alert("request was unsuccessful: " + xhr.status);
+}</code></pre>
+        <p class="calibre1">以上代码可能显示服务器返回的内容，也可能显示错误消息，取决于HTTP响应的状态码。为确定下一步该执行什么操作，最好检查<code class="calibre11">status</code>而不是<code class="calibre11">statusText</code>属性，因为后者已经被证明在跨浏览器的情况下不可靠。无论是什么响应内容类型，<code class="calibre11">responseText</code>属性始终会保存响应体，而<code class="calibre11">responseXML</code>则对于非XML数据是<code class="calibre11">null</code>。</p>
+        <p class="calibre1">虽然可以像前面的例子一样发送同步请求，但多数情况下最好使用异步请求，这样可以不阻塞JavaScript代码继续执行。XHR对象有一个<code class="calibre11">readyState</code>属性，表示当前处在请求/响应过程的哪个阶段。这个属性有如下可能的值。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">0：未初始化（Uninitialized）。尚未调用<code class="calibre11">open()</code>方法。</li>
+          <li class="di_1ji_wu_xu_lie_biao">1：已打开（Open）。已调用<code class="calibre11">open()</code>方法，尚未调用<code class="calibre11">send()</code>方法。</li>
+          <li class="di_1ji_wu_xu_lie_biao">2：已发送（Sent）。已调用<code class="calibre11">send()</code>方法，尚未收到响应。</li>
+          <li class="di_1ji_wu_xu_lie_biao">3：接收中（Receiving）。已经收到部分响应。</li>
+          <li class="di_1ji_wu_xu_lie_biao">4：完成（Complete）。已经收到所有响应，可以使用了。</li>
+        </ul>
+        <p class="calibre1">每次<code class="calibre11">readyState</code>从一个值变成另一个值，都会触发<code class="calibre11">readystatechange</code>事件。可以借此机会检查<code class="calibre11">readyState</code>的值。一般来说，我们唯一关心的<code class="calibre11">readyState</code>值是4，表示数据已就绪。为保证跨浏览器兼容，<code class="calibre11">onreadystatechange</code>事件处理程序应该在调用<code class="calibre11">open()</code>之前赋值。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();
+xhr.onreadystatechange = function() {
+  if (xhr.readystate == 4) {
+    if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+      alert(xhr.responsetext);
+    } else {
+      alert("request was unsuccessful: " + xhr.status);
+    }
+  }
+};
+xhr.open("get", "example.txt", true);
+xhr.send(null);</code></pre>
+        <p class="calibre1">以上代码使用DOM Level 0风格为XHR对象添加了事件处理程序，因为并不是所有浏览器都支持DOM Level 2风格。与其他事件处理程序不同，<code class="calibre11">onreadystatechange</code>事件处理程序不会收到<code class="calibre11">event</code>对象。在事件处理程序中，必须使用XHR对象本身来确定接下来该做什么。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            由于<code class="calibre11">onreadystatechange</code>事件处理程序的作用域问题，这个例子在<code class="calibre11">onreadystatechange</code>事件处理程序中使用了<code class="calibre11">xhr</code>对象而不是<code class="calibre11">this</code>对象。使用<code class="calibre11">this</code>可能导致功能失败或导致错误，取决于用户使用的是什么浏览器。因此还是使用保存XHR对象的变量更保险一些。</p>
+        </blockquote>
+        <p class="calibre1">在收到响应之前如果想取消异步请求，可以调用<code class="calibre11">abort()</code>方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.abort();</code></pre>
+        <p class="calibre1">调用这个方法后，XHR对象会停止触发事件，并阻止访问这个对象上任何与响应相关的属性。中断请求后，应该取消对XHR对象的引用。由于内存问题，不推荐重用XHR对象。</p>
+        <h3 id="nav_point_555" class="calibre15">24.1.2 HTTP头部</h3>
+        <p class="calibre1">每个HTTP请求和响应都会携带一些头部字段，这些字段可能对开发者有用。XHR对象会通过一些方法暴露与请求和响应相关的头部字段。</p>
+        <p class="calibre1">默认情况下，XHR请求会发送以下头部字段。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Accept</code>：浏览器可以处理的内容类型。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Accept-Charset</code>：浏览器可以显示的字符集。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Accept-Encoding</code>：浏览器可以处理的压缩编码类型。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Accept-Language</code>：浏览器使用的语言。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Connection</code>：浏览器与服务器的连接类型。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Cookie</code>：页面中设置的Cookie。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Host</code>：发送请求的页面所在的域。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">Referer</code>：发送请求的页面的URI。注意，这个字段在HTTP规范中就拼错了，所以考虑到兼容性也必须将错就错。（正确的拼写应该是Referrer。）</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">User-Agent</code>：浏览器的用户代理字符串。</li>
+        </ul>
+        <p class="calibre1">虽然不同浏览器发送的确切头部字段可能各不相同，但这些通常都是会发送的。如果需要发送额外的请求头部，可以使用<code class="calibre11">setRequestHeader()</code>方法。这个方法接收两个参数：头部字段的名称和值。为保证请求头部被发送，必须在<code class="calibre11">open()</code>之后、<code class="calibre11">send()</code>之前调用<code class="calibre11">setRequestHeader()</code>，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();
+xhr.onreadystatechange = function() {
+  if (xhr.readystate == 4) {
+    if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+      alert(xhr.responsetext);
+    } else {
+      alert("request was unsuccessful: " + xhr.status);
+    }
+  }
+};
+xhr.open("get", "example.php", true);
+xhr.setrequestheader("myheader", "myvalue");
+xhr.send(null);</code></pre>
+        <p class="calibre1">服务器通过读取自定义头部可以确定适当的操作。自定义头部一定要区别于浏览器正常发送的头部，否则可能影响服务器正常响应。有些浏览器允许重写默认头部，有些浏览器则不允许。</p>
+        <p class="calibre1">可以使用<code class="calibre11">getResponseHeader()</code>方法从XHR对象获取响应头部，只要传入要获取头部的名称即可。如果想取得所有响应头部，可以使用<code class="calibre11">getAllResponseHeaders()</code>方法，这个方法会返回包含所有响应头部的字符串。下面是调用这两个方法的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let myheader = xhr.getresponseheader("myheader");
+let allheaders  xhr.getallresponseheaders();</code></pre>
+        <p class="calibre1">服务器可以使用头部向浏览器传递额外的结构化数据。<code class="calibre11">getAllResponseHeaders()</code>方法通常返回类似如下的字符串：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">date: sun, 14 nov 2004 18:04:03 gmt
+server: apache/1.3.29 (unix)
+vary: accept
+x-powered-by: php/4.3.8
+connection: close
+content-type: text/html; charset=iso-8859-1</code></pre>
+        <p class="calibre1">通过解析以上头部字段的输出，就可以知道服务器发送的所有头部，而不需要单独去检查了。</p>
+        <h3 id="nav_point_556" class="calibre15">24.1.3 GET请求</h3>
+        <p class="calibre1">最常用的请求方法是GET请求，用于向服务器查询某些信息。必要时，需要在GET请求的URL后面添加查询字符串参数。对XHR而言，查询字符串必须正确编码后添加到URL后面，然后再传给<code class="calibre11">open()</code>方法。</p>
+        <p class="calibre1">发送GET请求最常见的一个错误是查询字符串格式不对。查询字符串中的每个名和值都必须使用<code class="calibre11">encodeURIComponent()</code>编码，所有名/值对必须以和号（<code class="calibre11">&amp;</code>）分隔，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.open("get", "example.php?name1=value1&amp;name2=value2", true);</code></pre>
+        <p class="calibre1">可以使用以下函数将查询字符串参数添加到现有的URL末尾：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addurlparam(url, name, value) {
+  url += (url.indexof("?") == -1 ? "?" : "&amp;");
+  url += encodeuricomponent(name) + "=" + encodeuricomponent(value);
+  return url;
+}</code></pre>
+        <p class="calibre1">这里定义了一个<code class="calibre11">addURLParam()</code>函数，它接收3个参数：要添加查询字符串的URL、查询参数和参数值。首先，这个函数会检查URL中是否已经包含问号（以确定是否已经存在其他参数）。如果没有，则加上一个问号；否则就加上一个和号。然后，分别对参数名和参数值进行编码，并添加到URL末尾。最后一步是返回更新后的URL。</p>
+        <p class="calibre1">可以使用这个函数构建请求URL，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let url = "example.php";
+
+// 添加参数
+url = addurlparam(url, "name", "nicholas");
+url = addurlparam(url, "book", "professional javascript");
+
+// 初始化请求
+xhr.open("get", url, false);</code></pre>
+        <p class="calibre1">这里使用<code class="calibre11">addURLParam()</code>函数可以保证通过XHR发送请求的URL格式正确。</p>
+        <h3 id="nav_point_557" class="calibre15">24.1.4 POST请求</h3>
+        <p class="calibre1">第二个最常用的请求是POST请求，用于向服务器发送应该保存的数据。每个POST请求都应该在请求体中携带提交的数据，而GET请求则不然。POST请求的请求体可以包含非常多的数据，而且数据可以是任意格式。要初始化POST请求，<code class="calibre11">open()</code>方法的第一个参数要传<code class="calibre11">"post"</code>，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">xhr.open("post", "example.php", true);</code></pre>
+        <p class="calibre1">接下来就是要给<code class="calibre11">send()</code>方法传入要发送的数据。因为XHR最初主要设计用于发送XML，所以可以传入序列化之后的XML DOM文档作为请求体。当然，也可以传入任意字符串。</p>
+        <p class="calibre1">默认情况下，对服务器而言，POST请求与提交表单是不一样的。服务器逻辑需要读取原始POST数据才能取得浏览器发送的数据。不过，可以使用XHR模拟表单提交。为此，第一步需要把<code class="calibre11">ContentType</code>头部设置为<code class="calibre11">"application/x-www-formurlencoded"</code>，这是提交表单时使用的内容类型。第二步是创建对应格式的字符串。POST数据此时使用与查询字符串相同的格式。如果网页中确实有一个表单需要序列化并通过XHR发送到服务器，则可以使用第14章的<code class="calibre11">serialize()</code>函数来创建相应的字符串，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function submitdata() {
+  let xhr = new xmlhttprequest();
+  xhr.onreadystatechange = function() {
+    if (xhr.readystate == 4) {
+      if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+        alert(xhr.responsetext);
+      } else {
+        alert("request was unsuccessful: " + xhr.status);
+      }
+    }
+  };
+
+  xhr.open("post", "postexample.php", true);
+  xhr.setrequestheader("content-type", "application/x-www-form-urlencoded");
+  let form = document.getelementbyid("user-info");
+  xhr.send(serialize(form));
+}</code></pre>
+        <p class="calibre1">在这个函数中，来自ID为<code class="calibre11">"user-info"</code>的表单中的数据被序列化之后发送给了服务器。PHP文件postexample.php随后可以通过<code class="calibre11">$_POST</code>取得POST的数据。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;?php
+  header("content-type: text/plain");
+  echo &lt;&lt;&lt;eof
+name: {$_post['user-name']}
+email: {$_post['user-email']}
+eof;
+?&gt;</code></pre>
+        <p class="calibre1">假如没有发送<code class="calibre11">Content-Type</code>头部，PHP的全局<code class="calibre11">$_POST</code>变量中就不会包含数据，而需要通过<code class="calibre11">$HTTP_RAW_POST_DATA</code>来获取。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            POST请求相比GET请求要占用更多资源。从性能方面说，发送相同数量的数据，GET请求比POST请求要快两倍。</p>
+        </blockquote>
+        <h3 id="nav_point_558" class="calibre15">24.1.5 XMLHttpRequest Level 2</h3>
+        <p class="calibre1">XHR对象作为事实标准的迅速流行，也促使W3C为规范这一行为而制定了正式标准。XMLHttpRequest Level 1只是把已经存在的XHR对象的实现细节明确了一下。XMLHttpRequest Level 2又进一步发展了XHR对象。并非所有浏览器都实现了XMLHttpRequest Level 2的所有部分，但所有浏览器都实现了其中部分功能。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">FormData</code>类型</strong>
+            </p>
+            <p class="calibre1">现代Web应用程序中经常需要对表单数据进行序列化，因此XMLHttpRequest Level 2新增了<code class="calibre11">FormData</code>类型。<code class="calibre11">FormData</code>类型便于表单序列化，也便于创建与表单类似格式的数据然后通过XHR发送。下面的代码创建了一个<code class="calibre11">FormData</code>对象，并填充了一些数据：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let data = new formdata();
+data.append("name", "nicholas");</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">append()</code>方法接收两个参数：键和值，相当于表单字段名称和该字段的值。可以像这样添加任意多个键<code class="calibre11">/</code>值对数据。此外，通过直接给<code class="calibre11">FormData</code>构造函数传入一个表单元素，也可以将表单中的数据作为键/值对填充进去：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let data = new formdata(document.forms[0]);</code></pre>
+            <p class="calibre1">有了<code class="calibre11">FormData</code>实例，可以像下面这样直接传给XHR对象的<code class="calibre11">send()</code>方法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();
+xhr.onreadystatechange = function() {
+  if (xhr.readystate == 4) {
+    if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+      alert(xhr.responsetext);
+    } else {
+      alert("request was unsuccessful: " + xhr.status);
+    }
+  }
+};
+xhr.open("post", "postexample.php", true);
+let form = document.getelementbyid("user-info");
+xhr.send(new formdata(form));</code></pre>
+            <p class="calibre1">使用<code class="calibre11">FormData</code>的另一个方便之处是不再需要给XHR对象显式设置任何请求头部了。XHR对象能够识别作为<code class="calibre11">FormData</code>实例传入的数据类型并自动配置相应的头部。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">超时</strong>
+            </p>
+            <p class="calibre1">IE8给XHR对象增加了一个<code class="calibre11">timeout</code>属性，用于表示发送请求后等待多少毫秒，如果响应不成功就中断请求。之后所有浏览器都在自己的XHR实现中增加了这个属性。在给<code class="calibre11">timeout</code>属性设置了一个时间且在该时间过后没有收到响应时，XHR对象就会触发<code class="calibre11">timeout</code>事件，调用<code class="calibre11">ontimeout</code>事件处理程序。这个特性后来也被添加到了XMLHttpRequest Level 2规范。下面看一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();
+xhr.onreadystatechange = function() {
+  if (xhr.readystate == 4) {
+    try {
+      if ((xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status == 304) {
+        alert(xhr.responsetext);
+      } else {
+        alert("request was unsuccessful: " + xhr.status);
+      }
+    } catch (ex) {
+      // 假设由ontimeout处理
+    }
+  }
+};
+
+xhr.open("get", "timeout.php", true);
+xhr.timeout = 1000; // 设置1秒超时
+xhr.ontimeout = function() {
+  alert("request did not return in a second.");
+};
+xhr.send(null);</code></pre>
+            <p class="calibre1">这个例子演示了使用<code class="calibre11">timeout</code>设置超时。给<code class="calibre11">timeout</code>设置1000毫秒意味着，如果请求没有在1秒钟内返回则会中断。此时则会触发<code class="calibre11">ontimeout</code>事件处理程序，<code class="calibre11">readyState</code>仍然会变成<code class="calibre11">4</code>，因此也会调用<code class="calibre11">onreadystatechange</code>事件处理程序。不过，如果在超时之后访问<code class="calibre11">status</code>属性则会发生错误。为做好防护，可以把检查<code class="calibre11">status</code>属性的代码封装在<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句中。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">overrideMimeType()</code>方法</strong>
+            </p>
+            <p class="calibre1">Firefox首先引入了<code class="calibre11">overrideMimeType()</code>方法用于重写XHR响应的MIME类型。这个特性后来也被添加到了XMLHttpRequest Level 2。因为响应返回的MIME类型决定了XHR对象如何处理响应，所以如果有办法覆盖服务器返回的类型，那么是有帮助的。</p>
+            <p class="calibre1">假设服务器实际发送了XML数据，但响应头设置的MIME类型是<code class="calibre11">text/plain</code>。结果就会导致虽然数据是XML，但<code class="calibre11">responseXML</code>属性值是<code class="calibre11">null</code>。此时调用<code class="calibre11">overrideMimeType()</code>可以保证将响应当成XML而不是纯文本来处理：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xhr = new xmlhttprequest();
+xhr.open("get", "text.php", true);
+xhr.overridemimetype("text/xml");
+xhr.send(null);</code></pre>
+            <p class="calibre1">这个例子强制让XHR把响应当成XML而不是纯文本来处理。为了正确覆盖响应的MIME类型，必须在调用<code class="calibre11">send()</code>之前调用<code class="calibre11">overrideMimeType()</code>。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0172.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0174.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

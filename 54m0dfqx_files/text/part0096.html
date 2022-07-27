@@ -1,0 +1,727 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0095.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0097.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_286" class="calibre9">12.3
+          <code class="calibre26">navigator</code>对象</h2>
+        <p class="calibre1">
+          <code class="calibre11">navigator</code>是由Netscape Navigator 2最早引入浏览器的，现在已经成为客户端标识浏览器的标准。只要浏览器启用JavaScript，<code class="calibre11">navigator</code>对象就一定存在。但是与其他BOM对象一样，每个浏览器都支持自己的属性。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">navigator</code>对象中关于系统能力的属性将在第13章详细介绍。</p>
+        </blockquote>
+        <p class="calibre1">
+          <code class="calibre11">navigator</code>对象实现了<code class="calibre11">NavigatorID</code>、<code class="calibre11">NavigatorLanguage</code>、<code class="calibre11">NavigatorOnLine</code>、<code class="calibre11">NavigatorContentUtils</code>、<code class="calibre11">NavigatorStorage</code>、<code class="calibre11">NavigatorStorageUtils</code>、<code class="calibre11">NavigatorConcurrentHardware</code>、<code class="calibre11">NavigatorPlugins</code>和<code class="calibre11">NavigatorUserMedia</code>接口定义的属性和方法。</p>
+        <p class="calibre1">下表列出了这些接口定义的属性和方法：</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">属性/方法</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">说明</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">activeVrDisplays</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回数组，包含<code class="calibre27">ispresenting</code>属性为<code class="calibre27">true</code>的<code class="calibre27">VRDisplay</code>实例</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">appCodeName</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">即使在非Mozilla浏览器中也会返回<code class="calibre27">"Mozilla"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">appName</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">浏览器全名</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">appVersion</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">浏览器版本。通常与实际的浏览器版本不一致</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">battery</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Battery Status API的<code class="calibre27">BatteryManager</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">buildId</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">浏览器的构建编号</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">connection</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Network Information API的<code class="calibre27">NetworkInformation</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">cookieEnabled</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回布尔值，表示是否启用了cookie</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">credentials</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Credentials Management API的<code class="calibre27">CredentialsContainer</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">deviceMemory</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回单位为GB的设备内存容量</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">doNotTrack</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回用户的“不跟踪”（do-not-track）设置</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">geolocation</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Geolocation API的<code class="calibre27">Geolocation</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getVRDisplays()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回数组，包含可用的每个<code class="calibre27">VRDisplay</code>实例</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUserMedia()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回与可用媒体设备硬件关联的流</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">hardwareConcurrency</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回设备的处理器核心数量</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">javaEnabled</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回布尔值，表示浏览器是否启用了Java</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">language</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器的主语言</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">languages</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器偏好的语言数组</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">locks</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Web Locks API的<code class="calibre27">LockManager</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">mediaCapabilities</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Media Capabilities API的<code class="calibre27">MediaCapabilities</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">mediaDevices</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回可用的媒体设备</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">maxTouchPoints</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回设备触摸屏支持的最大触点数</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">mimeTypes</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器中注册的MIME类型数组</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">onLine</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回布尔值，表示浏览器是否联网</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">oscpu</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器运行设备的操作系统和（或）CPU</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">permissions</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Permissions API的<code class="calibre27">Permissions</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">platform</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器运行的系统平台</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">plugins</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器安装的插件数组。在IE中，这个数组包含页面中所有<code class="calibre27">&lt;embed&gt;</code>元素</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">product</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回产品名称（通常是<code class="calibre27">"Gecko"</code>）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">productSub</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回产品的额外信息（通常是Gecko的版本）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">registerProtocolHandler()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将一个网站注册为特定协议的处理程序</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">requestMediaKeySystemAccess()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回一个期约，解决为<code class="calibre27">MediaKeySystemAccess</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">sendBeacon()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">异步传输一些小数据</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">serviceWorker</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回用来与<code class="calibre27">ServiceWorker</code>实例交互的<code class="calibre27">ServiceWorkerContainer</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">share()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回当前平台的原生共享机制</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">storage</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回暴露Storage API的<code class="calibre27">StorageManager</code>对象</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">userAgent</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器的用户代理字符串</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">vendor</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器的厂商名称</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">vendorSub</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器厂商的更多信息</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">vibrate()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">触发设备振动</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">webdriver</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回浏览器当前是否被自动化程序控制</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">
+          <code class="calibre11">navigator</code>对象的属性通常用于确定浏览器的类型。</p>
+        <h3 id="nav_point_287" class="calibre15">12.3.1 检测插件</h3>
+        <p class="calibre1">检测浏览器是否安装了某个插件是开发中常见的需求。除IE10及更低版本外的浏览器，都可以通过<code class="calibre11">plugins</code>数组来确定。这个数组中的每一项都包含如下属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">name</code>：插件名称。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">description</code>：插件介绍。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">filename</code>：插件的文件名。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">length</code>：由当前插件处理的MIME类型数量。</li>
+        </ul>
+        <p class="calibre1">通常，<code class="calibre11">name</code>属性包含识别插件所需的必要信息，尽管不是特别准确。检测插件就是遍历浏览器中可用的插件，并逐个比较插件的名称，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 插件检测，ie10及更低版本无效
+let hasplugin = function(name) {
+  name = name.tolowercase();
+  for (let plugin of window.navigator.plugins){
+    if (plugin.name.tolowercase().indexof(name) &gt; -1){
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// 检测flash
+alert(hasplugin("flash"));
+
+// 检测quicktime
+alert(hasplugin("quicktime"));</code></pre>
+        <p class="calibre1">这个<code class="calibre11">hasPlugin()</code>方法接收一个参数，即待检测插件的名称。第一步是把插件名称转换为小写形式，以便于比较。然后，遍历<code class="calibre11">plugins</code>数组，通过<code class="calibre11">indexOf()</code>方法检测每个<code class="calibre11">name</code>属性，看传入的名称是不是存在于某个数组中。比较的字符串全部小写，可以避免大小写问题。传入的参数应该尽可能独一无二，以避免混淆。像<code class="calibre11">"Flash"</code>、<code class="calibre11">"QuickTime"</code>这样的字符串就可以避免混淆。这个方法可以在Firefox、Safari、Opera和Chrome中检测插件。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">plugins</code>数组中的每个插件对象还有一个<code class="calibre11">MimeType</code>对象，可以通过中括号访问。每个<code class="calibre11">MimeType</code>对象有4个属性：<code class="calibre11">description</code>描述MIME类型，<code class="calibre11">enabledPlugin</code>是指向插件对象的指针，<code class="calibre11">suffixes</code>是该MIME类型对应扩展名的逗号分隔的字符串，<code class="calibre11">type</code>是完整的MIME类型字符串。</p>
+        </blockquote>
+        <p class="calibre1">IE11的<code class="calibre11">window.navigator</code>对象开始支持<code class="calibre11">plugins</code>和<code class="calibre11">mimeTypes</code>属性。这意味着前面定义的函数可以适用于所有较新版本的浏览器。而且，IE11中的<code class="calibre11">ActiveXObject</code>也从DOM中隐身了，意味着不能再用它来作为检测特性的手段。</p>
+        <p class="calibre1">
+          <strong class="calibre2">旧版本IE中的插件检测</strong>
+        </p>
+        <p class="calibre1">IE10及更低版本中检测插件的问题比较多，因为这些浏览器不支持Netscape式的插件。在这些IE中检测插件要使用专有的<code class="calibre11">ActiveXObject</code>，并尝试实例化特定的插件。IE中的插件是实现为COM对象的，由唯一的字符串标识。因此，要检测某个插件就必须知道其COM标识符。例如，Flash的标识符是<code class="calibre11">"ShockwaveFlash.ShockwaveFlash"</code>。知道了这个信息后，就可以像这样检测IE中是否安装了Flash：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在旧版本ie中检测插件
+function hasieplugin(name) {
+  try {
+    new activexobject(name);
+    return true;
+  } catch (ex) {
+    return false;
+  }
+}
+
+// 检测flash
+alert(hasieplugin("shockwaveflash.shockwaveflash"));
+
+// 检测quicktime
+alert(hasieplugin("quicktime.quicktime"));</code></pre>
+        <p class="calibre1">在这个例子中，<code class="calibre11">hasIEPlugin()</code>函数接收一个DOM标识符参数。为检测插件，这个函数会使用传入的标识符创建一个新<code class="calibre11">ActiveXObject</code>实例。相应代码封装在一个<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句中，因此如果创建的插件不存在则会抛出错误。如果创建成功则返回<code class="calibre11">true</code>，如果失败则在<code class="calibre11">catch</code>块中返回<code class="calibre11">false</code>。上面的例子还演示了如何检测Flash和QuickTime插件。</p>
+        <p class="calibre1">因为检测插件涉及两种方式，所以一般要针对特定插件写一个函数，而不是使用通常的检测函数。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在所有浏览器中检测flash
+function hasflash() {
+  var result = hasplugin("flash");
+  if (!result){
+    result = hasieplugin("shockwaveflash.shockwaveflash");
+  }
+  return result;
+}
+
+// 在所有浏览器中检测quicktime
+function hasquicktime() {
+  var result = hasplugin("quicktime");
+  if (!result){
+    result = hasieplugin("quicktime.quicktime");
+  }
+  return result;
+}
+
+// 检测flash
+alert(hasflash());
+
+// 检测quicktime
+alert(hasquicktime());</code></pre>
+        <p class="calibre1">以上代码定义了两个函数<code class="calibre11">hasFlash()</code>和<code class="calibre11">hasQuickTime()</code>。每个函数都先尝试使用非IE插件检测方式，如果返回<code class="calibre11">false</code>（对IE可能会），则再使用IE插件检测方式。如果IE插件检测方式再返回<code class="calibre11">false</code>，整个检测方法也返回<code class="calibre11">false</code>。只要有一种方式返回<code class="calibre11">true</code>，检测方法就会返回<code class="calibre11">true</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">plugins</code>有一个<code class="calibre11">refresh()</code>方法，用于刷新<code class="calibre11">plugins</code>属性以反映新安装的插件。这个方法接收一个布尔值参数，表示刷新时是否重新加载页面。如果传入<code class="calibre11">true</code>，则所有包含插件的页面都会重新加载。否则，只有<code class="calibre11">plugins</code>会更新，但页面不会重新加载。</p>
+        </blockquote>
+        <h3 id="nav_point_288" class="calibre15">12.3.2 注册处理程序</h3>
+        <p class="calibre1">现代浏览器支持<code class="calibre11">navigator</code>上的（在HTML5中定义的）<code class="calibre11">registerProtocolHandler()</code>方法。这个方法可以把一个网站注册为处理某种特定类型信息应用程序。随着在线RSS阅读器和电子邮件客户端的流行，可以借助这个方法将Web应用程序注册为像桌面软件一样的默认应用程序。</p>
+        <p class="calibre1">要使用<code class="calibre11">registerProtocolHandler()</code>方法，必须传入3个参数：要处理的协议（如<code class="calibre11">"mailto"</code>或<code class="calibre11">"ftp"</code>）、处理该协议的URL，以及应用名称。比如，要把一个Web应用程序注册为默认邮件客户端，可以这样做：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">navigator.registerprotocolhandler("mailto",
+  "http://www.somemailclient.com?cmd=%s",
+  "some mail client");</code></pre>
+        <p class="calibre1">这个例子为<code class="calibre11">"mailto"</code>协议注册了一个处理程序，这样邮件地址就可以通过指定的Web应用程序打开。注意，第二个参数是负责处理请求的URL，<code class="calibre11">%s</code>表示原始的请求。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0095.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0097.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

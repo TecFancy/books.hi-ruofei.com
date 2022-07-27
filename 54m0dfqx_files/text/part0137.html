@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0136.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0138.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_429" class="calibre9">19.1 表单基础</h2>
+        <p class="calibre1">Web表单在HTML中以<code class="calibre11">&lt;form&gt;</code>元素表示，在JavaScript中则以<code class="calibre11">HTMLFormElement</code>类型表示。<code class="calibre11">HTMLFormElement</code>类型继承自<code class="calibre11">HTMLElement</code>类型，因此拥有与其他HTML元素一样的默认属性。不过，<code class="calibre11">HTMLFormElement</code>也有自己的属性和方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">acceptCharset</code>：服务器可以接收的字符集，等价于HTML的<code class="calibre11">accept-charset</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">action</code>：请求的URL，等价于HTML的<code class="calibre11">action</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">elements</code>：表单中所有控件的<code class="calibre11">HTMLCollection</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">enctype</code>：请求的编码类型，等价于HTML的<code class="calibre11">enctype</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">length</code>：表单中控件的数量。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">method</code>：HTTP请求的方法类型，通常是<code class="calibre11">"get"</code>或<code class="calibre11">"post"</code>，等价于HTML的<code class="calibre11">method</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">name</code>：表单的名字，等价于HTML的<code class="calibre11">name</code>属性。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">reset()</code>：把表单字段重置为各自的默认值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">submit()</code>：提交表单。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">target</code>：用于发送请求和接收响应的窗口的名字，等价于HTML的<code class="calibre11">target</code>属性。</li>
+        </ul>
+        <p class="calibre1">有几种方式可以取得对<code class="calibre11">&lt;form&gt;</code>元素的引用。最常用的是将表单当作普通元素为它指定一个<code class="calibre11">id</code>属性，从而可以使用<code class="calibre11">getElementById()</code>来获取表单，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("form1");</code></pre>
+        <p class="calibre1">此外，使用<code class="calibre11">document.forms</code>集合可以获取页面上所有的表单元素。然后，可以进一步使用数字索引或表单的名字（<code class="calibre11">name</code>）来访问特定的表单。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 取得页面中的第一个表单
+let firstform = document.forms[0];
+
+// 取得名字为"form2"的表单
+let myform = document.forms["form2"];</code></pre>
+        <p class="calibre1">较早的浏览器，或者严格向后兼容的浏览器，也会把每个表单的<code class="calibre11">name</code>作为<code class="calibre11">document</code>对象的属性。例如，名为<code class="calibre11">"form2"</code>的表单可以通过<code class="calibre11">document.form2</code>来访问。不推荐使用这种方法，因为容易出错，而且这些属性将来可能会被浏览器删除。</p>
+        <p class="calibre1">注意，表单可以同时拥有<code class="calibre11">id</code>和<code class="calibre11">name</code>，而且两者可以不相同。</p>
+        <h3 id="nav_point_430" class="calibre15">19.1.1 提交表单</h3>
+        <p class="calibre1">表单是通过用户点击提交按钮或图片按钮的方式提交的。提交按钮可以使用<code class="calibre11">type</code>属性为<code class="calibre11">"submit"</code>的<code class="calibre11">&lt;input&gt;</code>或<code class="calibre11">&lt;button&gt;</code>元素来定义，图片按钮可以使用<code class="calibre11">type</code>属性为<code class="calibre11">"image"</code>的<code class="calibre11">&lt;input&gt;</code>元素来定义。点击下面例子中定义的所有按钮都可以提交它们所在的表单：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 通用提交按钮 --&gt;
+&lt;input type="submit" value="submit form"&gt;
+
+&lt;!-- 自定义提交按钮 --&gt;
+&lt;button type="submit"&gt;submit form&lt;/button&gt;
+
+&lt;!-- 图片按钮 --&gt;
+&lt;input type="image" src="graphic.gif"&gt;</code></pre>
+        <p class="calibre1">如果表单中有上述任何一个按钮，且焦点在表单中某个控件上，则按回车键也可以提交表单。（<code class="calibre11">textarea</code>控件是个例外，当焦点在它上面时，按回车键会换行。）注意，没有提交按钮的表单在按回车键时不会提交。</p>
+        <p class="calibre1">以这种方式提交表单会在向服务器发送请求之前触发<code class="calibre11">submit</code>事件。这样就提供了一个验证表单数据的机会，可以根据验证结果决定是否真的要提交。阻止这个事件的默认行为可以取消提交表单。例如，下面的代码会阻止表单提交：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+
+form.addeventlistener("submit", (event) =&gt; {
+  // 阻止表单提交
+  event.preventdefault();
+});</code></pre>
+        <p class="calibre1">调用<code class="calibre11">preventDefault()</code>方法可以阻止表单提交。通常，在表单数据无效以及不应该发送到服务器时可以这样处理。</p>
+        <p class="calibre1">当然，也可以通过编程方式在JavaScript中调用<code class="calibre11">submit()</code>方法来提交表单。可以在任何时候调用这个方法来提交表单，而且表单中不存在提交按钮也不影响表单提交。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+
+// 提交表单
+form.submit();</code></pre>
+        <p class="calibre1">通过<code class="calibre11">submit()</code>提交表单时，<code class="calibre11">submit</code>事件不会触发。因此在调用这个方法前要先做数据验证。</p>
+        <p class="calibre1">表单提交的一个最大的问题是可能会提交两次表单。如果提交表单之后没有什么反应，那么没有耐心的用户可能会多次点击提交按钮。结果是很烦人的（因为服务器要处理重复的请求），甚至可能造成损失（如果用户正在购物，则可能会多次下单）。解决这个问题主要有两种方式：在表单提交后禁用提交按钮，或者通过<code class="calibre11">onsubmit</code>事件处理程序取消之后的表单提交。</p>
+        <h3 id="nav_point_431" class="calibre15">19.1.2 重置表单</h3>
+        <p class="calibre1">用户单击重置按钮可以重置表单。重置按钮可以使用<code class="calibre11">type</code>属性为<code class="calibre11">"reset"</code>的<code class="calibre11">&lt;input&gt;</code>或<code class="calibre11">&lt;button&gt;</code>元素来创建，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!-- 通用重置按钮 --&gt;
+&lt;input type="reset" value="reset form"&gt;
+
+&lt;!-- 自定义重置按钮 --&gt;
+&lt;button type="reset"&gt;reset form&lt;/button&gt;</code></pre>
+        <p class="calibre1">这两种按钮都可以重置表单。表单重置后，所有表单字段都会重置回页面第一次渲染时各自拥有的值。如果字段原来是空的，就会变成空的；如果字段有默认值，则恢复为默认值。</p>
+        <p class="calibre1">用户单击重置按钮重置表单会触发<code class="calibre11">reset</code>事件。这个事件为取消重置提供了机会。例如，以下代码演示了如何阻止重置表单：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+
+form.addeventlistener("reset", (event) =&gt; {
+  event.preventdefault();
+});</code></pre>
+        <p class="calibre1">与表单提交一样，重置表单也可以通过JavaScript调用<code class="calibre11">reset()</code>方法来完成，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+
+// 重置表单
+form.reset();</code></pre>
+        <p class="calibre1">与<code class="calibre11">submit()</code>方法的功能不同，调用<code class="calibre11">reset()</code>方法会像单击了重置按钮一样触发<code class="calibre11">reset</code>事件。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            表单设计中通常不提倡重置表单，因为重置表单经常会导致用户迷失方向，如果意外触发则会令人感到厌烦。实践中几乎没有重置表单的需求。一般来说，提供一个取消按钮，让用户点击返回前一个页面，而不是恢复表单中所有的值来得更直观。</p>
+        </blockquote>
+        <h3 id="nav_point_432" class="calibre15">19.1.3 表单字段</h3>
+        <p class="calibre1">表单元素可以像页面中的其他元素一样使用原生DOM方法来访问。此外，所有表单元素都是表单<code class="calibre11">elements</code>属性（元素集合）中包含的一个值。这个<code class="calibre11">elements</code>集合是一个有序列表，包含对表单中所有字段的引用，包括所有<code class="calibre11">&lt;input&gt;</code>、<code class="calibre11">&lt;textarea&gt;</code>、<code class="calibre11">&lt;button&gt;</code>、<code class="calibre11">&lt;select&gt;</code>和<code class="calibre11">&lt;fieldset&gt;</code>元素。<code class="calibre11">elements</code>集合中的每个字段都以它们在HTML标记中出现的次序保存，可以通过索引位置和<code class="calibre11">name</code>属性来访问。以下是几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("form1");
+
+// 取得表单中的第一个字段
+let field1 = form.elements[0];
+
+// 取得表单中名为"textbox1"的字段
+let field2 = form.elements["textbox1"];
+
+// 取得字段的数量
+let fieldcount = form.elements.length;</code></pre>
+        <p class="calibre1">如果多个表单控件使用了同一个<code class="calibre11">name</code>，比如像单选按钮那样，则会返回包含所有同名元素的<code class="calibre11">HTMLCollection</code>。比如，来看下面的HTML代码片段：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;form method="post" id="myform"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;input type="radio" name="color" value="red"&gt;red&lt;/li&gt;
+    &lt;li&gt;&lt;input type="radio" name="color" value="green"&gt;green&lt;/li&gt;
+    &lt;li&gt;&lt;input type="radio" name="color" value="blue"&gt;blue&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</code></pre>
+        <p class="calibre1">这个HTML中的表单有3个单选按钮的<code class="calibre11">name</code>是<code class="calibre11">"color"</code>，这个名字把它们联系在了一起。在访问<code class="calibre11">elements["color"]</code>时，返回的<code class="calibre11">NodeList</code>就包含这3个元素。而在访问<code class="calibre11">elements[0]</code>时，只会返回第一个元素。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+
+let colorfields = form.elements["color"];
+console.log(colorfields.length);  // 3
+
+let firstcolorfield = colorfields[0];
+let firstformfield = form.elements[0];
+console.log(firstcolorfield === firstformfield);   // true</code></pre>
+        <p class="calibre1">以上代码表明，使用<code class="calibre11">form.elements[0]</code>获取的表单的第一个字段就是<code class="calibre11">form.elements["color"]</code>中包含的第一个元素。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            也可以通过表单属性的方式访问表单字段，比如<code class="calibre11">form[0]</code>这种使用索引和<code class="calibre11">form["color"]</code>这种使用字段名字的方式。访问这些属性与访问<code class="calibre11">form.elements</code>集合是一样的。这种方式是为向后兼容旧版本浏览器而提供的，实际开发中应该使用<code class="calibre11">elements</code>。</p>
+        </blockquote>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">表单字段的公共属性</strong>
+            </p>
+            <p class="calibre1">除<code class="calibre11">&lt;fieldset&gt;</code>元素以外，所有表单字段都有一组同样的属性。由于<code class="calibre11">&lt;input&gt;</code>类型可以表示多种表单字段，因此某些属性只适用于特定类型的字段。除此之外的属性可以在任何表单字段上使用。以下列出了这些表单字段的公共属性和方法。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">disabled</code>：布尔值，表示表单字段是否禁用。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">form</code>：指针，指向表单字段所属的表单。这个属性是只读的。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">name</code>：字符串，这个字段的名字。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">readOnly</code>：布尔值，表示这个字段是否只读。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">tabIndex</code>：数值，表示这个字段在按Tab键时的切换顺序。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>：字符串，表示字段类型，如<code class="calibre11">"checkbox"</code>、<code class="calibre11">"radio"</code>等。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">value</code>：要提交给服务器的字段值。对文件输入字段来说，这个属性是只读的，仅包含计算机上某个文件的路径。</li>
+            </ul>
+            <p class="calibre1">这里面除了<code class="calibre11">form</code>属性以外，JavaScript可以动态修改任何属性。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let form = document.getelementbyid("myform");
+let field = form.elements[0];
+
+// 修改字段的值
+field.value = "another value";
+
+// 检查字段所属的表单
+console.log(field.form === form);   // true
+
+// 给字段设置焦点
+field.focus();
+
+// 禁用字段
+field.disabled = true;
+
+// 改变字段的类型（不推荐，但对&lt;input&gt;来说是可能的）
+field.type = "checkbox";</code></pre>
+            <p class="calibre1">这种动态修改表单字段属性的能力为任何时候以任何方式修改表单提供了方便。举个例子，Web表单的一个常见问题是用户常常会点击两次提交按钮。在涉及信用卡扣款的情况下，这是个严重的问题，可能会导致重复扣款。对此，常见的解决方案是第一次点击之后禁用提交按钮。可以通过监听<code class="calibre11">submit</code>事件来实现。比如下面这个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 避免多次提交表单的代码
+let form = document.getelementbyid("myform");
+
+form.addeventlistener("submit", (event) =&gt; {
+  let target = event.target;
+
+  // 取得提交按钮
+  let btn = target.elements["submit-btn"];
+
+  // 禁用提交按钮
+  btn.disabled = true;
+});</code></pre>
+            <p class="calibre1">以上代码在表单的<code class="calibre11">submit</code>事件上注册了一个事件处理程序。当<code class="calibre11">submit</code>事件触发时，代码会取得提交按钮，然后将其<code class="calibre11">disabled</code>属性设置为<code class="calibre11">true</code>。注意，这个功能不能通过直接给提交按钮添加<code class="calibre11">onclick</code>事件处理程序来实现，原因是不同浏览器触发事件的时机不一样。有些浏览器会在触发表单的<code class="calibre11">submit</code>事件前先触发提交按钮的<code class="calibre11">click</code>事件，有些浏览器则会后触发<code class="calibre11">click</code>事件。对于先触发<code class="calibre11">click</code>事件的浏览器，这个按钮会在表单提交前被禁用，这意味着表单就不会被提交了。因此最好使用表单的<code class="calibre11">submit</code>事件来禁用提交按钮。但这种方式不适用于没有使用提交按钮的表单提交。如前所述，只有提交按钮才能触发<code class="calibre11">submit</code>事件。</p>
+            <p class="calibre1">
+              <code class="calibre11">type</code>属性可以用于除<code class="calibre11">&lt;fieldset&gt;</code>之外的任何表单字段。对于<code class="calibre11">&lt;input&gt;</code>元素，这个值等于HTML的<code class="calibre11">type</code>属性值。对于其他元素，这个<code class="calibre11">type</code>属性的值按照下表设置。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">描述</th>
+                <th class="calibre19">示例HTML</th>
+                <th class="calibre19">类型的值</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">单选列表</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;select&gt;...&lt;/select&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"select-one"</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">多选列表</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;select multiple&gt;...&lt;/select&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"select-multiple"</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">自定义按钮</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;button&gt;...&lt;/button&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"submit"</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">自定义非提交按钮</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;button type="button"&gt;...&lt;/button&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"button"</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">自定义重置按钮</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;button type="reset"&gt;...&lt;/button&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"reset"</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">自定义提交按钮</td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;button type="submit"&gt;...&lt;/button&gt;</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">"submit"</code>
+                </td>
+              </tr>
+            </table>
+
+            <p class="calibre1">对于<code class="calibre11">&lt;input&gt;</code>和<code class="calibre11">&lt;button&gt;</code>元素，可以动态修改其<code class="calibre11">type</code>属性。但<code class="calibre11">&lt;select&gt;</code>元素的<code class="calibre11">type</code>属性是只读的。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">表单字段的公共方法</strong>
+            </p>
+            <p class="calibre1">每个表单字段都有两个公共方法：<code class="calibre11">focus()</code>和<code class="calibre11">blur()</code>。<code class="calibre11">focus()</code>方法把浏览器焦点设置到表单字段，这意味着该字段会变成活动字段并可以响应键盘事件。例如，文本框在获得焦点时会在内部显示闪烁的光标，表示可以接收输入。<code class="calibre11">focus()</code>方法主要用来引起用户对页面中某个部分的注意。比如，在页面加载后把焦点定位到表单中第一个字段就是很常见的做法。实现方法是监听<code class="calibre11">load</code>事件，然后在第一个字段上调用<code class="calibre11">focus()</code>，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.addeventlistener("load", (event) =&gt; {
+  document.forms[0].elements[0].focus();
+});</code></pre>
+            <p class="calibre1">注意，如果表单中第一个字段是<code class="calibre11">type</code>为<code class="calibre11">"hidden"</code>的<code class="calibre11">&lt;input&gt;</code>元素，或者该字段被CSS属性<code class="calibre11">display</code>或<code class="calibre11">visibility</code>隐藏了，以上代码就会出错。</p>
+            <p class="calibre1">HTML5为表单字段增加了<code class="calibre11">autofocus</code>属性，支持的浏览器会自动为带有该属性的元素设置焦点，而无须使用JavaScript。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;input type="text" autofocus&gt;</code></pre>
+            <p class="calibre1">为了让之前的代码在使用<code class="calibre11">autofocus</code>时也能正常工作，必须先检测元素上是否设置了该属性。如果设置了<code class="calibre11">autofocus</code>，就不再调用<code class="calibre11">focus()</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.addeventlistener("load", (event) =&gt; {
+  let element = document.forms[0].elements[0];
+
+  if (element.autofocus !== true) {
+    element.focus();
+    console.log("js focus");
+  }
+});</code></pre>
+            <p class="calibre1">因为<code class="calibre11">autofocus</code>是布尔值属性，所以在支持的浏览器中通过JavaScript访问表单字段的<code class="calibre11">autofocus</code>属性会返回<code class="calibre11">true</code>（在不支持的浏览器中是空字符串）。上面的代码只会在<code class="calibre11">autofocus</code>属性不等于<code class="calibre11">true</code>时调用<code class="calibre11">focus()</code>方法，以确保向前兼容。大多数现代浏览器支持<code class="calibre11">autofocus</code>属性，只有iOS Safari、Opera Mini和IE10及以下版本不支持。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                默认情况下只能给表单元素设置焦点。不过，通过将<code class="calibre11">tabIndex</code>属性设置为–1再调用<code class="calibre11">focus()</code>，也可以给任意元素设置焦点。只有Opera不支持这个技术。</p>
+            </blockquote>
+            <p class="calibre1">
+              <code class="calibre11">focus()</code>的反向操作是<code class="calibre11">blur()</code>，其用于从元素上移除焦点。调用<code class="calibre11">blur()</code>时，焦点不会转移到任何特定元素，仅仅只是从调用这个方法的元素上移除了。在浏览器支持<code class="calibre11">readonly</code>属性之前，Web开发者通常会使用这个方法创建只读字段。现在很少有用例需要调用<code class="calibre11">blur()</code>，不过如果需要是可以用的。下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.forms[0].elements[0].blur();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">表单字段的公共事件</strong>
+            </p>
+            <p class="calibre1">除了鼠标、键盘、变化和HTML事件外，所有字段还支持以下3个事件。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">blur</code>：在字段失去焦点时触发。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">change</code>：在<code class="calibre11">&lt;input&gt;</code>和<code class="calibre11">&lt;textarea&gt;</code>元素的<code class="calibre11">value</code>发生变化且失去焦点时触发，或者在<code class="calibre11">&lt;select&gt;</code>元素中选中项发生变化时触发。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">focus</code>：在字段获得焦点时触发。</li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">blur</code>和<code class="calibre11">focus</code>事件会因为用户手动改变字段焦点或者调用<code class="calibre11">blur()</code>或<code class="calibre11">focus()</code>方法而触发。这两个事件对所有表单都会一视同仁。<code class="calibre11">change</code>事件则不然，它会因控件不同而在不同时机触发。对于<code class="calibre11">&lt;input&gt;</code>和<code class="calibre11">&lt;textarea&gt;</code>元素，<code class="calibre11">change</code>事件会在字段失去焦点，同时<code class="calibre11">value</code>自控件获得焦点后发生变化时触发。对于<code class="calibre11">&lt;select&gt;</code>元素，<code class="calibre11">change</code>事件会在用户改变了选中项时触发，不需要控件失去焦点。</p>
+            <p class="calibre1">
+              <code class="calibre11">focus</code>和<code class="calibre11">blur</code>事件通常用于以某种方式改变用户界面，以提供可见的提示或额外功能（例如在文本框下面显示下拉菜单）。<code class="calibre11">change</code>事件通常用于验证用户在字段中输入的内容。比如，有的文本框可能只限于接收数值。<code class="calibre11">focus</code>事件可以用来改变控件的背景颜色以便更清楚地表明当前字段获得了焦点。<code class="calibre11">blur</code>事件可以用于去掉这个背景颜色。而<code class="calibre11">change</code>事件可以用于在用户输入了非数值时把背景改为红色。以下代码展示了上述操作：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let textbox = document.forms[0].elements[0];
+textbox.addeventlistener("focus", (event) =&gt; {
+  let target = event.target;
+  if (target.style.backgroundcolor != "red") {
+    target.style.backgroundcolor = "yellow";
+  }
+});
+
+textbox.addeventlistener("blur", (event) =&gt; {
+  let target = event.target;
+  target.style.backgroundcolor = /[^\d]/.test(target.value) ? "red" : "";
+});
+
+textbox.addeventlistener("change", (event) =&gt; {
+  let target = event.target;
+  target.style.backgroundcolor = /[^\d]/.test(target.value) ? "red" : "";
+});</code></pre>
+            <p class="calibre1">这里的<code class="calibre11">onfocus</code>事件处理程序会把文本框的背景改为黄色，更清楚地表明它是当前活动字段。<code class="calibre11">onblur</code>和<code class="calibre11">onchange</code>事件处理程序会在发现非数值字符时把背景改为红色。为测试非数值字符，这里使用了一个简单的正则表达式来检测文本框的<code class="calibre11">value</code>。这个功能必须同时在<code class="calibre11">onblur</code>和<code class="calibre11">onchange</code>事件处理程序上实现，以确保无论文本框是否改变都能执行验证。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                <code class="calibre11">blur</code>和<code class="calibre11">change</code>事件的关系并没有明确定义。在某些浏览器中，<code class="calibre11">blur</code>事件会先于<code class="calibre11">change</code>事件触发；在其他浏览器中，触发顺序则相反。因此不能依赖这两个事件触发的顺序，必须区分时要多加注意。</p>
+            </blockquote>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0136.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0138.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

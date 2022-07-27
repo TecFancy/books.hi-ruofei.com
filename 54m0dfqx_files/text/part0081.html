@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0080.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0082.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_244" class="calibre9">10.11 函数表达式</h2>
+        <p class="calibre1">函数表达式虽然更强大，但也更容易让人迷惑。我们知道，定义函数有两种方式：函数声明和函数表达式。函数声明是这样的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function functionname(arg0, arg1, arg2) {
+  // 函数体
+}</code></pre>
+        <p class="calibre1">函数声明的关键特点是<strong class="calibre2">函数声明提升</strong>，即函数声明会在代码执行之前获得定义。这意味着函数声明可以出现在调用它的代码之后：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">sayhi();
+function sayhi() {
+  console.log("hi!");
+}</code></pre>
+        <p class="calibre1">这个例子不会抛出错误，因为JavaScript引擎会先读取函数声明，然后再执行代码。</p>
+        <p class="calibre1">第二种创建函数的方式就是函数表达式。函数表达式有几种不同的形式，最常见的是这样的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let functionname = function(arg0, arg1, arg2) {
+  // 函数体
+};</code></pre>
+        <p class="calibre1">函数表达式看起来就像一个普通的变量定义和赋值，即创建一个函数再把它赋值给一个变量<code class="calibre11">functionName</code>。这样创建的函数叫作<strong class="calibre2">匿名函数</strong>（anonymous funtion），因为<code class="calibre11">function</code>关键字后面没有标识符。（匿名函数有也时候也被称为<strong class="calibre2">兰姆达函数</strong>）。未赋值给其他变量的匿名函数的<code class="calibre11">name</code>属性是空字符串。</p>
+        <p class="calibre1">函数表达式跟JavaScript中的其他表达式一样，需要先赋值再使用。下面的例子会导致错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">sayhi();  // error! function doesn't exist yet
+let sayhi = function() {
+  console.log("hi!");
+};</code></pre>
+<p class="calibre1">理解函数声明与函数表达式之间的区别，关键是理解提升。比如，以下代码的执行结果可能会出乎意料：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 千万别这样做！
+if (condition) {
+  function sayhi() {
+    console.log('hi!');
+  }
+} else {
+  function sayhi() {
+    console.log('yo!');
+  }
+}</code></pre>
+<p class="calibre1">这段代码看起来很正常，就是如果<code class="calibre11">condition</code>为<code class="calibre11">true</code>，则使用第一个<code class="calibre11">sayhi()</code>定义；否则，就使用第二个。事实上，这种写法在ecamscript中不是有效的语法。javascript引擎会尝试将其纠正为适当的声明。问题在于浏览器纠正这个问题的方式并不一致。多数浏览器会忽略<code class="calibre11">condition</code>直接返回第二个声明。firefox会在<code class="calibre11">condition</code>为<code class="calibre11">true</code>时返回第一个声明。这种写法很危险，不要使用。不过，如果把上面的函数声明换成函数表达式就没问题了：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 没问题
+let sayhi;
+if (condition) {
+  sayhi = function() {
+    console.log("hi!");
+  };
+} else {
+  sayhi = function() {
+    console.log("yo!");
+  };
+}</code></pre>
+<p class="calibre1">这个例子可以如预期一样，根据<code class="calibre11">condition</code>的值为变量<code class="calibre11">sayhi</code>赋予相应的函数。</p>
+<p class="calibre1">创建函数并赋值给变量的能力也可以用于在一个函数中把另一个函数当作值返回：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">function createcomparisonfunction(propertyname) {
+  return function(object1, object2) {
+    let value1 = object1[propertyname];
+    let value2 = object2[propertyname];
+
+    if (value1 &lt; value2) {
+      return -1;
+    } else if (value1 &gt; value2) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+}</code></pre>
+<p class="calibre1">这里的<code class="calibre11">createcomparisonfunction()</code>函数返回一个匿名函数，这个匿名函数要么被赋值给一个变量，要么可以直接调用。但在<code class="calibre11">createcomparisonfunction()</code>内部，那个函数是匿名的。任何时候，只要函数被当作值来使用，它就是一个函数表达式。本章后面会介绍，这并不是使用函数表达式的唯一方式。</p>
+
+
+
+  </div>
+
+  
+  <div class="calibretoc">
+    <h2><a href="../../54m0dfqx.html">table of contents
+</a></h2>
+    <div>
+  <ul>
+    <li>
+      <a href="part0002.html#nav_point_0">版权声明</a>
+    </li>
+    <li>
+      <a href="part0003.html#nav_point_1">献词</a>
+    </li>
+    <li>
+      <a href="part0004.html#nav_point_2">译者序</a>
+    </li>
+    <li>
+      <a href="part0005.html#nav_point_3">序</a>
+    </li>
+    <li>
+      <a href="part0006.html#nav_point_4">前言</a>
+    </li>
+    <li>
+      <a href="part0012.html#nav_point_10">致谢</a>
+    </li>
+    <li>
+      <a href="part0013.html#nav_point_11">第 1 章 什么是javascript</a>
+    </li>
+    <li>
+      <a href="part0018.html#nav_point_19">第 2 章 html中的javascript</a>
+    </li>
+    <li>
+      <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+    </li>
+    <li>
+      <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+    </li>
+    <li>
+      <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+    </li>
+    <li>
+      <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+    </li>
+    <li>
+      <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+    </li>
+    <li>
+      <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+    </li>
+    <li>
+      <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+    </li>
+    <li>
+      <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+    </li>
+    <li>
+      <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+    </li>
+    <li>
+      <a href="part0093.html#nav_point_273">第 12 章 bom</a>
+    </li>
+    <li>
+      <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+    </li>
+    <li>
+      <a href="part0105.html#nav_point_306">第 14 章 dom</a>
+    </li>
+    <li>
+      <a href="part0110.html#nav_point_328">第 15 章 dom扩展</a>
+    </li>
+    <li>
+      <a href="part0116.html#nav_point_348">第 16 章 dom2和dom3</a>
+    </li>
+    <li>
+      <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+    </li>
+    <li>
+      <a href="part0130.html#nav_point_403">第 18 章 动画与canvas图形</a>
+    </li>
+    <li>
+      <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+    </li>
+    <li>
+      <a href="part0143.html#nav_point_450">第 20 章 javascript api</a>
+    </li>
+    <li>
+      <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+    </li>
+    <li>
+      <a href="part0163.html#nav_point_526">第 22 章 处理xml</a>
+    </li>
+    <li>
+      <a href="part0168.html#nav_point_542">第 23 章 json</a>
+    </li>
+    <li>
+      <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+    </li>
+    <li>
+      <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+    </li>
+    <li>
+      <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+    </li>
+    <li>
+      <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+    </li>
+    <li>
+      <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+    </li>
+    <li>
+      <a href="part0204.html#nav_point_683">附录 a es2018和es2019</a>
+    </li>
+    <li>
+      <a href="part0215.html#nav_point_708">附录 b 严格模式</a>
+    </li>
+    <li>
+      <a href="part0223.html#nav_point_719">附录 c javascript库和框架</a>
+    </li>
+    <li>
+      <a href="part0227.html#nav_point_741">附录 d javascript工具</a>
+    </li>
+    <li>
+      <a href="part0239.html#nav_point_800">作者简介</a>
+    </li>
+  </ul>
+</div>
+
+
+  </div>
+  
+
+  <div class="calibreebnav">
+    
+      <a href="part0080.html" class="calibreaprev">上一页
+</a>
+    
+
+    <a href="../../54m0dfqx.html" class="calibreahome">首页
+</a>
+
+    
+      <a href="part0082.html" class="calibreanext">下一页
+</a>
+    
+  </div>
+
+</div>
+
+</body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-6487844781006261"
+     data-ad-slot="3432081921"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</html>

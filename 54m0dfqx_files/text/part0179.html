@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0178.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0180.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_576" class="calibre9">24.7 Web Socket</h2>
+        <p class="calibre1">Web Socket（套接字）的目标是通过一个长时连接实现与服务器全双工、双向的通信。在JavaScript中创建Web Socket时，一个HTTP请求会发送到服务器以初始化连接。服务器响应后，连接使用HTTP的<code class="calibre11">Upgrade</code>头部从HTTP协议切换到Web Socket协议。这意味着Web Socket不能通过标准HTTP服务器实现，而必须使用支持该协议的专有服务器。</p>
+        <p class="calibre1">因为Web Socket使用了自定义协议，所以URL方案（scheme）稍有变化：不能再使用http://或https://，而要使用ws://和wss://。前者是不安全的连接，后者是安全连接。在指定Web Socket URL时，必须包含URL方案，因为将来有可能再支持其他方案。</p>
+        <p class="calibre1">使用自定义协议而非HTTP协议的好处是，客户端与服务器之间可以发送非常少的数据，不会对HTTP造成任何负担。使用更小的数据包让Web Socket非常适合带宽和延迟问题比较明显的移动应用。使用自定义协议的缺点是，定义协议的时间比定义JavaScript API要长。Web Socket得到了所有主流浏览器支持。</p>
+        <h3 id="nav_point_577" class="calibre15">24.7.1 API</h3>
+        <p class="calibre1">要创建一个新的Web Socket，就要实例化一个<code class="calibre11">WebSocket</code>对象并传入提供连接的URL：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let socket = new websocket("ws://www.example.com/server.php");</code></pre>
+        <p class="calibre1">注意，必须给<code class="calibre11">WebSocket</code>构造函数传入一个绝对URL。同源策略不适用于Web Socket，因此可以打开到任意站点的连接。至于是否与来自特定源的页面通信，则完全取决于服务器。（在握手阶段就可以确定请求来自哪里。）</p>
+        <p class="calibre1">浏览器会在初始化<code class="calibre11">WebSocket</code>对象之后立即创建连接。与XHR类似，<code class="calibre11">WebSocket</code>也有一个<code class="calibre11">readyState</code>属性表示当前状态。不过，这个值与XHR中相应的值不一样。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WebSocket.OPENING</code>（0）：连接正在建立。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WebSocket.OPEN</code>（1）：连接已经建立。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WebSocket.CLOSING</code>（2）：连接正在关闭。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">WebSocket.CLOSE</code>（3）：连接已经关闭。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">WebSocket</code>对象没有<code class="calibre11">readystatechange</code>事件，而是有与上述不同状态对应的其他事件。<code class="calibre11">readyState</code>值从0开始。</p>
+        <p class="calibre1">任何时候都可以调用<code class="calibre11">close()</code>方法关闭Web Socket连接：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">socket.close();</code></pre>
+        <p class="calibre1">调用<code class="calibre11">close()</code>之后，<code class="calibre11">readyState</code>立即变为2（连接正在关闭），并会在关闭后变为3（连接已经关闭）。</p>
+        <h3 id="nav_point_578" class="calibre15">24.7.2 发送和接收数据</h3>
+        <p class="calibre1">打开Web Socket之后，可以通过连接发送和接收数据。要向服务器发送数据，使用<code class="calibre11">send()</code>方法并传入一个字符串、<code class="calibre11">ArrayBuffer</code>或<code class="calibre11">Blob</code>，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let socket = new websocket("ws://www.example.com/server.php");
+
+let stringdata = "hello world!";
+let arraybufferdata = uint8array.from(['f', 'o', 'o']);
+let blobdata = new blob(['f', 'o', 'o']);
+
+socket.send(stringdata);
+socket.send(arraybufferdata.buffer);
+socket.send(blobdata);</code></pre>
+        <p class="calibre1">服务器向客户端发送消息时，<code class="calibre11">WebSocket</code>对象上会触发<code class="calibre11">message</code>事件。这个<code class="calibre11">message</code>事件与其他消息协议类似，可以通过<code class="calibre11">event.data</code>属性访问到有效载荷：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">socket.onmessage = function(event) {
+  let data = event.data;
+  // 对数据执行某些操作
+};</code></pre>
+        <p class="calibre1">与通过<code class="calibre11">send()</code>方法发送的数据类似，<code class="calibre11">event.data</code>返回的数据也可能是<code class="calibre11">ArrayBuffer</code>或<code class="calibre11">Blob</code>。这由<code class="calibre11">WebSocket</code>对象的<code class="calibre11">binaryType</code>属性决定，该属性可能是<code class="calibre11">"blob"</code>或<code class="calibre11">"arraybuffer"</code>。</p>
+        <h3 id="nav_point_579" class="calibre15">24.7.3 其他事件</h3>
+        <p class="calibre1">
+          <code class="calibre11">WebSocket</code>对象在连接生命周期中有可能触发3个其他事件。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">open</code>：在连接成功建立时触发。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">error</code>：在发生错误时触发。连接无法存续。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">close</code>：在连接关闭时触发。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">WebSocket</code>对象不支持DOM Level 2事件监听器，因此需要使用DOM Level 0风格的事件处理程序来监听这些事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let socket = new websocket("ws://www.example.com/server.php");
+socket.onopen = function() {
+  alert("connection established.");
+};
+socket.onerror = function() {
+  alert("connection error.");
+};
+socket.onclose = function() {
+  alert("connection closed.");
+};</code></pre>
+        <p class="calibre1">在这些事件中，只有<code class="calibre11">close</code>事件的<code class="calibre11">event</code>对象上有额外信息。这个对象上有3个额外属性：<code class="calibre11">wasClean</code>、<code class="calibre11">code</code>和<code class="calibre11">reason</code>。其中，<code class="calibre11">wasClean</code>是一个布尔值，表示连接是否干净地关闭；<code class="calibre11">code</code>是一个来自服务器的数值状态码；<code class="calibre11">reason</code>是一个字符串，包含服务器发来的消息。可以将这些信息显示给用户或记录到日志：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">socket.onclose = function(event) {
+  console.log(`as clean? ${event.wasclean} code=${event.code} reason=${
+              event.reason}`);
+};</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0178.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0180.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

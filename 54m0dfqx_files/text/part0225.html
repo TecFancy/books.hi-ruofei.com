@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0224.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0226.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_727" class="calibre9">C.2 通用库</h2>
+        <p class="calibre1">通用JavaScript库提供适应任何需求的功能。所有通用库都致力于通过将常用功能封装为新API，来补偿浏览器接口、弥补实现差异。其中有些API与原生功能相似，而另一些API则完全不同。通用库通常会提供与DOM的交互，对Ajax的支持，还有辅助常见任务的实用方法。</p>
+        <h3 id="nav_point_728" class="calibre15">C.2.1 jQuery</h3>
+        <p class="calibre1">jQuery是为JavaScript提供函数式编程接口的开源库。该库的核心是通过CSS选择符匹配DOM元素，通过调用链，jQuery代码看起来更像描述故事情节而不是JavaScript代码。这种代码风格在设计师和原型设计者中非常流行。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：MIT或GPL</li>
+        </ul>
+        <h3 id="nav_point_729" class="calibre15">C.2.2 Google Closure Library</h3>
+        <p class="calibre1">Google Closure Library是通用JavaScript工具包，与jQuery在很多方面都很像。这个库包含非常多的模块，涵盖底层操作和高层组件和部件。Google Closure Library可以按需加载模块，并使用Google Closure Compiler（附录D会介绍）构建。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：Apache 2.0</li>
+        </ul>
+        <h3 id="nav_point_730" class="calibre15">C.2.3 Underscore.js</h3>
+        <p class="calibre1">Underscore.js并不是严格意义上的通用库，但提供了JavaScript函数式编程的额外能力。它的文档将Underscore.js看成jQuery的组件，但提供了更多底层能力，用于操作对象、数组、函数和其他JavaScript数据类型。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：MIT</li>
+        </ul>
+        <h3 id="nav_point_731" class="calibre15">C.2.4 Lodash</h3>
+        <p class="calibre1">与Underscore.js一样，Lodash也是实用库，用于扩充JavaScript工具包。Lodash提供了很多操作原生类型，如数组、对象、函数和原始值的增强方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：MIT</li>
+        </ul>
+        <h3 id="nav_point_732" class="calibre15">C.2.5 Prototype</h3>
+        <p class="calibre1">Prototype是对常见Web开发任务提供简单API的开源库。Prototype最初是为了Ruby on Rails开发者开发的，由类驱动，旨在为JavaScript提供类定义和继承。为此，Prototype提供了大量的类，将常用和复杂的功能封装为简单的API调用。Prototype包含在一个文件里，可以轻松地插入页面中使用。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：MIT及CC BY-SA 3.0</li>
+        </ul>
+        <h3 id="nav_point_733" class="calibre15">C.2.6 Dojo Toolkit</h3>
+        <p class="calibre1">Dojo Toolkit是以包系统为基础的开源库，将功能分门别类地划分为包，可以按需加载。Dojo支持各种配置选项，几乎涵盖了使用JavaScript所需的一切。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：“新”BSD许可或Academic Free License 2.1</li>
+        </ul>
+        <h3 id="nav_point_734" class="calibre15">C.2.7 MooTools</h3>
+        <p class="calibre1">MooTools是简洁、优化的开源库，为原生JavaScript对象添加方法，在熟悉的接口上提供新功能。由于体积小、API简单，MooTools在Web开发者中很受欢迎。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：MIT</li>
+        </ul>
+        <h3 id="nav_point_735" class="calibre15">C.2.8 qooxdoo</h3>
+        <p class="calibre1">qooxdoo是致力于全周期支持Web应用程序开发的开源库。通过实现自己的类和接口，qooxdoo创建了类似传统面向对象编程语言的模型。这个库包含完整的GUI工具包和编译器，用于简化前端构建过程。qooxdoo最初是网站托管公司1&amp;1的内部库，后来基于开源许可对外发布。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">许可</strong>：LGPL或EPL</li>
+        </ul>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0224.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0226.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

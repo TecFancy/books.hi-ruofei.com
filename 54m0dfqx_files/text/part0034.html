@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0033.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0035.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_79" class="calibre9">4.1 原始值与引用值</h2>
+        <p class="calibre1">ECMAScript变量可以包含两种不同类型的数据：原始值和引用值。<strong class="calibre2">原始值</strong>（primitive value）就是最简单的数据，<strong class="calibre2">引用值</strong>（reference value）则是由多个值构成的对象。</p>
+        <p class="calibre1">在把一个值赋给变量时，JavaScript引擎必须确定这个值是原始值还是引用值。上一章讨论了6种原始值：<code class="calibre11">Undefined</code>、<code class="calibre11">Null</code>、<code class="calibre11">Boolean</code>、<code class="calibre11">Number</code>、<code class="calibre11">String</code>和<code class="calibre11">Symbol</code>。保存原始值的变量是<strong class="calibre2">按值</strong>（by value）访问的，因为我们操作的就是存储在变量中的实际值。</p>
+        <p class="calibre1">引用值是保存在内存中的对象。与其他语言不同，JavaScript不允许直接访问内存位置，因此也就不能直接操作对象所在的内存空间。在操作对象时，实际上操作的是对该对象的<strong class="calibre2">引用</strong>（reference）而非实际的对象本身。为此，保存引用值的变量是<strong class="calibre2">按引用</strong>（by reference）访问的。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在很多语言中，字符串是使用对象表示的，因此被认为是引用类型。ECMAScript打破了这个惯例。</p>
+        </blockquote>
+        <h3 id="nav_point_80" class="calibre15">4.1.1 动态属性</h3>
+        <p class="calibre1">原始值和引用值的定义方式很类似，都是创建一个变量，然后给它赋一个值。不过，在变量保存了这个值之后，可以对这个值做什么，则大有不同。对于引用值而言，可以随时添加、修改和删除其属性和方法。比如，看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let person = new object();
+person.name = "nicholas";
+console.log(person.name); // "nicholas"</code></pre>
+        <p class="calibre1">这里，首先创建了一个对象，并把它保存在变量<code class="calibre11">person</code>中。然后，给这个对象添加了一个名为<code class="calibre11">name</code>的属性，并给这个属性赋值了一个字符串<code class="calibre11">"Nicholas"</code>。在此之后，就可以访问这个新属性，直到对象被销毁或属性被显式地删除。</p>
+        <p class="calibre1">原始值不能有属性，尽管尝试给原始值添加属性不会报错。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let name = "nicholas";
+name.age = 27;
+console.log(name.age);  // undefined</code></pre>
+        <p class="calibre1">在此，代码想给字符串<code class="calibre11">name</code>定义一个<code class="calibre11">age</code>属性并给该属性赋值27。紧接着在下一行，属性不见了。记住，只有引用值可以动态添加后面可以使用的属性。</p>
+        <p class="calibre1">注意，原始类型的初始化可以只使用原始字面量形式。如果使用的是<code class="calibre11">new</code>关键字，则JavaScript会创建一个<code class="calibre11">Object</code>类型的实例，但其行为类似原始值。下面来看看这两种初始化方式的差异：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let name1 = "nicholas";
+let name2 = new string("matt");
+name1.age = 27;
+name2.age = 26;
+console.log(name1.age);    // undefined
+console.log(name2.age);    // 26
+console.log(typeof name1); // string
+console.log(typeof name2); // object</code></pre>
+        <h3 id="nav_point_81" class="calibre15">4.1.2 复制值</h3>
+        <p class="calibre1">除了存储方式不同，原始值和引用值在通过变量复制时也有所不同。在通过变量把一个原始值赋值到另一个变量时，原始值会被复制到新变量的位置。请看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num1 = 5;
+let num2 = num1;</code></pre>
+        <p class="calibre1">这里，<code class="calibre11">num1</code>包含数值5。当把<code class="calibre11">num2</code>初始化为<code class="calibre11">num1</code>时，<code class="calibre11">num2</code>也会得到数值5。这个值跟存储在<code class="calibre11">num1</code>中的5是完全独立的，因为它是那个值的副本。</p>
+        <p class="calibre1">这两个变量可以独立使用，互不干扰。这个过程如图4-1所示。</p>
+        <p class="calibre7"><img src="../images/00018.gif" alt="" width="28%" class="calibre30"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 4-1</strong>
+        </p>
+        <p class="calibre1">在把引用值从一个变量赋给另一个变量时，存储在变量中的值也会被复制到新变量所在的位置。区别在于，这里复制的值实际上是一个指针，它指向存储在堆内存中的对象。操作完成后，两个变量实际上指向同一个对象，因此一个对象上面的变化会在另一个对象上反映出来，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let obj1 = new object();
+let obj2 = obj1;
+obj1.name = "nicholas";
+console.log(obj2.name); // "nicholas"</code></pre>
+        <p class="calibre1">在这个例子中，变量<code class="calibre11">obj1</code>保存了一个新对象的实例。然后，这个值被复制到<code class="calibre11">obj2</code>，此时两个变量都指向了同一个对象。在给<code class="calibre11">obj1</code>创建属性<code class="calibre11">name</code>并赋值后，通过<code class="calibre11">obj2</code>也可以访问这个属性，因为它们都指向同一个对象。图4-2展示了变量与堆内存中对象之间的关系。</p>
+        <p class="calibre7"><img src="../images/00047.jpeg" alt="" width="80%" class="calibre31"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 4-2</strong>
+        </p>
+        <h3 id="nav_point_82" class="calibre15">4.1.3 传递参数</h3>
+        <p class="calibre1">ECMAScript中所有函数的参数都是按值传递的。这意味着函数外的值会被复制到函数内部的参数中，就像从一个变量复制到另一个变量一样。如果是原始值，那么就跟原始值变量的复制一样，如果是引用值，那么就跟引用值变量的复制一样。对很多开发者来说，这一块可能会不好理解，毕竟变量有按值和按引用访问，而传参则只有按值传递。</p>
+        <p class="calibre1">在按值传递参数时，值会被复制到一个局部变量（即一个命名参数，或者用ECMAScript的话说，就是<code class="calibre11">arguments</code>对象中的一个槽位）。在按引用传递参数时，值在内存中的位置会被保存在一个局部变量，这意味着对本地变量的修改会反映到函数外部。（这在ECMAScript中是不可能的。）来看下面这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addten(num) {
+  num += 10;
+  return num;
+}
+
+let count = 20;
+let result = addten(count);
+console.log(count);  // 20，没有变化
+console.log(result); // 30</code></pre>
+        <p class="calibre1">这里，函数<code class="calibre11">addTen()</code>有一个参数<code class="calibre11">num</code>，它其实是一个局部变量。在调用时，变量<code class="calibre11">count</code>作为参数传入。<code class="calibre11">count</code>的值是20，这个值被复制到参数<code class="calibre11">num</code>以便在<code class="calibre11">addTen()</code>内部使用。在函数内部，参数num的值被加上了10，但这不会影响函数外部的原始变量<code class="calibre11">count</code>。参数<code class="calibre11">num</code>和变量<code class="calibre11">count</code>互不干扰，它们只不过碰巧保存了一样的值。如果<code class="calibre11">num</code>是按引用传递的，那么<code class="calibre11">count</code>的值也会被修改为30。这个事实在使用数值这样的原始值时是非常明显的。但是，如果变量中传递的是对象，就没那么清楚了。比如，再看这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function setname(obj) {
+  obj.name = "nicholas";
+}
+
+let person = new object();
+setname(person);
+console.log(person.name);  // "nicholas"</code></pre>
+        <p class="calibre1">这一次，我们创建了一个对象并把它保存在变量<code class="calibre11">person</code>中。然后，这个对象被传给<code class="calibre11">setName()</code>方法，并被复制到参数<code class="calibre11">obj</code>中。在函数内部，<code class="calibre11">obj</code>和<code class="calibre11">person</code>都指向同一个对象。结果就是，即使对象是按值传进函数的，<code class="calibre11">obj</code>也会通过引用访问对象。当函数内部给<code class="calibre11">obj</code>设置了<code class="calibre11">name</code>属性时，函数外部的对象也会反映这个变化，因为<code class="calibre11">obj</code>指向的对象保存在全局作用域的堆内存上。很多开发者错误地认为，当在局部作用域中修改对象而变化反映到全局时，就意味着参数是按引用传递的。为证明对象是按值传递的，我们再来看看下面这个修改后的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function setname(obj) {
+  obj.name = "nicholas";
+  obj = new object();
+  obj.name = "greg";
+}
+
+let person = new object();
+setname(person);
+console.log(person.name);  // "nicholas"</code></pre>
+        <p class="calibre1">这个例子前后唯一的变化就是<code class="calibre11">setName()</code>中多了两行代码，将<code class="calibre11">obj</code>重新定义为一个有着不同<code class="calibre11">name</code>的新对象。当<code class="calibre11">person</code>传入<code class="calibre11">setName()</code>时，其<code class="calibre11">name</code>属性被设置为<code class="calibre11">"Nicholas"</code>。然后变量<code class="calibre11">obj</code>被设置为一个新对象且<code class="calibre11">name</code>属性被设置为<code class="calibre11">"Greg"</code>。如果<code class="calibre11">person</code>是按引用传递的，那么<code class="calibre11">person</code>应该自动将指针改为指向<code class="calibre11">name</code>为<code class="calibre11">"Greg"</code>的对象。可是，当我们再次访问<code class="calibre11">person.name</code>时，它的值是<code class="calibre11">"Nicholas"</code>，这表明函数中参数的值改变之后，原始的引用仍然没变。当<code class="calibre11">obj</code>在函数内部被重写时，它变成了一个指向本地对象的指针。而那个本地对象在函数执行结束时就被销毁了。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            ECMAScript中函数的参数就是局部变量。</p>
+        </blockquote>
+        <h3 id="nav_point_83" class="calibre15">4.1.4 确定类型</h3>
+        <p class="calibre1">前一章提到的<code class="calibre11">typeof</code>操作符最适合用来判断一个变量是否为原始类型。更确切地说，它是判断一个变量是否为字符串、数值、布尔值或<code class="calibre11">undefined</code>的最好方式。如果值是对象或<code class="calibre11">null</code>，那么<code class="calibre11">typeof</code>返回<code class="calibre11">"object"</code>，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let s = "nicholas";
+let b = true;
+let i = 22;
+let u;
+let n = null;
+let o = new object();
+console.log(typeof s); // string
+console.log(typeof i); // number
+console.log(typeof b); // boolean
+console.log(typeof u); // undefined
+console.log(typeof n); // object
+console.log(typeof o); // object</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">typeof</code>虽然对原始值很有用，但它对引用值的用处不大。我们通常不关心一个值是不是对象，而是想知道它是什么类型的对象。为了解决这个问题，ECMAScript提供了<code class="calibre11">instanceof</code>操作符，语法如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">result = variable instanceof constructor</code></pre>
+        <p class="calibre1">如果变量是给定引用类型（由其原型链决定，将在第8章详细介绍）的实例，则<code class="calibre11">instanceof</code>操作符返回<code class="calibre11">true</code>。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(person instanceof object);  // 变量person是object吗？
+console.log(colors instanceof array);   // 变量colors是array吗？
+console.log(pattern instanceof regexp); // 变量pattern是regexp吗？</code></pre>
+        <p class="calibre1">按照定义，所有引用值都是<code class="calibre11">Object</code>的实例，因此通过<code class="calibre11">instanceof</code>操作符检测任何引用值和<code class="calibre11">Object</code>构造函数都会返回<code class="calibre11">true</code>。类似地，如果用<code class="calibre11">instanceof</code>检测原始值，则始终会返回<code class="calibre11">false</code>，因为原始值不是对象。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">typeof</code>操作符在用于检测函数时也会返回<code class="calibre11">"function"</code>。当在Safari（直到Safari 5）和Chrome（直到Chrome 7）中用于检测正则表达式时，由于实现细节的原因，<code class="calibre11">typeof</code>也会返回<code class="calibre11">"function"</code>。ECMA-262规定，任何实现内部<code class="calibre11">[[Call]]</code>方法的对象都应该在<code class="calibre11">typeof</code>检测时返回<code class="calibre11">"function"</code>。因为上述浏览器中的正则表达式实现了这个方法，所以<code class="calibre11">typeof</code>对正则表达式也返回<code class="calibre11">"function"</code>。在IE和Firefox中，<code class="calibre11">typeof</code>对正则表达式返回<code class="calibre11">"object"</code>。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0033.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0035.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

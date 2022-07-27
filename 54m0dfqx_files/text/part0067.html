@@ -1,0 +1,997 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0066.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0068.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_204" class="calibre9">9.2 代理捕获器与反射方法</h2>
+        <p class="calibre1">代理可以捕获13种不同的基本操作。这些操作有各自不同的反射API方法、参数、关联ECMAScript操作和不变式。</p>
+        <p class="calibre1">正如前面示例所展示的，有几种不同的JavaScript操作会调用同一个捕获器处理程序。不过，对于在代理对象上执行的任何一种操作，只会有一个捕获处理程序被调用。不会存在重复捕获的情况。</p>
+        <p class="calibre1">只要在代理上调用，所有捕获器都会拦截它们对应的反射API操作。</p>
+        <h3 id="nav_point_205" class="calibre15">9.2.1
+          <code class="calibre26">get()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">get()</code>捕获器会在获取属性值的操作中被调用。对应的反射API方法为<code class="calibre11">Reflect.get()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  get(target, property, receiver) {
+    console.log('get()');
+    return reflect.get(...arguments)
+  }
+});
+
+proxy.foo;
+// get()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">返回值无限制。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy.property</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy[property]</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.create(proxy)[property]</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.get(proxy, property, receiver)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。<span class="zhu_shi_bian_hao">1</span></li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">receiver</code>：代理对象或继承代理对象的对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不可写且不可配置，则处理程序返回的值必须与<code class="calibre11">target.property</code>匹配。</p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不可配置且<code class="calibre11">[[Get]]</code>特性为<code class="calibre11">undefined</code>，处理程序的返回值也必须是<code class="calibre11">undefined</code>。</p>
+          </li>
+        </ol>
+        <p class="zhu_shi_nei_rong">
+          <span class="zhu_shi_bian_hao_xia">1</span>严格来讲，<code class="calibre11">property</code>参数除了字符串键，也可能是符（<code class="calibre11">symbol</code>）键。后面几处也一样。——译者注</p>
+        <h3 id="nav_point_206" class="calibre15">9.2.2
+          <code class="calibre26">set()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">set()</code>捕获器会在设置属性值的操作中被调用。对应的反射API方法为<code class="calibre11">Reflect.set()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  set(target, property, value, receiver) {
+    console.log('set()');
+    return reflect.set(...arguments)
+  }
+});
+
+proxy.foo = 'bar';
+// set()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">返回<code class="calibre11">true</code>表示成功；返回<code class="calibre11">false</code>表示失败，严格模式下会抛出<code class="calibre11">TypeError</code>。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy.property = value</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy[property] = value</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.create(proxy)[property] = value</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.set(proxy, property, value, receiver)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">value</code>：要赋给属性的值。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">receiver</code>：接收最初赋值的对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不可写且不可配置，则不能修改目标属性的值。</p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不可配置且<code class="calibre11">[[Set]]</code>特性为<code class="calibre11">undefined</code>，则不能修改目标属性的值。</p>
+            <p class="calibre1">在严格模式下，处理程序中返回<code class="calibre11">false</code>会抛出<code class="calibre11">TypeError</code>。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_207" class="calibre15">9.2.3
+          <code class="calibre26">has()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">has()</code>捕获器会在<code class="calibre11">in</code>操作符中被调用。对应的反射API方法为<code class="calibre11">Reflect.has()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  has(target, property) {
+    console.log('has()');
+    return reflect.has(...arguments)
+  }
+});
+
+'foo' in proxy;
+// has()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">has()</code>必须返回布尔值，表示属性是否存在。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property in proxy</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property in Object.create(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">with(proxy) {(property);}</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.has(proxy, property)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>存在且不可配置，则处理程序必须返回<code class="calibre11">true</code>。</p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>存在且目标对象不可扩展，则处理程序必须返回<code class="calibre11">true</code>。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_208" class="calibre15">9.2.4
+          <code class="calibre26">defineProperty()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">defineProperty()</code>捕获器会在<code class="calibre11">Object.defineProperty()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.defineProperty()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  defineproperty(target, property, descriptor) {
+    console.log('defineproperty()');
+    return reflect.defineproperty(...arguments)
+  }
+});
+
+object.defineproperty(proxy, 'foo', { value: 'bar' });
+// defineproperty()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">defineProperty()</code>必须返回布尔值，表示属性是否成功定义。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.defineProperty(proxy, property, descriptor)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.defineProperty(proxy, property, descriptor)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">descriptor</code>：包含可选的<code class="calibre11">enumerable</code>、<code class="calibre11">configurable</code>、<code class="calibre11">writable</code>、<code class="calibre11">value</code>、<code class="calibre11">get</code>和<code class="calibre11">set</code>定义的对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果目标对象不可扩展，则无法定义属性。</p>
+            <p class="calibre1">如果目标对象有一个可配置的属性，则不能添加同名的不可配置属性。</p>
+            <p class="calibre1">如果目标对象有一个不可配置的属性，则不能添加同名的可配置属性。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_209" class="calibre15">9.2.5
+          <code class="calibre26">getOwnPropertyDescriptor()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">getOwnPropertyDescriptor()</code>捕获器会在<code class="calibre11">Object.getOwnPropertyDescriptor()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.getOwnPropertyDescriptor()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  getownpropertydescriptor(target, property) {
+    console.log('getownpropertydescriptor()');
+    return reflect.getownpropertydescriptor(...arguments)
+  }
+});
+
+object.getownpropertydescriptor(proxy, 'foo');
+// getownpropertydescriptor()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">getOwnPropertyDescriptor()</code>必须返回对象，或者在属性不存在时返回<code class="calibre11">undefined</code>。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.getOwnPropertyDescriptor(proxy, property)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.getOwnPropertyDescriptor(proxy, property)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果自有的<code class="calibre11">target.property</code>存在且不可配置，则处理程序必须返回一个表示该属性存在的对象。</p>
+            <p class="calibre1">如果自有的<code class="calibre11">target.property</code>存在且可配置，则处理程序必须返回表示该属性可配置的对象。</p>
+            <p class="calibre1">如果自有的<code class="calibre11">target.property</code>存在且<code class="calibre11">target</code>不可扩展，则处理程序必须返回一个表示该属性存在的对象。</p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不存在且<code class="calibre11">target</code>不可扩展，则处理程序必须返回<code class="calibre11">undefined</code>表示该属性不存在。</p>
+            <p class="calibre1">如果<code class="calibre11">target.property</code>不存在，则处理程序不能返回表示该属性可配置的对象。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_210" class="calibre15">9.2.6
+          <code class="calibre26">deleteProperty()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">deleteProperty()</code>捕获器会在<code class="calibre11">delete</code>操作符中被调用。对应的反射API方法为<code class="calibre11">Reflect.deleteProperty()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  deleteproperty(target, property) {
+    console.log('deleteproperty()');
+    return reflect.deleteproperty(...arguments)
+  }
+});
+
+delete proxy.foo
+// deleteproperty()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">deleteProperty()</code>必须返回布尔值，表示删除属性是否成功。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">delete proxy.property</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">delete proxy[property]</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.deleteProperty(proxy, property)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">property</code>：引用的目标对象上的字符串键属性。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果自有的<code class="calibre11">target.property</code>存在且不可配置，则处理程序不能删除这个属性。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_211" class="calibre15">9.2.7
+          <code class="calibre26">ownKeys()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">ownKeys()</code>捕获器会在<code class="calibre11">Object.keys()</code>及类似方法中被调用。对应的反射API方法为<code class="calibre11">Reflect.ownKeys()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  ownkeys(target) {
+    console.log('ownkeys()');
+    return reflect.ownkeys(...arguments)
+  }
+});
+
+object.keys(proxy);
+// ownkeys()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">ownKeys()</code>必须返回包含字符串或符号的可枚举对象。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.getOwnPropertyNames(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.getOwnPropertySymbols(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.keys(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.ownKeys(proxy)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">返回的可枚举对象必须包含<code class="calibre11">target</code>的所有不可配置的自有属性。</p>
+            <p class="calibre1">如果<code class="calibre11">target</code>不可扩展，则返回可枚举对象必须准确地包含自有属性键。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_212" class="calibre15">9.2.8
+          <code class="calibre26">getPrototypeOf()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">getPrototypeOf()</code>捕获器会在<code class="calibre11">Object.getPrototypeOf()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.getPrototypeOf()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  getprototypeof(target) {
+    console.log('getprototypeof()');
+    return reflect.getprototypeof(...arguments)
+  }
+});
+
+object.getprototypeof(proxy);
+// getprototypeof()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">getPrototypeOf()</code>必须返回对象或<code class="calibre11">null</code>。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.getPrototypeOf(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.getPrototypeOf(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy.__proto__</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.prototype.isPrototypeOf(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy instanceof Object</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target</code>不可扩展，则<code class="calibre11">Object.getPrototypeOf(proxy)</code>唯一有效的返回值就是<code class="calibre11">Object.getPrototypeOf(target)</code>的返回值。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_213" class="calibre15">9.2.9
+          <code class="calibre26">setPrototypeOf()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">setPrototypeOf()</code>捕获器会在<code class="calibre11">Object.setPrototypeOf()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.setPrototypeOf()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  setprototypeof(target, prototype) {
+    console.log('setprototypeof()');
+    return reflect.setprototypeof(...arguments)
+  }
+});
+
+object.setprototypeof(proxy, object);
+// setprototypeof()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">setPrototypeOf()</code>必须返回布尔值，表示原型赋值是否成功。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.setPrototypeOf(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.setPrototypeOf(proxy)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">prototype</code>：<code class="calibre11">target</code>的替代原型，如果是顶级原型则为<code class="calibre11">null</code>。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target</code>不可扩展，则唯一有效的<code class="calibre11">prototype</code>参数就是<code class="calibre11">Object.getPrototypeOf(target)</code>的返回值。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_214" class="calibre15">9.2.10
+          <code class="calibre26">isExtensible()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">isExtensible()</code>捕获器会在<code class="calibre11">Object.isExtensible()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.isExtensible()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  isextensible(target) {
+    console.log('isextensible()');
+    return reflect.isextensible(...arguments)
+  }
+});
+
+object.isextensible(proxy);
+// isextensible()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">isExtensible()</code>必须返回布尔值，表示<code class="calibre11">target</code>是否可扩展。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.isExtensible(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.isExtensible(proxy)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">target</code>可扩展，则处理程序必须返回<code class="calibre11">true</code>。</p>
+            <p class="calibre1">如果<code class="calibre11">target</code>不可扩展，则处理程序必须返回<code class="calibre11">false</code>。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_215" class="calibre15">9.2.11
+          <code class="calibre26">preventExtensions()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">preventExtensions()</code>捕获器会在<code class="calibre11">Object.preventExtensions()</code>中被调用。对应的反射API方法为<code class="calibre11">Reflect.preventExtensions()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = {};
+
+const proxy = new proxy(mytarget, {
+  preventextensions(target) {
+    console.log('preventextensions()');
+    return reflect.preventextensions(...arguments)
+  }
+});
+
+object.preventextensions(proxy);
+// preventextensions()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">preventExtensions()</code>必须返回布尔值，表示<code class="calibre11">target</code>是否已经不可扩展。返回非布尔值会被转型为布尔值。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object.preventExtensions(proxy)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.preventExtensions(proxy)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">如果<code class="calibre11">Object.isExtensible(proxy)</code>是<code class="calibre11">false</code>，则处理程序必须返回<code class="calibre11">true</code>。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_216" class="calibre15">9.2.12
+          <code class="calibre26">apply()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">apply()</code>捕获器会在调用函数时中被调用。对应的反射API方法为<code class="calibre11">Reflect.apply()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = () =&gt; {};
+
+const proxy = new proxy(mytarget, {
+  apply(target, thisarg, ...argumentslist) {
+    console.log('apply()');
+    return reflect.apply(...arguments)
+  }
+});
+
+proxy();
+// apply()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">返回值无限制。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">proxy(...argumentsList)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Function.prototype.apply(thisArg, argumentsList)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Function.prototype.call(thisArg, ...argumentsList)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.apply(target, thisArgument, argumentsList)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">thisArg</code>：调用函数时的<code class="calibre11">this</code>参数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">argumentsList</code>：调用函数时的参数列表<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">target</code>必须是一个函数对象。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_217" class="calibre15">9.2.13
+          <code class="calibre26">construct()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">construct()</code>捕获器会在<code class="calibre11">new</code>操作符中被调用。对应的反射API方法为<code class="calibre11">Reflect.construct()</code>。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const mytarget = function() {};
+
+const proxy = new proxy(mytarget, {
+  construct(target, argumentslist, newtarget) {
+    console.log('construct()');
+    return reflect.construct(...arguments)
+  }
+});
+
+new proxy;
+// construct()</code></pre>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">返回值</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">construct()</code>必须返回一个对象。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">拦截的操作</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">new proxy(...argumentsList)</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Reflect.construct(target, argumentsList, newTarget)</code><br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器处理程序参数</strong>
+            </p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">target</code>：目标构造函数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">argumentsList</code>：传给目标构造函数的参数列表。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">newTarget</code>：最初被调用的构造函数。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">捕获器不变式</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">target</code>必须可以用作构造函数。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0066.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0068.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

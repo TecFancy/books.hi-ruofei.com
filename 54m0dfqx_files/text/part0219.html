@@ -1,0 +1,297 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0218.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0220.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_712" class="calibre9">B.4 函数</h2>
+        <p class="calibre1">首先，严格模式要求命名函数参数必须唯一。看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 命名参数重名
+// 非严格模式：没有错误，只有第二个参数有效
+// 严格模式：抛出syntaxerror
+function sum (num, num){
+  // 函数代码
+}</code></pre>
+        <p class="calibre1">在非严格模式下，这个函数声明不会抛出错误。这样可以通过名称访问第二个<code class="calibre11">num</code>，但只能通过<code class="calibre11">arguments</code>访问第一个参数。</p>
+        <p class="calibre1">
+          <code class="calibre11">arguments</code>对象在严格模式下也有一些变化。在非严格模式下，修改命名参数也会修改<code class="calibre11">arguments</code>对象中的值。而在严格模式下，命名参数和<code class="calibre11">arguments</code>是相互独立的。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 修改命名参数的值
+// 非严格模式：arguments会反映变化
+// 严格模式：arguments不会反映变化
+function showvalue(value){
+  value = "foo";
+  alert(value);         // "foo"
+  alert(arguments[0]);  // 非严格模式："foo"
+                        // 严格模式："hi"
+}
+showvalue("hi");</code></pre>
+        <p class="calibre1">在这个例子中，函数<code class="calibre11">showValue()</code>有一个命名参数<code class="calibre11">value</code>。调用这个函数时给它传入参数<code class="calibre11">"Hi"</code>，该值会赋给<code class="calibre11">value</code>。在函数内部，<code class="calibre11">value</code>被修改为<code class="calibre11">"Foo"</code>。在非严格模式下，这样也会修改<code class="calibre11">arguments[0]</code>的值，但在严格模式下则不会。</p>
+        <p class="calibre1">另一个变化是去掉了<code class="calibre11">arguments.callee</code>和<code class="calibre11">arguments.caller</code>。在非严格模式下，它们分别引用函数本身和调用函数。在严格模式下，访问这两个属性中的任何一个都会抛出<code class="calibre11">TypeError</code>。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 访问arguments.callee
+// 非严格模式：没问题
+// 严格模式：抛出typeerror
+function factorial(num){
+  if (num &lt;= 1) {
+    return 1;
+  } else {
+    return num * arguments.callee(num-1)
+  }
+}
+let result = factorial(5);</code></pre>
+        <p class="calibre1">类似地，读或写函数的<code class="calibre11">caller</code>或<code class="calibre11">callee</code>属性也会抛出<code class="calibre11">TypeError</code>。因此对这个例子而言，访问<code class="calibre11">factorial.caller</code>和<code class="calibre11">factorial.callee</code>也会抛出错误。</p>
+        <p class="calibre1">另外，与变量一样，严格模式也限制了函数的命名，不允许函数名为<code class="calibre11">implements</code>、<code class="calibre11">interface</code>、<code class="calibre11">let</code>、<code class="calibre11">package</code>、<code class="calibre11">private</code>、<code class="calibre11">protected</code>、<code class="calibre11">public</code>、<code class="calibre11">static</code>和<code class="calibre11">yield</code>。</p>
+        <p class="calibre1">关于函数的最后一个变化是不允许函数声明，除非它们位于脚本或函数的顶级。这意味着在<code class="calibre11">if</code>语句中声明的函数现在是个语法错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在if语句中声明函数
+// 非严格模式：函数提升至if语句外部
+// 严格模式：抛出syntaxerror
+if (true){
+  function dosomething(){
+    // ...
+  }
+}</code></pre>
+        <p class="calibre1">所有浏览器在非严格模式下都支持这个语法，但在严格模式下则会抛出语法错误。</p>
+        <h3 id="nav_point_713" class="calibre15">B.4.1 函数参数</h3>
+        <p class="calibre1">ES6增加了剩余操作符、解构操作符和默认参数，为函数组织、结构和定义参数提供了强大的支持。ECMAScript 7增加了一条限制，要求使用任何上述先进参数特性的函数内部都不能使用严格模式，否则会抛出错误。不过，全局严格模式还是允许的。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 可以
+function foo(a, b, c) {
+  "use strict";
+}
+
+// 不可以
+function bar(a, b, c='d') {
+  "use strict";
+}
+
+// 不可以
+function baz({a, b, c}) {
+  "use strict";
+}
+
+// 不可以
+function qux(a, b, ...c) {
+  "use strict";
+}</code></pre>
+        <p class="calibre1">ES6增加的这些新特性期待参数与函数体在相同模式下进行解析。如果允许编译指示<code class="calibre11">"use strict"</code>出现在函数体内，JavaScript解析器就需要在解析函数参数之前先检查函数体内是否存在这个编译指示，而这会带来很多问题。为此，ES7规范增加了这个约定，目的是让解析器在解析函数之前就确切知道该使用什么模式。</p>
+        <h3 id="nav_point_714" class="calibre15">B.4.2
+          <code class="calibre26">eval()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">eval()</code>函数在严格模式下也有变化。最大的变化是<code class="calibre11">eval()</code>不会再在包含上下文中创建变量或函数。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用eval()创建变量
+// 非严格模式：警告框显示10
+// 严格模式：调用alert(x)时抛出referenceerror
+function dosomething(){
+  eval("let x = 10");
+  alert(x);
+}</code></pre>
+        <p class="calibre1">以上代码在非严格模式下运行时，会在<code class="calibre11">doSomething()</code>函数内部创建局部变量<code class="calibre11">x</code>，然后<code class="calibre11">alert()</code>会显示这个变量的值。在严格模式下，调用<code class="calibre11">eval()</code>不会在<code class="calibre11">doSomething()</code>中创建变量<code class="calibre11">x</code>，由于<code class="calibre11">x</code>没有声明，<code class="calibre11">alert()</code>会抛出<code class="calibre11">ReferenceError</code>。</p>
+        <p class="calibre1">变量和函数可以在<code class="calibre11">eval()</code>中声明，但它们会位于代码执行期间的一个特殊的作用域里，代码执行完毕就会销毁。因此，以下代码就不会出错：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">"use strict";
+let result = eval("let x = 10, y = 11; x + y");
+alert(result);    // 21</code></pre>
+        <p class="calibre1">这里在<code class="calibre11">eval()</code>中声明了变量<code class="calibre11">x</code>和<code class="calibre11">y</code>，将它们相加后返回得到的结果。变量<code class="calibre11">result</code>会包含<code class="calibre11">x</code>和<code class="calibre11">y</code>相加的结果21，虽然<code class="calibre11">x</code>和<code class="calibre11">y</code>在调用<code class="calibre11">alert()</code>时已经不存在了，但不影响结果的显示。</p>
+        <h3 id="nav_point_715" class="calibre15">B.4.3
+          <code class="calibre26">eval</code>与<code class="calibre26">arguments</code>
+        </h3>
+        <p class="calibre1">严格模式明确不允许使用<code class="calibre11">eval</code>和<code class="calibre11">arguments</code>作为标识符和操作它们的值。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 将eval和arguments重新定义为变量
+// 非严格模式：可以，没有错误
+// 严格模式：抛出syntaxerror
+let eval = 10;
+let arguments = "hello world!";</code></pre>
+        <p class="calibre1">在非严格模式下，可以重写<code class="calibre11">eval</code>和<code class="calibre11">arguments</code>。在严格模式下，这样会导致语法错误。不能用它们作为标识符，这意味着下面这些情况都会抛出语法错误：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">使用<code class="calibre11">let</code>声明；</li>
+          <li class="di_1ji_wu_xu_lie_biao">赋予其他值；</li>
+          <li class="di_1ji_wu_xu_lie_biao">修改其包含的值，如使用<code class="calibre11">++</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">用作函数名；</li>
+          <li class="di_1ji_wu_xu_lie_biao">用作函数参数名；</li>
+          <li class="di_1ji_wu_xu_lie_biao">在<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句中用作异常名称。</li>
+        </ul>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0218.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0220.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

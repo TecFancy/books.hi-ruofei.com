@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0177.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0179.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_575" class="calibre9">24.6 Beacon API</h2>
+        <p class="calibre1">为了把尽量多的页面信息传到服务器，很多分析工具需要在页面生命周期中尽量晚的时候向服务器发送遥测或分析数据。因此，理想的情况下是通过浏览器的<code class="calibre11">unload</code>事件发送网络请求。这个事件表示用户要离开当前页面，不会再生成别的有用信息了。</p>
+        <p class="calibre1">在<code class="calibre11">unload</code>事件触发时，分析工具要停止收集信息并把收集到的数据发给服务器。这时候有一个问题，因为<code class="calibre11">unload</code>事件对浏览器意味着没有理由再发送任何结果未知的网络请求（因为页面都要被销毁了）。例如，在<code class="calibre11">unload</code>事件处理程序中创建的任何异步请求都会被浏览器取消。为此，异步<code class="calibre11">XMLHttpRequest</code>或<code class="calibre11">fetch()</code>不适合这个任务。分析工具可以使用同步<code class="calibre11">XMLHttpRequest</code>强制发送请求，但这样做会导致用户体验问题。浏览器会因为要等待<code class="calibre11">unload</code>事件处理程序完成而延迟导航到下一个页面。</p>
+        <p class="calibre1">为解决这个问题，W3C引入了补充性的Beacon API。这个API给<code class="calibre11">navigator</code>对象增加了一个<code class="calibre11">sendBeacon()</code>方法。这个简单的方法接收一个URL和一个数据有效载荷参数，并会发送一个POST请求。可选的数据有效载荷参数有<code class="calibre11">ArrayBufferView</code>、<code class="calibre11">Blob</code>、<code class="calibre11">DOMString</code>、<code class="calibre11">FormData</code>实例。如果请求成功进入了最终要发送的任务队列，则这个方法返回<code class="calibre11">true</code>，否则返回<code class="calibre11">false</code>。</p>
+        <p class="calibre1">可以像下面这样使用这个方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 发送post请求
+// url: 'https://example.com/analytics-reporting-url'
+// 请求负载：'{foo: "bar"}'
+
+navigator.sendbeacon('https://example.com/analytics-reporting-url', '{foo: "bar"}');</code></pre>
+        <p class="calibre1">这个方法虽然看起来只不过是POST请求的一个语法糖，但它有几个重要的特性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">sendBeacon()</code>并不是只能在页面生命周期末尾使用，而是任何时候都可以使用。</li>
+          <li class="di_1ji_wu_xu_lie_biao">调用<code class="calibre11">sendBeacon()</code>后，浏览器会把请求添加到一个内部的请求队列。浏览器会主动地发送队列中的请求。</li>
+          <li class="di_1ji_wu_xu_lie_biao">浏览器保证在原始页面已经关闭的情况下也会发送请求。</li>
+          <li class="di_1ji_wu_xu_lie_biao">状态码、超时和其他网络原因造成的失败完全是不透明的，不能通过编程方式处理。</li>
+          <li class="di_1ji_wu_xu_lie_biao">信标（beacon）请求会携带调用<code class="calibre11">sendBeacon()</code>时所有相关的cookie。</li>
+        </ul>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0177.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0179.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

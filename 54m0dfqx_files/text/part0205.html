@@ -1,0 +1,570 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0204.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0206.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_684" class="calibre9">A.1 异步迭代</h2>
+        <p class="calibre1">在ECMAScript最近发布的几个版本中，异步执行和迭代器协议是两个极其热门的主题。异步执行用于释放对执行线程的控制以执行慢操作和收回控制，而迭代器协议则涉及为任意对象定义规范顺序。异步迭代只是这两个概念在逻辑上的统一。</p>
+        <p class="calibre1">同步迭代器在每次调用<code class="calibre11">next()</code>时都会返回<code class="calibre11">{ value, done }</code>对象。当然，这要求确定这个对象内容的计算和资源获取在<code class="calibre11">next()</code>调用退出时必须完成，否则这些值就无法确定。在使用<strong class="calibre2">同步</strong>迭代器迭代<strong class="calibre2">异步</strong>确定的值时，主执行线程会被阻塞，以等待异步操作完成。</p>
+        <p class="calibre1">有了异步迭代器，这个问题就迎刃而解了。异步迭代器在每次调用<code class="calibre11">next()</code>时会提供解决为<code class="calibre11">{ value, done }</code>对象的期约。这样，执行线程可以释放并在当前这步循环完成之前执行其他任务。</p>
+        <h3 id="nav_point_685" class="calibre15">A.1.1 创建并使用异步迭代器</h3>
+        <p class="calibre1">要理解异步迭代器，最简单的办法是用它跟同步迭代器进行比较。下面代码中创建了一个简单的<code class="calibre11">Emitter</code>类，该类包含一个同步生成器函数，该函数会产生一个同步迭代器，同步迭代器输出0~4：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class emitter {
+  constructor(max) {
+    this.max = max;
+    this.syncidx = 0;
+  }
+
+  *[symbol.iterator]() {
+    while(this.syncidx &lt; this.max) {
+      yield this.syncidx++;
+    }
+  }
+}
+
+const emitter = new emitter(5);
+
+function synccount() {
+  const synccounter = emitter[symbol.iterator]();
+
+  for (const x of synccounter) {
+    console.log(x);
+  }
+}
+
+synccount();
+// 0
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <p class="calibre1">这个例子之所以可以运行起来，主要是因为迭代器可以立即产生下一个值。假如你不想在确定下一个产生的值时阻塞主线程执行，也可以定义异步迭代器函数，让它产生期约包装的值。</p>
+        <p class="calibre1">为此，要使用迭代器和生成器的异步版本。ECMAScript 2018为此定义了<code class="calibre11">Symbol.asyncIterator</code>，以便定义和调用输出期约的生成器函数。同时，这一版规范还为异步迭代器增加了<code class="calibre11">for-await-of</code>循环，用于使用异步迭代器。</p>
+        <p class="calibre1">相应地，前面的例子可以扩展为同时支持同步和异步迭代：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class emitter {
+  constructor(max) {
+    this.max = max;
+    this.syncidx = 0;
+    this.asyncidx = 0;
+  }
+
+  *[symbol.iterator]() {
+    while(this.syncidx &lt; this.max) {
+      yield this.syncidx++;
+    }
+  }
+
+  async *[symbol.asynciterator]() {
+  // *[symbol.asynciterator]() {
+    while(this.asyncidx &lt; this.max) {
+      // yield new promise((resolve) =&gt; resolve(this.asyncidx++));
+    yield this.asyncidx++
+    }
+  }
+}
+
+const emitter = new emitter(5);
+
+function synccount() {
+  const synccounter = emitter[symbol.iterator]();
+
+  for (const x of synccounter) {
+    console.log(x);
+  }
+}
+
+async function asynccount() {
+  const asynccounter = emitter[symbol.asynciterator]();
+
+  for await(const x of asynccounter) {
+    console.log(x);
+  }
+}
+
+synccount();
+// 0
+// 1
+// 2
+// 3
+// 4
+
+asynccount();
+// 0
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <p class="calibre1">为了加深理解，可以把前面例子中的<strong class="calibre2">同步</strong>生成器传给<code class="calibre11">for-await-of</code>循环：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const emitter = new emitter(5);
+
+async function asynciteratorsynccount() {
+  const synccounter = emitter[symbol.iterator]();
+
+  for await(const x of synccounter) {
+    console.log(x);
+  }
+}
+
+asynciteratorsynccount();
+// 0
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <p class="calibre1">虽然这里迭代的是同步生成器产生的原始值，但<code class="calibre11">for-await-of</code>循环仍像它们被包装在期约中一样处理它们。这说明<code class="calibre11">for-await-of</code>循环可以流畅地处理同步和异步可迭代对象。但是常规<code class="calibre11">for</code>循环就不能处理异步迭代器了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function synciteratorasynccount() {
+  const asynccounter = emitter[symbol.asynciterator]();
+
+  for (const x of asynccounter) {
+    console.log(x);
+  }
+}
+
+synciteratorasynccount();
+// typeerror: asynccounter is not iterable</code></pre>
+        <p class="calibre1">关于异步迭代器，要理解的非常重要的一个概念是<code class="calibre11">Symbol.asyncIterator</code>符号不会改变生成器函数的行为或者消费生成器的方式。注意在前面的例子中，生成器函数加上了<code class="calibre11">async</code>修饰符成为异步函数，又加上了星号成为生成器函数。<code class="calibre11">Symbol.asyncIterator</code>在这里只起一个提示的作用，告诉将来消费这个迭代器的外部结构如<code class="calibre11">for-await-of</code>循环，这个迭代器会返回期约对象的序列。</p>
+        <h3 id="nav_point_686" class="calibre15">A.1.2 理解异步迭代器队列</h3>
+        <p class="calibre1">当然，前面的例子是假想的，因为迭代器返回的期约都会立即解决，所以跟同步迭代器的区别很难看出来。想象一下迭代器返回的期约会在不确定的时间解决，而且它们返回的顺序是乱的。异步迭代器应该尽可能模拟同步迭代器，包括每次迭代时代码的按顺序执行。为此，异步迭代器会维护一个回调队列，以保证早期值的迭代器处理程序总是会在处理晚期值之前完成，即使后面的值早于之前的值解决。</p>
+        <p class="calibre1">为验证这一点，下面的例子中的异步迭代器以随机时长返回期约。异步迭代队列可以保证期约解决的顺序不会干扰迭代顺序。结果应该按顺序打印一组整数（但间隔时间随机）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class emitter {
+  constructor(max) {
+    this.max = max;
+    this.syncidx = 0;
+    this.asyncidx = 0;
+  }
+
+  *[symbol.iterator]() {
+    while(this.syncidx &lt; this.max) {
+      yield this.syncidx++;
+    }
+  }
+  async *[symbol.asynciterator]() {
+    while(this.asyncidx &lt; this.max) {
+      yield new promise((resolve) =&gt; {
+        settimeout(() =&gt; {
+          resolve(this.asyncidx++);
+        }, math.floor(math.random() * 1000));
+      });
+    }
+  }
+}
+
+const emitter = new emitter(5);
+
+function synccount() {
+  const synccounter = emitter[symbol.iterator]();
+
+  for (const x of synccounter) {
+    console.log(x);
+  }
+}
+
+async function asynccount() {
+  const asynccounter = emitter[symbol.asynciterator]();
+
+  for await(const x of asynccounter) {
+    console.log(x);
+  }
+}
+
+synccount();
+// 0
+// 1
+// 2
+// 3
+// 4
+
+asynccount();
+// 0
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <h3 id="nav_point_687" class="calibre15">A.1.3 处理异步迭代器的<code class="calibre26">reject()</code>
+        </h3>
+        <p class="calibre1">因为异步迭代器使用期约来包装返回值，所以必须考虑某个期约被拒绝的情况。由于异步迭代会按顺序完成，而在循环中跳过被拒绝的期间是不合理的。因此，被拒绝的期约会强制退出迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class emitter {
+  constructor(max) {
+    this.max = max;
+    this.asyncidx = 0;
+  }
+
+  async *[symbol.asynciterator]() {
+    while (this.asyncidx &lt; this.max) {
+      if (this.asyncidx &lt; 3) {
+        yield this.asyncidx++;
+      } else {
+        throw 'exited loop';
+      }
+    }
+  }
+}
+
+const emitter = new emitter(5);
+
+async function asynccount() {
+  const asynccounter = emitter[symbol.asynciterator]();
+
+  for await (const x of asynccounter) {
+    console.log(x);
+  }
+}
+
+asynccount();
+// 0
+// 1
+// 2
+// uncaught (in promise) exited loop</code></pre>
+        <h3 id="nav_point_688" class="calibre15">A.1.4 使用<code class="calibre26">next()</code>手动异步迭代</h3>
+        <p class="calibre1">
+          <code class="calibre11">for-await-of</code>循环提供了两个有用的特性：一是利用异步迭代器队列保证按顺序执行，二是隐藏异步迭代器的期约。不过，使用这个循环会隐藏很多底层行为。</p>
+        <p class="calibre1">因为异步迭代器仍遵守迭代器协议，所以可以使用<code class="calibre11">next()</code>逐个遍历异步可迭代对象。如前所述，<code class="calibre11">next()</code>返回的值会包含一个期约，该期约可解决为<code class="calibre11">{ value, done }</code>这样的迭代结果。这意味着必须使用期约API获取方法，同时也意味着可以不使用异步迭代器队列。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const emitter = new emitter(5);
+
+const asynccounter = emitter[symbol.asynciterator]();
+
+console.log(asynccounter.next());
+// promise&lt;{value, done}&gt;</code></pre>
+        <h3 id="nav_point_689" class="calibre15">A.1.5 顶级异步循环</h3>
+        <p class="calibre1">一般来说，包括<code class="calibre11">for-await-of</code>循环在内的异步行为不能出现在异步函数外部。不过，有时候可能确实需要在这样的上下文使用异步行为。为此可以通过创建异步IIFE来达到目的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class emitter {
+  constructor(max) {
+    this.max = max;
+    this.asyncidx = 0;
+  }
+
+  async *[symbol.asynciterator]() {
+    while(this.asyncidx &lt; this.max) {
+      yield new promise((resolve) =&gt; resolve(this.asyncidx++));
+    }
+  }
+}
+
+const emitter = new emitter(5);
+
+(async function() {
+  const asynccounter = emitter[symbol.asynciterator]();
+
+  for await(const x of asynccounter) {
+    console.log(x);
+  }
+})();
+// 0
+// 1
+// 2
+// 3
+// 4</code></pre>
+        <h3 id="nav_point_690" class="calibre15">A.1.6 实现可观察对象</h3>
+        <p class="calibre1">异步迭代器可以耐心等待下一次迭代而不会导致计算成本，那么这也为实现可观察对象（Observable）接口提供了可能。总体上看，这涉及捕获事件，将它们封装在期约中，然后把这些事件提供给迭代器，而处理程序可以利用这些异步迭代器。在某个事件触发时，异步迭代器的下一个期约会解决为该事件。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            可观察对象的话题超出了本书范围，因为它们很大程度上是作为第三方库实现的。有兴趣的读者可以了解一下非常流行的RxJS库。</p>
+        </blockquote>
+        <p class="calibre1">下面这个简单的例子会捕获浏览器事件的可观察流。这需要一个期约的队列，每个期约对应一个事件。该队列也会保持事件生成的顺序，对这种问题来说保持顺序也是合理的。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class observable {
+  constructor() {
+    this.promisequeue = [];
+
+    // 保存用于解决队列中下一个期约的程序
+    this.resolve = null;
+
+    // 把最初的期约推到队列
+    // 该期约会解决为第一个观察到的事件
+    this.enqueue();
+  }
+
+  // 创建新期约，保存其解决方法
+  // 再把它保存到队列中
+  enqueue() {
+    this.promisequeue.push(
+      new promise((resolve) =&gt; this.resolve = resolve));
+  }
+
+  // 从队列前端移除期约
+  // 并返回它
+  dequeue() {
+    return this.promisequeue.shift();
+  }
+}</code></pre>
+        <p class="calibre1">要利用这个期约队列，可以在这个类上定义一个异步生成器方法。该生成器可用于任何类型的事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class observable {
+  constructor() {
+    this.promisequeue = [];
+
+    // 保存用于解决队列中下一个期约的程序
+    this.resolve = null;
+
+    // 把最初的期约推到队列
+    // 该期约会解决为第一个观察到的事件
+    this.enqueue();
+  }
+
+  // 创建新期约，保存其解决方法
+  // 再把它保存到队列中
+  enqueue() {
+    this.promisequeue.push(
+      new promise((resolve) =&gt; this.resolve = resolve));
+  }
+
+  // 从队列前端移除期约
+  // 并返回它
+  dequeue() {
+    return this.promisequeue.shift();
+  }
+
+  async *fromevent (element, eventtype) {
+    // 在有事件生成时，用事件对象来解决队列头部的期约
+    // 同时把另一个期约加入队列
+    element.addeventlistener(eventtype, (event) =&gt; {
+      this.resolve(event);
+      this.enqueue();
+    });
+
+    // 每次解决队列前面的期约
+    // 都会向异步迭代器返回相应的事件对象
+    while (1) {
+      yield await this.dequeue();
+    }
+  }
+}</code></pre>
+        <p class="calibre1">这样，这个类就定义完了。接下来在DOM元素上定义可观察对象就很简单了。假设页面上有一个<code class="calibre11">&lt;button&gt;</code>元素，可以像下面这样捕获该按钮上的一系列<code class="calibre11">click</code>事件，然后在控制台把它们打印出来：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class observable {
+  constructor() {
+    this.promisequeue = [];
+
+    // 保存用于解决队列中下一个期约的程序
+    this.resolve = null;
+
+    // 把最初的期约推到队列
+    // 该期约会解决为第一个观察到的事件
+    this.enqueue();
+  }
+
+  // 创建新期约，保存其解决方法
+  // 再把它保存到队列中
+  enqueue() {
+    this.promisequeue.push(
+      new promise((resolve) =&gt; this.resolve = resolve));
+  }
+
+  // 从队列前端移除期约
+  // 并返回它
+  dequeue() {
+    return this.promisequeue.shift();
+  }
+
+  async *fromevent (element, eventtype) {
+    // 在有事件生成时，用事件对象来解决 队列头部的期约
+    // 同时把另一个期约加入队列
+    element.addeventlistener(eventtype, (event) =&gt; {
+      this.resolve(event);
+      this.enqueue();
+    });
+
+    // 每次解决队列前面的期约
+    // 都会向异步迭代器返回相应的事件对象
+    while (1) {
+      yield await this.dequeue();
+    }
+  }
+}
+
+(async function() {
+  const observable = new observable();
+
+  const button = document.queryselector('button');
+  const mouseclickiterator = observable.fromevent(button, 'click');
+
+  for await (const clickevent of mouseclickiterator) {
+    console.log(clickevent);
+  }
+})();</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0204.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0206.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

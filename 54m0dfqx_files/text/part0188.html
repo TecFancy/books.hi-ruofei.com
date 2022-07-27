@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0187.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0189.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_608" class="calibre9">26.1 理解模块模式</h2>
+        <p class="calibre1">将代码拆分成独立的块，然后再把这些块连接起来可以通过模块模式来实现。这种模式背后的思想很简单：把逻辑分块，各自封装，相互独立，每个块自行决定对外暴露什么，同时自行决定引入执行哪些外部代码。不同的实现和特性让这些基本的概念变得有点复杂，但这个基本的思想是所有JavaScript模块系统的基础。</p>
+        <h3 id="nav_point_609" class="calibre15">26.1.1 模块标识符</h3>
+        <p class="calibre1">模块标识符是所有模块系统通用的概念。模块系统本质上是键/值实体，其中每个模块都有个可用于引用它的标识符。这个标识符在模拟模块的系统中可能是字符串，在原生实现的模块系统中可能是模块文件的实际路径。</p>
+        <p class="calibre1">有的模块系统支持明确声明模块的标识，还有的模块系统会隐式地使用文件名作为模块标识符。不管怎样，完善的模块系统一定不会存在模块标识冲突的问题，且系统中的任何模块都应该能够无歧义地引用其他模块。</p>
+        <p class="calibre1">将模块标识符解析为实际模块的过程要根据模块系统对标识符的实现。原生浏览器模块标识符必须提供实际JavaScript文件的路径。除了文件路径，Node.js还会搜索node_modules目录，用标识符去匹配包含index.js的目录。</p>
+        <h3 id="nav_point_610" class="calibre15">26.1.2 模块依赖</h3>
+        <p class="calibre1">模块系统的核心是管理依赖。指定依赖的模块与周围的环境会达成一种契约。本地模块向模块系统声明一组外部模块（依赖），这些外部模块对于当前模块正常运行是必需的。模块系统检视这些依赖，进而保证这些外部模块能够被加载并在本地模块运行时初始化所有依赖。</p>
+        <p class="calibre1">每个模块都会与某个唯一的标识符关联，该标识符可用于检索模块。这个标识符通常是JavaScript文件的路径，但在某些模块系统中，这个标识符也可以是在模块本身内部声明的命名空间路径字符串。</p>
+        <h3 id="nav_point_611" class="calibre15">26.1.3 模块加载</h3>
+        <p class="calibre1">加载模块的概念派生自依赖契约。当一个外部模块被指定为依赖时，本地模块期望在执行它时，依赖已准备好并已初始化。</p>
+        <p class="calibre1">在浏览器中，加载模块涉及几个步骤。加载模块涉及执行其中的代码，但必须是在所有依赖都加载并执行之后。如果浏览器没有收到依赖模块的代码，则必须发送请求并等待网络返回。收到模块代码之后，浏览器必须确定刚收到的模块是否也有依赖。然后递归地评估并加载所有依赖，直到所有依赖模块都加载完成。只有整个依赖图都加载完成，才可以执行入口模块。</p>
+        <h3 id="nav_point_612" class="calibre15">26.1.4 入口</h3>
+        <p class="calibre1">相互依赖的模块必须指定一个模块作为入口（entry point），这也是代码执行的起点。这是理所当然的，因为JavaScript是顺序执行的，并且是单线程的，所以代码必须有执行的起点。入口模块也可能依赖其他模块，其他模块同样可能有自己的依赖。于是模块化JavaScript应用程序的所有模块会构成依赖图。</p>
+        <p class="calibre1">可以通过有向图来表示应用程序中各模块的依赖关系。图26-1展示了一个想象中应用程序的模块依赖关系图。</p>
+        <p class="calibre7"><img src="../images/00077.gif" alt="" width="55%" class="calibre44"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 26-1</strong>
+        </p>
+        <p class="calibre1">图中的箭头表示依赖方向：模块A依赖模块B和模块C，模块B依赖模块D和模块E，模块C依赖模块E。因为模块必须在依赖加载完成后才能被加载，所以这个应用程序的入口模块A必须在应用程序的其他部分加载后才能执行。</p>
+        <p class="calibre1">在JavaScript中，“加载”的概念可以有多种实现方式。因为模块是作为包含将立即执行的JavaScript代码的文件实现的，所以一种可能是按照依赖图的要求依次请求各个脚本。对于前面的应用程序来说，下面的脚本请求顺序能够满足依赖图的要求：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;script src="modulee.js"&gt;&lt;/script&gt;
+&lt;script src="moduled.js"&gt;&lt;/script&gt;
+&lt;script src="modulec.js"&gt;&lt;/script&gt;
+&lt;script src="moduleb.js"&gt;&lt;/script&gt;
+&lt;script src="modulea.js"&gt;&lt;/script&gt;</code></pre>
+        <p class="calibre1">模块加载是“阻塞的”，这意味着前置操作必须完成才能执行后续操作。每个模块在自己的代码到达浏览器之后完成加载，此时其依赖已经加载并初始化。不过，这个策略存在一些性能和复杂性问题。为一个应用程序而按顺序加载五个JavaScript文件并不理想，并且手动管理正确的加载顺序也颇为棘手。</p>
+        <h3 id="nav_point_613" class="calibre15">26.1.5 异步依赖</h3>
+        <p class="calibre1">因为JavaScript可以异步执行，所以如果能按需加载就好了。换句话说，可以让JavaScript通知模块系统在必要时加载新模块，并在模块加载完成后提供回调。在代码层面，可以通过下面的伪代码来实现：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在模块a里面
+load('moduleb').then(function(moduleb) {
+  moduleb.dostuff();
+});</code></pre>
+        <p class="calibre1">模块A的代码使用了<code class="calibre11">moduleB</code>标识符向模块系统请求加载模块B，并以模块B作为参数调用回调。模块B可能已加载完成，也可能必须重新请求和初始化，但这里的代码并不关心。这些事情都交给了模块加载器去负责。</p>
+        <p class="calibre1">如果重写前面的应用程序，只使用动态模块加载，那么使用一个<code class="calibre11">&lt;script&gt;</code>标签即可完成模块A的加载。模块A会按需请求模块文件，而不会生成必需的依赖列表。这样有几个好处，其中之一就是性能，因为在页面加载时只需同步加载一个文件。</p>
+        <p class="calibre1">这些脚本也可以分离出来，比如给<code class="calibre11">&lt;script&gt;</code>标签应用<code class="calibre11">defer</code>或<code class="calibre11">async</code>属性，再加上能够识别异步脚本何时加载和初始化的逻辑。此行为将模拟在ES6模块规范中实现的行为，本章稍后会对此进行讨论。</p>
+        <h3 id="nav_point_614" class="calibre15">26.1.6 动态依赖</h3>
+        <p class="calibre1">有些模块系统要求开发者在模块开始列出所有依赖，而有些模块系统则允许开发者在程序结构中动态添加依赖。动态添加的依赖有别于模块开头列出的常规依赖，这些依赖必须在模块执行前加载完毕。</p>
+        <p class="calibre1">下面是动态依赖加载的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (loadcondition) {
+  require('./modulea');
+}</code></pre>
+        <p class="calibre1">在这个模块中，是否加载<code class="calibre11">moduleA</code>是运行时确定的。加载<code class="calibre11">moduleA</code>时可能是阻塞的，也可能导致执行，且只有模块加载后才会继续。无论怎样，模块内部的代码在<code class="calibre11">moduleA</code>加载前都不能执行，因为<code class="calibre11">moduleA</code>的存在是后续模块行为正确的关键。</p>
+        <p class="calibre1">动态依赖可以支持更复杂的依赖关系，但代价是增加了对模块进行静态分析的难度。</p>
+        <h3 id="nav_point_615" class="calibre15">26.1.7 静态分析</h3>
+        <p class="calibre1">模块中包含的发送到浏览器的JavaScript代码经常会被静态分析，分析工具会检查代码结构并在不实际执行代码的情况下推断其行为。对静态分析友好的模块系统可以让模块打包系统更容易将代码处理为较少的文件。它还将支持在智能编辑器里智能自动完成。</p>
+        <p class="calibre1">更复杂的模块行为，例如动态依赖，会导致静态分析更困难。不同的模块系统和模块加载器具有不同层次的复杂度。至于模块的依赖，额外的复杂度会导致相关工具更难预测模块在执行时到底需要哪些依赖。</p>
+        <h3 id="nav_point_616" class="calibre15">26.1.8 循环依赖</h3>
+        <p class="calibre1">要构建一个没有循环依赖的JavaScript应用程序几乎是不可能的，因此包括CommonJS、AMD和ES6在内的所有模块系统都支持循环依赖。在包含循环依赖的应用程序中，模块加载顺序可能会出人意料。不过，只要恰当地封装模块，使它们没有副作用，加载顺序就应该不会影响应用程序的运行。</p>
+        <p class="calibre1">在下面的模块代码中（其中使用了模块中立的伪代码），任何模块都可以作为入口模块，即使依赖图中存在循环依赖：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">require('./moduled');
+require('./moduleb');
+
+console.log('modulea');
+require('./modulea');
+require('./modulec');
+
+console.log('moduleb');
+require('./moduleb');
+require('./moduled');
+
+console.log('modulec');
+
+require('./modulea');
+require('./modulec');
+
+console.log('moduled');</code></pre>
+        <p class="calibre1">修改主模块中用到的模块会改变依赖加载顺序。如果<code class="calibre11">moduleA</code>最先加载，则会打印如下输出，这表示模块加载完成时的绝对顺序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">moduleb
+modulec
+moduled
+modulea</code></pre>
+        <p class="calibre1">以上模块加载顺序可以用图26-2的依赖图来表示，其中加载器会执行深度优先的依赖加载：</p>
+        <p class="calibre7"><img src="../images/00033.gif" alt="" width="30%" class="calibre46"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 26-2</strong>
+        </p>
+        <p class="calibre1">如果<code class="calibre11">moduleC</code>最先加载，则会打印如下输出，这表示模块加载的绝对顺序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">moduled
+modulea
+moduleb
+modulec</code></pre>
+        <p class="calibre1">以上模块加载顺序可以通过图26-3的依赖图来表示，其中加载器会执行深度优先的依赖加载：</p>
+        <p class="calibre7"><img src="../images/00058.gif" alt="" width="30%" class="calibre46"/></p>
+        <p class="calibre1">
+          <strong class="calibre2">图 26-3</strong>
+        </p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0187.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0189.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

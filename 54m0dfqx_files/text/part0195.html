@@ -1,0 +1,1226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0194.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0196.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_638" class="calibre9">27.2 专用工作者线程</h2>
+        <p class="calibre1">
+          <strong class="calibre2">专用工作者线程</strong>是最简单的Web工作者线程，网页中的脚本可以创建专用工作者线程来执行在页面线程之外的其他任务。这样的线程可以与父页面交换信息、发送网络请求、执行文件输入/输出、进行密集计算、处理大量数据，以及实现其他不适合在页面执行线程里做的任务（否则会导致页面响应迟钝）。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在使用工作者线程时，脚本在哪里执行、在哪里加载是非常重要的概念。除非另有说明，否则本章假定main.js是从https://example.com域的根路径加载并执行的顶级脚本。</p>
+        </blockquote>
+        <h3 id="nav_point_639" class="calibre15">27.2.1 专用工作者线程的基本概念</h3>
+        <p class="calibre1">可以把专用工作者线程称为<strong class="calibre2">后台脚本</strong>（background script）。JavaScript线程的各个方面，包括生命周期管理、代码路径和输入/输出，都由初始化线程时提供的脚本来控制。该脚本也可以再请求其他脚本，但一个线程总是从一个脚本源开始。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">创建专用工作者线程</strong>
+            </p>
+            <p class="calibre1">创建专用工作者线程最常见的方式是加载JavaScript文件。把文件路径提供给<code class="calibre11">Worker</code>构造函数，然后构造函数再在后台异步加载脚本并实例化工作者线程。传给构造函数的文件路径可以是多种形式。</p>
+            <p class="calibre1">下面的代码演示了如何创建空的专用工作者线程：</p>
+            <p class="calibre1">
+              <strong class="calibre2">emptyWorker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 空的js工作者线程文件</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(location.href); // "https://example.com/"
+const worker = new worker(location.href + 'emptyworker.js');
+console.log(worker);        // worker {}</code></pre>
+            <p class="calibre1">这个例子非常简单，但涉及几个基本概念。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">emptyWorker.js文件是从绝对路径加载的。根据应用程序的结构，使用绝对URL经常是多余的。</li>
+              <li class="di_1ji_wu_xu_lie_biao">这个文件是在后台加载的，工作者线程的初始化完全独立于main.js。</li>
+              <li class="di_1ji_wu_xu_lie_biao">工作者线程本身存在于一个独立的JavaScript环境中，因此main.js必须以<code class="calibre11">Worker</code>对象为代理实现与工作者线程通信。在上面的例子中，该对象被赋值给了<code class="calibre11">worker</code>变量。</li>
+              <li class="di_1ji_wu_xu_lie_biao">虽然相应的工作者线程可能还不存在，但该<code class="calibre11">Worker</code>对象已在原始环境中可用了。</li>
+            </ul>
+            <p class="calibre1">前面的例子可修改为使用相对路径。不过，这要求main.js必须与emptyWorker.js在同一个路径下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./emptyworker.js');
+console.log(worker);   // worker {}</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">工作者线程安全限制</strong>
+            </p>
+            <p class="calibre1">工作者线程的脚本文件只能从与父页面相同的源加载。从其他源加载工作者线程的脚本文件会导致错误，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 尝试基于https://example.com/worker.js创建工作者线程
+const sameoriginworker = new worker('./worker.js');
+
+// 尝试基于https://untrusted.com/worker.js创建工作者线程
+const remoteoriginworker = new worker('https://untrusted.com/worker.js');
+
+// error: uncaught domexception: failed to construct 'worker':
+// script at https://untrusted.com/main.js cannot be accessed
+// from origin https://example.com</code></pre>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                不能使用非同源脚本创建工作者线程，并不影响执行其他源的脚本。在工作者线程内部，使用<code class="calibre11">importScripts()</code>可以加载其他源的脚本。本章稍后会介绍。</p>
+            </blockquote>
+            <p class="calibre1">基于加载脚本创建的工作者线程不受文档的内容安全策略限制，因为工作者线程在与父文档不同的上下文中运行。不过，如果工作者线程加载的脚本带有全局唯一标识符（与加载自一个二进制大文件一样），就会受父文档内容安全策略的限制。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                27.2.5节会介绍基于二进制大文件创建工作者线程。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用<code class="calibre11">Worker</code>对象</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Worker()</code>构造函数返回的<code class="calibre11">Worker</code>对象是与刚创建的专用工作者线程通信的连接点。它可用于在工作者线程和父上下文间传输信息，以及捕获专用工作者线程发出的事件。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                要管理好使用<code class="calibre11">Worker()</code>创建的每个<code class="calibre11">Worker</code>对象。在终止工作者线程之前，它不会被垃圾回收，也不能通过编程方式恢复对之前<code class="calibre11">Worker</code>对象的引用。</p>
+            </blockquote>
+            <p class="calibre1">
+              <code class="calibre11">Worker</code>对象支持下列事件处理程序属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onerror</code>：在工作者线程中发生<code class="calibre11">ErrorEvent</code>类型的错误事件时会调用指定给该属性的处理程序。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">该事件会在工作者线程中抛出错误时发生。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">该事件也可以通过<code class="calibre11">worker.addEventListener('error', handler)</code>的形式处理。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onmessage</code>：在工作者线程中发生<code class="calibre11">MessageEvent</code>类型的消息事件时会调用指定给该属性的处理程序。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">该事件会在工作者线程向父上下文发送消息时发生。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">该事件也可以通过使用<code class="calibre11">worker.addEventListener('message', handler)</code>处理。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onmessageerror</code>：在工作者线程中发生<code class="calibre11">MessageEvent</code>类型的错误事件时会调用指定给该属性的处理程序。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">该事件会在工作者线程收到无法反序列化的消息时发生。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">该事件也可以通过使用<code class="calibre11">worker.addEventListener('messageerror', handler)</code>处理。</li>
+                </ul>
+              </li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">Worker</code>对象还支持下列方法。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">postMessage()</code>：用于通过异步消息事件向工作者线程发送信息。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">terminate()</code>：用于立即终止工作者线程。没有为工作者线程提供清理的机会，脚本会突然停止。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">DedicatedWorkerGlobalScope</code>
+              </strong>
+            </p>
+            <p class="calibre1">在专用工作者线程内部，全局作用域是<code class="calibre11">DedicatedWorkerGlobalScope</code>的实例。因为这继承自<code class="calibre11">WorkerGlobalScope</code>，所以包含它的所有属性和方法。工作者线程可以通过<code class="calibre11">self</code>关键字访问该全局作用域。</p>
+            <p class="calibre1">
+              <strong class="calibre2">globalScopeWorker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('inside worker:', self);</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./globalscopeworker.js');
+
+console.log('created worker:', worker);
+
+// created worker: worker {}
+
+// inside worker: dedicatedworkerglobalscope {}</code></pre>
+            <p class="calibre1">如此例所示，顶级脚本和工作者线程中的<code class="calibre11">console</code>对象都将写入浏览器控制台，这对于调试非常有用。因为工作者线程具有不可忽略的启动延迟，所以即使<code class="calibre11">Worker</code>对象存在，工作者线程的日志也会在主线程的日志之后打印出来。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                这里两个独立的JavaScript线程都在向一个<code class="calibre11">console</code>对象发消息，该对象随后将消息序列化并在浏览器控制台打印出来。浏览器从两个不同的JavaScript线程收到消息，并按照自己认为合适的顺序输出这些消息。为此，在多线程应用程序中使用日志确定操作顺序时必须要当心。</p>
+            </blockquote>
+            <p class="calibre1">
+              <code class="calibre11">DedicatedWorkerGlobalScope</code>在<code class="calibre11">WorkerGlobalScope</code>基础上增加了以下属性和方法。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">name</code>：可以提供给<code class="calibre11">Worker</code>构造函数的一个可选的字符串标识符。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">postMessage()</code>：与<code class="calibre11">worker.postMessage()</code>对应的方法，用于从工作者线程内部向父上下文发送消息。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">close()</code>：与<code class="calibre11">worker.terminate()</code>对应的方法，用于立即终止工作者线程。没有为工作者线程提供清理的机会，脚本会突然停止。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">importScripts()</code>：用于向工作者线程中导入任意数量的脚本。</li>
+            </ul>
+          </li>
+        </ol>
+        <h3 id="nav_point_640" class="calibre15">27.2.2 专用工作者线程与隐式<code class="calibre26">MessagePorts</code>
+        </h3>
+        <p class="calibre1">专用工作者线程的<code class="calibre11">Worker</code>对象和<code class="calibre11">DedicatedWorkerGlobalScope</code>与<code class="calibre11">MessagePorts</code>有一些相同接口处理程序和方法：<code class="calibre11">onmessage</code>、<code class="calibre11">onmessageerror</code>、<code class="calibre11">close()</code>和<code class="calibre11">postMessage()</code>。这不是偶然的，因为专用工作者线程隐式使用了<code class="calibre11">MessagePorts</code>在两个上下文之间通信。</p>
+        <p class="calibre1">父上下文中的<code class="calibre11">Worker</code>对象和<code class="calibre11">DedicatedWorkerGlobalScope</code>实际上融合了<code class="calibre11">MessagePort</code>，并在自己的接口中分别暴露了相应的处理程序和方法。换句话说，消息还是通过<code class="calibre11">MessagePort</code>发送，只是没有直接使用<code class="calibre11">MessagePort</code>而已。</p>
+        <p class="calibre1">也有不一致的地方，比如<code class="calibre11">首页()</code>和<code class="calibre11">close()</code>约定。专用工作者线程会自动发送排队的消息，因此<code class="calibre11">首页()</code>也就没有必要了。另外，<code class="calibre11">close()</code>在专用工作者线程的上下文中没有意义，因为这样关闭<code class="calibre11">MessagePort</code>会使工作者线程孤立。因此，在工作者线程内部调用<code class="calibre11">close()</code>（或在外部调用<code class="calibre11">terminate()</code>）不仅会关闭<code class="calibre11">MessagePort</code>，也会终止线程。</p>
+        <h3 id="nav_point_641" class="calibre15">27.2.3 专用工作者线程的生命周期</h3>
+        <p class="calibre1">调用<code class="calibre11">Worker()</code>构造函数是一个专用工作者线程生命的起点。调用之后，它会初始化对工作者线程脚本的请求，并把<code class="calibre11">Worker</code>对象返回给父上下文。虽然父上下文中可以立即使用这个<code class="calibre11">Worker</code>对象，但与之关联的工作者线程可能还没有创建，因为存在请求脚本的网格延迟和初始化延迟。</p>
+        <p class="calibre1">一般来说，专用工作者线程可以非正式区分为处于下列三个状态：<strong class="calibre2">初始化</strong>（initializing）、<strong class="calibre2">活动</strong>（active）和<strong class="calibre2">终止</strong>（terminated）。这几个状态对其他上下文是不可见的。虽然<code class="calibre11">Worker</code>对象可能会存在于父上下文中，但也无法通过它确定工作者线程当前是处理初始化、活动还是终止状态。换句话说，与活动的专用工作者线程关联的<code class="calibre11">Worker</code>对象和与终止的专用工作者线程关联的<code class="calibre11">Worker</code>对象无法分别。</p>
+        <p class="calibre1">初始化时，虽然工作者线程脚本尚未执行，但可以先把要发送给工作者线程的消息加入队列。这些消息会等待工作者线程的状态变为活动，再把消息添加到它的消息队列。下面的代码演示了这个过程。</p>
+        <p class="calibre1">
+          <strong class="calibre2">initializingWorker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.addeventlistener('message', ({data}) =&gt; console.log(data));</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./initializingworker.js');
+
+// worker可能仍处于初始化状态
+// 但postmessage()数据可以正常处理
+worker.postmessage('foo');
+worker.postmessage('bar');
+worker.postmessage('baz');
+
+// foo
+// bar
+// baz</code></pre>
+        <p class="calibre1">创建之后，专用工作者线程就会伴随页面的整个生命期而存在，除非自我终止（<code class="calibre11">self.close()</code>）或通过外部终止（<code class="calibre11">worker.terminate()</code>）。即使线程脚本已运行完成，线程的环境仍会存在。只要工作者线程仍存在，与之关联的<code class="calibre11">Worker</code>对象就不会被当成垃圾收集掉。</p>
+        <p class="calibre1">自我终止和外部终止最终都会执行相同的工作者线程终止例程。来看下面的例子，其中工作者线程在发送两条消息中间执行了自我终止：</p>
+        <p class="calibre1">
+          <strong class="calibre2">closeWorker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.postmessage('foo');
+self.close();
+self.postmessage('bar');
+settimeout(() =&gt; self.postmessage('baz'), 0);</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./closeworker.js');
+worker.onmessage = ({data}) =&gt; console.log(data);
+
+// foo
+// bar</code></pre>
+        <p class="calibre1">虽然调用了<code class="calibre11">close()</code>，但显然工作者线程的执行并没有立即终止。<code class="calibre11">close()</code>在这里会通知工作者线程取消事件循环中的所有任务，并阻止继续添加新任务。这也是为什么<code class="calibre11">"baz"</code>没有打印出来的原因。工作者线程<strong class="calibre2">不</strong>需要执行同步停止，因此在父上下文的事件循环中处理的<code class="calibre11">"bar"</code>仍会打印出来。</p>
+        <p class="calibre1">下面来看外部终止的例子。</p>
+        <p class="calibre1">
+          <strong class="calibre2">terminateWorker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; console.log(data);</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./terminateworker.js');
+
+// 给1000毫秒让工作者线程初始化
+settimeout(() =&gt; {
+  worker.postmessage('foo');
+  worker.terminate();
+  worker.postmessage('bar');
+  settimeout(() =&gt; worker.postmessage('baz'), 0);
+}, 1000);
+
+// foo</code></pre>
+        <p class="calibre1">这里，外部先给工作者线程发送了带<code class="calibre11">"foo"</code>的<code class="calibre11">postMessage</code>，这条消息可以在外部终止之前处理。一旦调用了<code class="calibre11">terminate()</code>，工作者线程的消息队列就会被清理并锁住，这也是只是打印<code class="calibre11">"foo"</code>的原因。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">close()</code>和<code class="calibre11">terminate()</code>是幂等操作，多次调用没有问题。这两个方法仅仅是将<code class="calibre11">Worker</code>标记为<code class="calibre11">teardown</code>，因此多次调用不会有不好的影响。</p>
+        </blockquote>
+        <p class="calibre1">在整个生命周期中，一个专用工作者线程只会关联一个网页（Web工作者线程规范称其为一个<strong class="calibre2">文档</strong>）。除非明确终止，否则只要关联文档存在，专用工作者线程就会存在。如果浏览器离开网页（通过导航或关闭标签页或关闭窗口），它会将与其关联的工作者线程标记为终止，它们的执行也会立即停止。</p>
+        <h3 id="nav_point_642" class="calibre15">27.2.4 配置<code class="calibre26">Worker</code>选项</h3>
+        <p class="calibre1">
+          <code class="calibre11">Worker()</code>构造函数允许将可选的配置对象作为第二个参数。该配置对象支持下列属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">name</code>：可以在工作者线程中通过<code class="calibre11">self.name</code>读取到的字符串标识符。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">type</code>：表示加载脚本的运行方式，可以是<code class="calibre11">"classic"</code>或<code class="calibre11">"module"</code>。<code class="calibre11">"classic"</code>将脚本作为常规脚本来执行，<code class="calibre11">"module"</code>将脚本作为模块来执行。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">credentials</code>：在<code class="calibre11">type</code>为<code class="calibre11">"module"</code>时，指定如何获取与传输凭证数据相关的工作者线程模块脚本。值可以是<code class="calibre11">"omit"</code>、<code class="calibre11">"same-orign"</code>或<code class="calibre11">"include"</code>。这些选项与<code class="calibre11">fetch()</code>的凭证选项相同。在<code class="calibre11">type</code>为<code class="calibre11">"classic"</code>时，默认为<code class="calibre11">"omit"</code>。</li>
+        </ul>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            有的现代浏览器还不完全支持模块工作者线程或可能需要修改标志才能支持。</p>
+        </blockquote>
+        <h3 id="nav_point_643" class="calibre15">27.2.5 在JavaScript行内创建工作者线程</h3>
+        <p class="calibre1">工作者线程需要基于脚本文件来创建，但这并不意味着该脚本必须是远程资源。专用工作者线程也可以通过<code class="calibre11">Blob</code>对象URL在行内脚本创建。这样可以更快速地初始化工作者线程，因为没有网络延迟。</p>
+        <p class="calibre1">下面展示了一个在行内创建工作者线程的例子。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建要执行的javascript代码字符串
+const workerscript = `
+  self.onmessage = ({data}) =&gt; console.log(data);
+`;
+
+// 基于脚本字符串生成blob对象
+const workerscriptblob = new blob([workerscript]);
+
+// 基于blob实例创建对象url
+const workerscriptbloburl = url.createobjecturl(workerscriptblob);
+
+// 基于对象url创建专用工作者线程
+const worker = new worker(workerscriptbloburl);
+
+worker.postmessage('blob worker script');
+// blob worker script</code></pre>
+        <p class="calibre1">在这个例子中，通过脚本字符串创建了<code class="calibre11">Blob</code>，然后又通过<code class="calibre11">Blob</code>创建了对象URL，最后把对象URL传给了<code class="calibre11">Worker()</code>构造函数。该构造函数同样创建了专用工作者线程。</p>
+        <p class="calibre1">如果把所有代码写在一块，可以浓缩为这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker(url.createobjecturl(new blob([`self.onmessage =
+({data}) =&gt; console.log(data);`])));
+
+worker.postmessage('blob worker script');
+// blob worker script</code></pre>
+        <p class="calibre1">工作者线程也可以利用函数序列化来初始化行内脚本。这是因为函数的<code class="calibre11">toString()</code>方法返回函数代码的字符串，而函数可以在父上下文中定义但在子上下文中执行。来看下面这个简单的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function fibonacci(n) {
+  return n &lt; 1 ? 0
+      : n &lt;= 2 ? 1
+      : fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+const workerscript = `
+  self.postmessage(
+    (${fibonacci.tostring()})(9)
+  );
+`;
+
+const worker = new worker(url.createobjecturl(new blob([workerscript])));
+
+worker.onmessage = ({data}) =&gt; console.log(data);
+
+// 34</code></pre>
+        <p class="calibre1">这里有意使用了斐波那契数列的实现，将其序列化之后传给了工作者线程。该函数作为IIFE调用并传递参数，结果则被发送回主线程。虽然计算斐波那契数列比较耗时，但所有计算都会委托到工作者线程，因此并不会影响父上下文的性能。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            像这样序列化函数有个前提，就是函数体内不能使用通过闭包获得的引用，也包括全局变量，比如<code class="calibre11">window</code>，因为这些引用在工作者线程中执行时会出错。</p>
+        </blockquote>
+        <h3 id="nav_point_644" class="calibre15">27.2.6 在工作者线程中动态执行脚本</h3>
+        <p class="calibre1">工作者线程中的脚本并非铁板一块，而是可以使用<code class="calibre11">importScripts()</code>方法通过编程方式加载和执行任意脚本。该方法可用于全局<code class="calibre11">Worker</code>对象。这个方法会加载脚本并按照加载顺序同步执行。比如，下面的例子加载并执行了两个脚本：</p>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+
+// importing scripts
+// scripta executes
+// scriptb executes
+// scripts imported</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">scriptA.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('scripta executes');</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">scriptB.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('scriptb executes');</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">worker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('importing scripts');
+
+importscripts('./scripta.js');
+importscripts('./scriptb.js');
+
+console.log('scripts imported');</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">importScripts()</code>方法可以接收任意数量的脚本作为参数。浏览器下载它们的顺序没有限制，但执行则会严格按照它们在参数列表的顺序进行。因此，下面的代码与前面的效果一样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('importing scripts');
+
+importscripts('./scripta.js', './scriptb.js');
+
+console.log('scripts imported');</code></pre>
+        <p class="calibre1">脚本加载受到常规CORS的限制，但在工作者线程内部可以请求来自任何源的脚本。这里的脚本导入策略类似于使用生成的<code class="calibre11">&lt;script&gt;</code>标签动态加载脚本。在这种情况下，所有导入的脚本也会共享作用域。下面的代码演示了这个事实：</p>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js', {name: 'foo'});
+
+// importing scripts in foo with bar
+// scripta executes in foo with bar
+// scriptb executes in foo with bar
+// scripts imported</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">scriptA.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(`scripta executes in ${self.name} with ${globaltoken}`);</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">scriptB.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(`scriptb executes in ${self.name} with ${globaltoken}`);</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">worker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const globaltoken = 'bar';
+
+console.log(`importing scripts in ${self.name} with ${globaltoken}`);
+
+importscripts('./scripta.js', './scriptb.js');
+
+console.log('scripts imported');</code></pre>
+        <h3 id="nav_point_645" class="calibre15">27.2.7 委托任务到子工作者线程</h3>
+        <p class="calibre1">有时候可能需要在工作者线程中再创建子工作者线程。在有多个CPU核心的时候，使用多个子工作者线程可以实现并行计算。使用多个子工作者线程前要考虑周全，确保并行计算的投入确实能够得到收益，毕竟同时运行多个子线程会有很大计算成本。</p>
+        <p class="calibre1">除了路径解析不同，创建子工作者线程与创建普通工作者线程是一样的。子工作者线程的脚本路径根据父工作者线程而不是相对于网页来解析。来看下面的例子（注意额外的js目录）：</p>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./js/worker.js');
+
+// worker
+// subworker</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">js/worker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('worker');
+
+const worker = new worker('./subworker.js');</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">js/subworker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log('subworker');</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            顶级工作者线程的脚本和子工作者线程的脚本都必须从与主页相同的源加载。</p>
+        </blockquote>
+        <h3 id="nav_point_646" class="calibre15">27.2.8 处理工作者线程错误</h3>
+        <p class="calibre1">如果工作者线程脚本抛出了错误，该工作者线程沙盒可以阻止它打断父线程的执行。如下例所示，其中的<code class="calibre11">try</code>/<code class="calibre11">catch</code>块不会捕获到错误：</p>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  const worker = new worker('./worker.js');
+  console.log('no error');
+} catch(e) {
+  console.log('caught error');
+}
+
+// no error</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">worker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw error('foo');</code></pre>
+        <p class="calibre1">不过，相应的错误事件仍然会冒泡到工作者线程的全局上下文，因此可以通过在<code class="calibre11">Worker</code>对象上设置错误事件侦听器访问到。下面看这个例子：</p>
+        <p class="calibre1">
+          <strong class="calibre2">main.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+worker.onerror = console.log;
+
+// errorevent {message: "uncaught error: foo"}</code></pre>
+        <p class="calibre1">
+          <strong class="calibre2">worker.js</strong>
+        </p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw error('foo');</code></pre>
+        <h3 id="nav_point_647" class="calibre15">27.2.9 与专用工作者线程通信</h3>
+        <p class="calibre1">与工作者线程的通信都是通过异步消息完成的，但这些消息可以有多种形式。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用<code class="calibre11">postMessage()</code>
+              </strong>
+            </p>
+            <p class="calibre1">最简单也最常用的形式是使用<code class="calibre11">postMessage()</code>传递序列化的消息。下面来看一个计算阶乘的例子：</p>
+            <p class="calibre1">
+              <strong class="calibre2">factorialWorker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function factorial(n) {
+  let result = 1;
+  while(n) { result *= n--; }
+  return result;
+}
+
+self.onmessage = ({data}) =&gt; {
+  self.postmessage(`${data}! = ${factorial(data)}`);
+};</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const factorialworker = new worker('./factorialworker.js');
+
+factorialworker.onmessage = ({data}) =&gt; console.log(data);
+
+factorialworker.postmessage(5);
+factorialworker.postmessage(7);
+factorialworker.postmessage(10);
+
+// 5! = 120
+// 7! = 5040
+// 10! = 3628800</code></pre>
+            <p class="calibre1">对于传递简单的消息，使用<code class="calibre11">postMessage()</code>在主线程和工作者线程之间传递消息，与在两个窗口间传递消息非常像。主要区别是没有<code class="calibre11">targetOrigin</code>的限制，该限制是针对<code class="calibre11">Window.prototype.postMessage</code>的，对<code class="calibre11">WorkerGlobalScope.prototype.postMessage</code>或<code class="calibre11">Worker.prototype.postMessage</code>没有影响。这样约定的原因很简单：工作者线程脚本的源被限制为主页的源，因此没有必要再去过滤了。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用<code class="calibre11">MessageChannel</code>
+              </strong>
+            </p>
+            <p class="calibre1">无论主线程还是工作者线程，通过<code class="calibre11">postMessage()</code>进行通信涉及调用全局对象上的方法，并定义一个临时的传输协议。这个过程可以被Channel Messaging API取代，基于该API可以在两个上下文间明确建立通信渠道。</p>
+            <p class="calibre1">
+              <code class="calibre11">MessageChannel</code>实例有两个端口，分别代表两个通信端点。要让父页面和工作线程通过<code class="calibre11">MessageChannel</code>通信，需要把一个端口传到工作者线程中，如下所示：</p>
+            <p class="calibre1">
+              <strong class="calibre2">worker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在监听器中存储全局messageport
+let messageport = null;
+
+function factorial(n) {
+  let result = 1;
+  while(n) { result *= n--; }
+  return result;
+}
+
+// 在全局对象上添加消息处理程序
+self.onmessage = ({ports}) =&gt; {
+  // 只设置一次端口
+  if (!messageport) {
+    // 初始化消息发送端口，
+    // 给变量赋值并重置监听器
+
+    messageport = ports[0];
+    self.onmessage = null;
+
+    // 在全局对象上设置消息处理程序
+    messageport.onmessage = ({data}) =&gt; {
+      // 收到消息后发送数据
+      messageport.postmessage(`${data}! = ${factorial(data)}`);
+    };
+  }
+};</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const channel = new messagechannel();
+const factorialworker = new worker('./worker.js');
+
+// 把`messageport`对象发送到工作者线程
+// 工作者线程负责处理初始化信道
+factorialworker.postmessage(null, [channel.port1]);
+
+// 通过信道实际发送数据
+channel.port2.onmessage = ({data}) =&gt; console.log(data);
+
+// 工作者线程通过信道响应
+channel.port2.postmessage(5);
+
+// 5! = 120</code></pre>
+            <p class="calibre1">在这个例子中，父页面通过<code class="calibre11">postMessage</code>与工作者线程共享<code class="calibre11">MessagePort</code>。使用数组语法是为了在两个上下文间传递可转移对象。本章稍后会介绍可转移对象（<code class="calibre11">Transferable</code>）。工作者线程维护着对该端口的引用，并使用它代替通过全局对象传递消息。当然，消息的格式也需要临时约定：工作者线程收到的第一条消息包含端口，后续的消息才是数据。</p>
+            <p class="calibre1">使用<code class="calibre11">MessageChannel</code>实例与父页面通信很大程度上是多余的。这是因为全局<code class="calibre11">postMessage()</code>方法本质上与<code class="calibre11">channel.postMessage()</code>执行的是同样的操作（不考虑<code class="calibre11">MessageChannel</code>接口的其他特性）。<code class="calibre11">MessageChannel</code>真正有用的地方是让两个工作者线程之间直接通信。这可以通过把端口传给另一个工作者线程实现。下面的例子把一个数组传给了一个工作者线程，这个线程又把它传另一个工作者线程，然后再传回主页：</p>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const channel = new messagechannel();
+const workera = new worker('./worker.js');
+const workerb = new worker('./worker.js');
+
+workera.postmessage('workera', [channel.port1]);
+workerb.postmessage('workerb', [channel.port2]);
+
+workera.onmessage = ({data}) =&gt; console.log(data);
+workerb.onmessage = ({data}) =&gt; console.log(data);
+
+workera.postmessage(['page']);
+
+// ['page', 'workera', 'workerb']
+
+workerb.postmessage(['page'])
+
+// ['page', 'workerb', 'workera']</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">worker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let messageport = null;
+let contextidentifier = null;
+
+function addcontextandsend(data, destination) {
+  // 添加标识符以标识当前工作者线程
+  data.push(contextidentifier);
+
+  // 把数据发送到下一个目标
+  destination.postmessage(data);
+}
+
+self.onmessage = ({data, ports}) =&gt; {
+  // 如果消息里存在端口（ports）
+  // 则初始化工作者线程
+  if (ports.length) {
+    // 记录标识符
+    contextidentifier = data;
+
+    // 获取messageport
+    messageport = ports[0];
+
+    // 添加处理程序把接收的数据
+    // 发回到父页面
+    messageport.onmessage = ({data}) =&gt; {
+      addcontextandsend(data, self);
+    }
+  } else {
+    addcontextandsend(data, messageport);
+  }
+};</code></pre>
+            <p class="calibre1">在这个例子中，数组的每一段旅程都会添加一个字符串，标识自己到过哪里。数组从父页面发送到工作者线程，工作者线程会加上自己的上下文标识符。然后，数组又从一个工作者线程发送到另一个工作者线程。第二个线程又加上自己的上下文标识符，随即将数组发回主页，主页把数组打印出来。这个例子中的两个工作者线程使用了同一个脚本，因此要注意数组可以双向传递。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用<code class="calibre11">BroadcastChannel</code>
+              </strong>
+            </p>
+            <p class="calibre1">同源脚本能够通过<code class="calibre11">BroadcastChannel</code>相互之间发送和接收消息。这种通道类型的设置比较简单，不需要像<code class="calibre11">MessageChannel</code>那样转移乱糟糟的端口。这可以通过以下方式实现：</p>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const channel = new broadcastchannel('worker_channel');
+const worker = new worker('./worker.js');
+
+channel.onmessage = ({data}) =&gt; {
+  console.log(`heard ${data} on page`);
+}
+
+settimeout(() =&gt; channel.postmessage('foo'), 1000);
+
+// heard foo in worker
+// heard bar on page</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">worker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const channel = new broadcastchannel('worker_channel');
+
+channel.onmessage = ({data}) =&gt; {
+  console.log(`heard ${data} in worker`);
+  channel.postmessage('bar');
+}</code></pre>
+            <p class="calibre1">这里，页面在通过<code class="calibre11">BroadcastChannel</code>发送消息之前会先等1秒钟。因为这种信道没有端口所有权的概念，所以如果没有实体监听这个信道，广播的消息就不会有人处理。在这种情况下，如果没有<code class="calibre11">setTimeout()</code>，则由于初始化工作者线程的延迟，就会导致消息已经发送了，但工作者线程上的消息处理程序还没有就位。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_648" class="calibre15">27.2.10 工作者线程数据传输</h3>
+        <p class="calibre1">使用工作者线程时，经常需要为它们提供某种形式的数据负载。工作者线程是独立的上下文，因此在上下文之间传输数据就会产生消耗。在支持传统多线程模型的语言中，可以使用锁、互斥量，以及<code class="calibre11">volatile</code>变量。在JavaScript中，有三种在上下文间转移信息的方式：<strong class="calibre2">结构化克隆算法</strong>（structured clone algorithm）、<strong class="calibre2">可转移对象</strong>（transferable objects）和<strong class="calibre2">共享数组缓冲区</strong>（shared array buffers）。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">结构化克隆算法</strong>
+            </p>
+            <p class="calibre1">
+              <strong class="calibre2">结构化克隆算法</strong>可用于在两个独立上下文间共享数据。该算法由浏览器在后台实现，不能直接调用。</p>
+            <p class="calibre1">在通过<code class="calibre11">postMessage()</code>传递对象时，浏览器会遍历该对象，并在目标上下文中生成它的一个副本。下列类型是结构化克隆算法支持的类型。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">除<code class="calibre11">Symbol</code>之外的所有原始类型</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Boolean</code>对象</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">String</code>对象</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">BDate</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">RegExp</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Blob</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">File</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">FileList</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ArrayBuffer</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ArrayBufferView</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ImageData</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Array</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Object</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Map</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Set</code>
+              </li>
+            </ul>
+            <p class="calibre1">关于结构化克隆算法，有以下几点需要注意。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">复制之后，源上下文中对该对象的修改，不会传播到目标上下文中的对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">结构化克隆算法可以识别对象中包含的循环引用，不会无穷遍历对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">克隆<code class="calibre11">Error</code>对象、<code class="calibre11">Function</code>对象或DOM节点会抛出错误。</li>
+              <li class="di_1ji_wu_xu_lie_biao">结构化克隆算法并不总是创建完全一致的副本。</li>
+              <li class="di_1ji_wu_xu_lie_biao">对象属性描述符、获取方法和设置方法不会克隆，必要时会使用默认值。</li>
+              <li class="di_1ji_wu_xu_lie_biao">原型链不会克隆。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">RegExp.prototype.lastIndex</code>属性不会克隆。</li>
+            </ul>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                结构化克隆算法在对象比较复杂时会存在计算性消耗。因此，实践中要尽可能避免过大、过多的复制。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">可转移对象</strong>
+            </p>
+            <p class="calibre1">使用<strong class="calibre2">可转移对象</strong>（transferable objects）可以把所有权从一个上下文转移到另一个上下文。在不太可能在上下文间复制大量数据的情况下，这个功能特别有用。只有如下几种对象是可转移对象：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ArrayBuffer</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">MessagePort</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ImageBitmap</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">OffscreenCanvas</code>
+              </li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">postMessage()</code>方法的第二个可选参数是数组，它指定应该将哪些对象转移到目标上下文。在遍历消息负载对象时，浏览器根据转移对象数组检查对象引用，并对转移对象进行转移而不复制它们。这意味着被转移的对象可以通过消息负载发送，消息负载本身会被复制，比如对象或数组。</p>
+            <p class="calibre1">下面的例子演示了工作者线程对<code class="calibre11">ArrayBuffer</code>的常规结构化克隆。这里没有对象转移：</p>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+
+// 创建32位缓冲区
+const arraybuffer = new arraybuffer(32);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`); // 32
+
+worker.postmessage(arraybuffer);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`); // 32</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">worker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  console.log(`worker's buffer size: ${data.bytelength}`);    // 32
+};</code></pre>
+<p class="calibre1">如果把<code class="calibre11">arraybuffer</code>指定为可转移对象，那么对缓冲区内存的引用就会从父上下文中抹去，然后分配给工作者线程。下面的例子演示了这个操作，结果分配给<code class="calibre11">arraybuffer</code>的内存从父上下文转移到了工作者线程：</p>
+<p class="calibre1"><strong class="calibre2">main.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+
+// 创建32位缓冲区
+const arraybuffer = new arraybuffer(32);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`); // 32
+
+worker.postmessage(arraybuffer, [arraybuffer]);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`); // 0</code></pre>
+<p class="calibre1"><strong class="calibre2">worker.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  console.log(`worker's buffer size: ${data.bytelength}`);    // 32
+};</code></pre>
+            <p class="calibre1">在其他类型的对象中嵌套可转移对象也完全没有问题。包装对象会被复制，而嵌套的对象会被转移：</p>
+            <p class="calibre1">
+              <strong class="calibre2">main.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+
+// 创建32位缓冲区
+const arraybuffer = new arraybuffer(32);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`);      // 32
+
+worker.postmessage({foo: {bar: arraybuffer}}, [arraybuffer]);
+
+console.log(`page's buffer size: ${arraybuffer.bytelength}`);      // 0</code></pre>
+            <p class="calibre1">
+              <strong class="calibre2">worker.js</strong>
+            </p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  console.log(`worker's buffer size: ${data.foo.bar.bytelength}`); // 32
+};</code></pre>
+<p class="calibre1"> </p>
+</li>
+<li value="3" class="di_1ji_wu_xu_lie_biao"><p class="calibre1"><strong class="calibre2"><code class="calibre11">sharedarraybuffer</code></strong></p>
+<blockquote class="calibre13">
+<p class="calibre1"><strong class="calibre2">注意</strong>　由于spectre和meltdown的漏洞，所有主流浏览器在2018年1月就禁用了<code class="calibre11">sharedarraybuffer</code>。从2019年开始，有些浏览器开始逐步重新启用这一特性。</p>
+</blockquote>
+<p class="calibre1">既不克隆，也不转移，<code class="calibre11">sharedarraybuffer</code>作为<code class="calibre11">arraybuffer</code>能够在不同浏览器上下文间共享。在把<code class="calibre11">sharedarraybuffer</code>传给<code class="calibre11">postmessage()</code>时，浏览器只会传递原始缓冲区的引用。结果是，两个不同的javascript上下文会分别维护对同一个内存块的引用。每个上下文都可以随意修改这个缓冲区，就跟修改常规<code class="calibre11">arraybuffer</code>一样。来看下面的例子：</p>
+<p class="calibre1"><strong class="calibre2">main.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">const worker = new worker('./worker.js');
+
+// 创建1字节缓冲区
+const sharedarraybuffer = new sharedarraybuffer(1);
+
+// 创建1字节缓冲区的视图
+const view = new uint8array(sharedarraybuffer);
+
+// 父上下文赋值1
+view[0] = 1;
+
+worker.onmessage = () =&gt; {
+  console.log(`buffer value after worker modification: ${view[0]}`);
+};
+
+// 发送对sharedarraybuffer的引用
+worker.postmessage(sharedarraybuffer);
+
+// buffer value before worker modification: 1
+// buffer value after worker modification: 2</code></pre>
+<p class="calibre1"><strong class="calibre2">worker.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  const view = new uint8array(data);
+
+  console.log(`buffer value before worker modification: ${view[0]}`);
+
+  // 工作者线程为共享缓冲区赋值
+  view[0] += 1;
+
+  // 发送空消息，通知赋值完成
+  self.postmessage(null);
+};</code></pre>
+<p class="calibre1">当然，在两个并行线程中共享内存块有资源争用的风险。换句话说，<code class="calibre11">sharedarraybuffer</code>实例实际上会被当成易变（volatile）内存。下面的例子演示了这一点：</p>
+<p class="calibre1"><strong class="calibre2">main.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建包含4个线程的线程池
+const workers = [];
+for (let i = 0; i &lt; 4; ++i) {
+  workers.push(new worker('./worker.js'));
+}
+
+// 在最后一个工作者线程完成后打印最终值
+let responsecount = 0;
+for (const worker of workers) {
+  worker.onmessage = () =&gt; {
+    if (++responsecount == workers.length) {
+      console.log(`final buffer value: ${view[0]}`);
+    }
+  };
+}
+
+// 初始化sharedarraybuffer
+const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+view[0] = 1;
+
+// 把sharedarraybuffer发给每个线程
+for (const worker of workers) {
+  worker.postmessage(sharedarraybuffer);
+}
+
+// （期待结果为4000001。实际输出类似于：）
+// final buffer value: 2145106</code></pre>
+<p class="calibre1"><strong class="calibre2">worker.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  const view = new uint32array(data);
+
+  // 执行100万次加操作
+  for (let i = 0; i &lt; 1e6; ++i) {
+    view[0] += 1;
+  }
+
+  self.postmessage(null);
+};</code></pre>
+<p class="calibre1">这里，每个工作者线程都顺序执行了100万次加操作，每次都读取共享数组的索引、执行一次加操作，然后再把值写回数组索引。在所有工作者线程读/写操作交织的过程中就会发生资源争用。例如：</p>
+<p class="calibre1">(1) 线程a读取到值1；</p>
+<p class="calibre1">(2) 线程b读取到值1；</p>
+<p class="calibre1">(3) 线程a加1并将2写回数组；</p>
+<p class="calibre1">(4) 线程b仍然使用陈旧的数组值1，同样把2写回数组。</p>
+<p class="calibre1">为解决该问题，可以使用<code class="calibre11">atomics</code>对象让一个工作者线程获得<code class="calibre11">sharedarraybuffer</code>实例的锁，在执行完全部读/写/读操作后，再允许另一个工作者线程执行操作。把<code class="calibre11">atomics.add()</code>放到这个例子中就可以得到正确的最终值：</p>
+<p class="calibre1"><strong class="calibre2">main.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建包含4个线程的线程池
+const workers = [];
+for (let i = 0; i &lt; 4; ++i) {
+  workers.push(new worker('./worker.js'));
+}
+
+// 在最后一个工作者线程完成后打印最终值
+let responsecount = 0;
+for (const worker of workers) {
+  worker.onmessage = () =&gt; {
+    if (++responsecount == workers.length) {
+      console.log(`final buffer value: ${view[0]}`);
+    }
+  };
+}
+
+// 初始化sharedarraybuffer
+const sharedarraybuffer = new sharedarraybuffer(4);
+const view = new uint32array(sharedarraybuffer);
+view[0] = 1;
+
+// 把sharedarraybuffer发给每个线程
+for (const worker of workers) {
+  worker.postmessage(sharedarraybuffer);
+}
+
+//（期待结果为4000001）
+// final buffer value: 4000001</code></pre>
+<p class="calibre1"><strong class="calibre2">worker.js</strong></p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  const view = new uint32array(data);
+
+  // 执行100万次加操作
+  for (let i = 0; i &lt; 1e6; ++i) {
+    atomics.add(view, 0, 1);
+}
+
+  self.postmessage(null);
+};</code></pre>
+<blockquote class="calibre13">
+<p class="calibre1"><strong class="calibre2">注意</strong>　第20章详细介绍了<code class="calibre11">sharedarraybuffer</code>和atomics api。</p>
+</blockquote>
+</li>
+</ol>
+<h3 id="nav_point_649" class="calibre15">27.2.11　线程池</h3>
+<p class="calibre1">因为启用工作者线程代价很大，所以某些情况下可以考虑始终保持固定数量的线程活动，需要时就把任务分派给它们。工作者线程在执行计算时，会被标记为忙碌状态。直到它通知线程池自己空闲了，才准备好接收新任务。这些活动线程就称为“线程池”或“工作者线程池”。</p>
+<p class="calibre1">线程池中线程的数量多少合适并没有权威的答案，不过可以参考<code class="calibre11">navigator.hardware concurrency</code>属性返回的系统可用的核心数量。因为不太可能知道每个核心的多线程能力，所以最好把这个数字作为线程池大小的上限。</p>
+<p class="calibre1">一种使用线程池的策略是每个线程都执行同样的任务，但具体执行什么任务由几个参数来控制。通过使用特定于任务的线程池，可以分配固定数量的工作者线程，并根据需要为他们提供参数。工作者线程会接收这些参数，执行耗时的计算，并把结果返回给线程池。然后线程池可以再将其他工作分派给工作者线程去执行。接下来的例子将构建一个相对简单的线程池，但可以涵盖上述思路的所有基本要求。</p>
+<p class="calibre1">首先是定义一个<code class="calibre11">taskworker</code>类，它可以扩展<code class="calibre11">worker</code>类。<code class="calibre11">taskworker</code>类负责两件事：跟踪线程是否正忙于工作，并管理进出线程的信息与事件。另外，传入给这个工作者线程的任务会封装到一个期约中，然后正确地解决和拒绝。这个类的定义如下：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class taskworker extends worker {
+  constructor(notifyavailable, ...workerargs) {
+    super(...workerargs);
+
+    // 初始化为不可用状态
+    this.available = false;
+    this.resolve = null;
+    this.reject = null;
+
+    // 线程池会传递回调
+    // 以便工作者线程发出它需要新任务的信号
+    this.notifyavailable = notifyavailable;
+
+    // 线程脚本在完全初始化之后
+    // 会发送一条"ready"消息
+    this.onmessage = () =&gt; this.setavailable();
+  }
+
+  // 由线程池调用，以分派新任务
+  dispatch({ resolve, reject, postmessageargs }) {
+    this.available = false;
+
+    this.onmessage = ({ data }) =&gt; {
+      resolve(data);
+      this.setavailable();
+    };
+
+    this.onerror = (e) =&gt; {
+      reject(e);
+      this.setavailable();
+    };
+
+    this.postmessage(...postmessageargs);
+  }
+
+  setavailable() {
+    this.available = true;
+    this.resolve = null;
+    this.reject = null;
+    this.notifyavailable();
+  }
+}</code></pre>
+<p class="calibre1">然后是定义使用<code class="calibre11">taskworker</code>类的<code class="calibre11">workerpool</code>类。它还必须维护尚未分派给工作者线程的任务队列。两个事件可以表明应该分派一个新任务：新任务被添加到队列中，或者工作者线程完成了一个任务，应该再发送另一个任务。<code class="calibre11">workerpool</code>类定义如下：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class workerpool {
+  constructor(poolsize, ...workerargs) {
+    this.taskqueue = [];
+    this.workers = [];
+
+    // 初始化线程池
+    for (let i = 0; i &lt; poolsize; ++i) {
+      this.workers.push(
+        new taskworker(() =&gt; this.dispatchifavailable(), ...workerargs));
+    }
+  }
+
+  // 把任务推入队列
+  enqueue(...postmessageargs) {
+    return new promise((resolve, reject) =&gt; {
+      this.taskqueue.push({ resolve, reject, postmessageargs });
+
+      this.dispatchifavailable();
+    });
+  }
+
+  // 把任务发送给下一个空闲的线程（如果有的话）
+  dispatchifavailable() {
+    if (!this.taskqueue.length) {
+      return;
+    }
+    for (const worker of this.workers) {
+      if (worker.available) {
+        let a = this.taskqueue.shift();
+        worker.dispatch(a);
+        break;
+      }
+    }
+  }
+
+  // 终止所有工作者线程
+  close() {
+    for (const worker of this.workers) {
+      worker.terminate();
+    }
+  }
+}</code></pre>
+<p class="calibre1">定义了这两个类之后，现在可以把任务分派到线程池，并在工作者线程可用时执行它们。在这个例子中，假设我们想计算1000万个浮点值之和。为节省转移成本，我们使用<code class="calibre11">sharedarraybuffer</code>。工作者线程的脚本（worker.js）大致如下：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">self.onmessage = ({data}) =&gt; {
+  let sum = 0;
+  let view = new float32array(data.arraybuffer)
+
+  // 求和
+  for (let i = data.startidx; i &lt; data.endidx; ++i) {
+    // 不需要原子操作，因为只需要读
+    sum += view[i];
+  }
+
+  // 把结果发送给工作者线程
+  self.postmessage(sum);
+};
+
+// 发送消息给taskworker
+// 通知工作者线程准备好接收任务了
+self.postmessage('ready');</code></pre>
+<p class="calibre1">有了以上代码，利用线程池分派任务的代码可以这样写：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class taskworker {
+  ...
+]
+
+class workerpool {
+  ...
+}
+
+const totalfloats = 1e8;
+const numtasks = 20;
+const floatspertask = totalfloats / numtasks;
+const numworkers = 4;
+
+// 创建线程池
+const pool = new workerpool(numworkers, './worker.js');
+
+// 填充浮点值数组
+let arraybuffer = new sharedarraybuffer(4 * totalfloats);
+let view = new float32array(arraybuffer);
+for (let i = 0; i &lt; totalfloats; ++i) {
+  view[i] = math.random();
+}
+
+let partialsumpromises = [];
+for (let i = 0; i &lt; totalfloats; i += floatspertask) {
+  partialsumpromises.push(
+    pool.enqueue({
+      startidx: i,
+      endidx: i + floatspertask,
+      arraybuffer: arraybuffer
+    })
+  );
+}
+
+// 等待所有期约完成，然后求和
+promise.all(partialsumpromises)
+  .then((partialsums) =&gt; partialsums.reduce((x, y) =&gt; x + y))
+  .then(console.log);
+
+//（在这个例子中，和应该约等于1e8/2）
+// 49997075.47203197</code></pre>
+<blockquote class="calibre13">
+<p class="calibre1"><strong class="calibre2">注意</strong>　草率地采用并行计算不一定是最好的办法。线程池的调优策略会因计算任务不同和系统硬件不同而不同。</p>
+</blockquote>
+
+
+
+  </div>
+
+  
+  <div class="calibretoc">
+    <h2><a href="../../54m0dfqx.html">table of contents
+</a></h2>
+    <div>
+  <ul>
+    <li>
+      <a href="part0002.html#nav_point_0">版权声明</a>
+    </li>
+    <li>
+      <a href="part0003.html#nav_point_1">献词</a>
+    </li>
+    <li>
+      <a href="part0004.html#nav_point_2">译者序</a>
+    </li>
+    <li>
+      <a href="part0005.html#nav_point_3">序</a>
+    </li>
+    <li>
+      <a href="part0006.html#nav_point_4">前言</a>
+    </li>
+    <li>
+      <a href="part0012.html#nav_point_10">致谢</a>
+    </li>
+    <li>
+      <a href="part0013.html#nav_point_11">第 1 章 什么是javascript</a>
+    </li>
+    <li>
+      <a href="part0018.html#nav_point_19">第 2 章 html中的javascript</a>
+    </li>
+    <li>
+      <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+    </li>
+    <li>
+      <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+    </li>
+    <li>
+      <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+    </li>
+    <li>
+      <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+    </li>
+    <li>
+      <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+    </li>
+    <li>
+      <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+    </li>
+    <li>
+      <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+    </li>
+    <li>
+      <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+    </li>
+    <li>
+      <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+    </li>
+    <li>
+      <a href="part0093.html#nav_point_273">第 12 章 bom</a>
+    </li>
+    <li>
+      <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+    </li>
+    <li>
+      <a href="part0105.html#nav_point_306">第 14 章 dom</a>
+    </li>
+    <li>
+      <a href="part0110.html#nav_point_328">第 15 章 dom扩展</a>
+    </li>
+    <li>
+      <a href="part0116.html#nav_point_348">第 16 章 dom2和dom3</a>
+    </li>
+    <li>
+      <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+    </li>
+    <li>
+      <a href="part0130.html#nav_point_403">第 18 章 动画与canvas图形</a>
+    </li>
+    <li>
+      <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+    </li>
+    <li>
+      <a href="part0143.html#nav_point_450">第 20 章 javascript api</a>
+    </li>
+    <li>
+      <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+    </li>
+    <li>
+      <a href="part0163.html#nav_point_526">第 22 章 处理xml</a>
+    </li>
+    <li>
+      <a href="part0168.html#nav_point_542">第 23 章 json</a>
+    </li>
+    <li>
+      <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+    </li>
+    <li>
+      <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+    </li>
+    <li>
+      <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+    </li>
+    <li>
+      <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+    </li>
+    <li>
+      <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+    </li>
+    <li>
+      <a href="part0204.html#nav_point_683">附录 a es2018和es2019</a>
+    </li>
+    <li>
+      <a href="part0215.html#nav_point_708">附录 b 严格模式</a>
+    </li>
+    <li>
+      <a href="part0223.html#nav_point_719">附录 c javascript库和框架</a>
+    </li>
+    <li>
+      <a href="part0227.html#nav_point_741">附录 d javascript工具</a>
+    </li>
+    <li>
+      <a href="part0239.html#nav_point_800">作者简介</a>
+    </li>
+  </ul>
+</div>
+
+
+  </div>
+  
+
+  <div class="calibreebnav">
+    
+      <a href="part0194.html" class="calibreaprev">上一页
+</a>
+    
+
+    <a href="../../54m0dfqx.html" class="calibreahome">首页
+</a>
+
+    
+      <a href="part0196.html" class="calibreanext">下一页
+</a>
+    
+  </div>
+
+</div>
+
+</body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-6487844781006261"
+     data-ad-slot="3432081921"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</html>

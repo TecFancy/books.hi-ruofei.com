@@ -1,0 +1,537 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0101.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0103.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_298" class="calibre9">13.2 用户代理检测</h2>
+        <p class="calibre1">用户代理检测通过浏览器的用户代理字符串确定使用的是什么浏览器。用户代理字符串包含在每个HTTP请求的头部，在JavaScript中可以通过<code class="calibre11">navigator.userAgent</code>访问。在服务器端，常见的做法是根据接收到的用户代理字符串确定浏览器并执行相应操作。而在客户端，用户代理检测被认为是不可靠的，只应该在没有其他选项时再考虑。</p>
+        <p class="calibre1">用户代理字符串最受争议的地方就是，在很长一段时间里，浏览器都通过在用户代理字符串包含错误或误导性信息来欺骗服务器。要理解背后的原因，必须回顾一下自Web出现之后用户代理字符串的历史。</p>
+        <h3 id="nav_point_299" class="calibre15">13.2.1 用户代理的历史</h3>
+        <p class="calibre1">HTTP规范（1.0和1.1）要求浏览器应该向服务器发送包含浏览器名称和版本信息的简短字符串。RFC 2616（HTTP 1.1）是这样描述用户代理字符串的：</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">产品标记用于通过软件名称和版本来标识通信产品的身份。多数使用产品标记的字段也允许列出属于应用主要部分的子产品，以空格分隔。按照约定，产品按照标识应用重要程度的先后顺序列出。</p>
+        </blockquote>
+        <p class="calibre1">这个规范进一步要求用户代理字符串应该是“标记/版本”形式的产品列表。但现实当中的用户代理字符串远没有那么简单。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">早期浏览器</strong>
+            </p>
+            <p class="calibre1">美国国家超级计算应用中心（NCSA，National Center for Supercomputing Applications）发布于1993年的Mosaic是早期Web浏览器的代表，其用户代理字符串相当简单，类似于：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mosaic/0.9</code></pre>
+            <p class="calibre1">虽然在不同操作系统和平台中可能会有所不同，但基本形式都是这么简单直接。斜杠前是产品名称（有时候可能是“NCSA Mosaic”之类的），斜杠后是产品版本。</p>
+            <p class="calibre1">在网景公司准备开发浏览器时，代号确定为“Mozilla”（Mosaic Killer的简写）。第一个公开发行版Netscape Navigator 2的用户代理字符串是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/version [language] (platform; encryption)</code></pre>
+            <p class="calibre1">网景公司遵守了将产品名称和版本作为用户代理字符串的规定，但又在后面添加了如下信息。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">Language：语言代码，表示浏览器的目标使用语言。</li>
+              <li class="di_1ji_wu_xu_lie_biao">Platform：表示浏览器所在的操作系统和/或平台。</li>
+              <li class="di_1ji_wu_xu_lie_biao">Encryption：包含的安全加密类型，可能的值是U（128位加密）、I（40位加密）和N（无加密）。</li>
+            </ul>
+            <p class="calibre1">Netscape Navigator 2的典型用户代理字符串如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/2.02 [fr] (winnt; i)</code></pre>
+            <p class="calibre1">这个字符串表示Netscape Navigator 2.02，在主要使用法语地区的发行，运行在Windows NT上，40位加密。总体上看，通过产品名称还是很容易知道这是什么浏览器的。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Netscape Navigator 3和IE3</strong>
+            </p>
+            <p class="calibre1">1996年，Netscape Navigator 3发布之后超过Mosaic成为最受欢迎的浏览器。其用户代理字符串也发生了一些小变化，删除了语言信息，并将操作系统或系统CPU信息（OS-or-CPU description）等列为可选信息。此时的格式如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/version (platform; encryption [; os-or-cpu description])</code></pre>
+            <p class="calibre1">运行在Windows系统上的Netscape Navigator 3的典型用户代理字符串如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/3.0 (win95; u)</code></pre>
+            <p class="calibre1">这个字符串表示Netscape Navigator 3运行在Windows 95上，采用了128位加密。注意在Windows系统上，没有“OS-or-CPU”部分。</p>
+            <p class="calibre1">Netscape Navigator 3发布后不久，微软也首次对外发布了IE3。这是因为当时Netscape Navigator是市场占有率最高的浏览器，很多服务器在返回网页之前都会特意检测其用户代理字符串。如果IE因此打不开网页，那么这个当时初出茅庐的浏览器就会遭受重创。为此，IE就在用户代理字符串中添加了兼容Netscape用户代理字符串的内容。结果格式为：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/2.0 (compatible; msie version; operating system)</code></pre>
+            <p class="calibre1">比如，Windows 95平台上的IE3.02的用户代理字符串如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/2.0 (compatible; msie 3.02; windows 95)</code></pre>
+            <p class="calibre1">当时的大多数浏览器检测程序都只看用户代理字符串中的产品名称，因此IE成功地将自己伪装成了Mozilla，也就是Netscape Navigator。这个做法引发了一些争议，因为它违反了浏览器标识的初衷。另外，真正的浏览器版本也跑到了字符串中间。</p>
+            <p class="calibre1">这个字符串中还有一个地方很有意思，即它将自己标识为Mozilla 2.0而不是3.0。3.0是当时市面上使用最多的版本，按理说使用这个版本更合逻辑。背后的原因至今也没有揭开，不过很可能就是当事人一时大意造成的。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Netscape Communicator 4和IE4~8</strong>
+            </p>
+            <p class="calibre1">1997年8月，Netscape Communicator 4发布（这次发布将Navigator改成了Communicator）。Netscape在这个版本中仍然沿用了上一个版本的格式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/version (platform; encryption [; os-or-cpu description])</code></pre>
+            <p class="calibre1">比如，Windows 98上的第4版，其用户代理字符串就是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (win98; i)</code></pre>
+            <p class="calibre1">如果发布了补丁，则相应增加版本号，比如下面是4.79版的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.79 (win98; i)</code></pre>
+            <p class="calibre1">微软在发布IE4时只更新了版本，格式不变：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie version; operating system)</code></pre>
+            <p class="calibre1">比如，Windows 98上运行的IE4的字符串如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 4.0; windows 98)</code></pre>
+            <p class="calibre1">更新版本号之后，IE的版本号跟Mozilla的就一致了，识别同为第4代的两款浏览器也方便 了。可是，这种版本同步就此打住。在IE4.5（只针对Mac）面世时，Mozilla的版本号还是4，IE的版本号却变了：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 4.5; mac_powerpc)</code></pre>
+            <p class="calibre1">直到IE7，Mozilla的版本号就没有变过，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 7.0; windows nt 5.1)</code></pre>
+            <p class="calibre1">IE8在用户代理字符串中添加了额外的标识“Trident”，就是浏览器渲染引擎的代号。格式变成：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie version; operating system; trident/tridentversion)</code></pre>
+            <p class="calibre1">比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 8.0; windows nt 5.1; trident/4.0)</code></pre>
+            <p class="calibre1">这个新增的“Trident”是为了让开发者知道什么时候IE8运行兼容模式。在兼容模式下，MSIE的版本会变成7，但Trident的版本不变：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 7.0; windows nt 5.1; trident/4.0)</code></pre>
+            <p class="calibre1">添加这个标识之后，就可以确定浏览器究竟是IE7（没有“Trident”），还是IE8运行在兼容模式。</p>
+            <p class="calibre1">IE9稍微升级了一下用户代理字符串的格式。Mozilla的版本增加到了5.0，Trident的版本号也增加到了5.0。IE9的默认用户代理字符串是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (compatible; msie 9.0; windows nt 6.1; trident/5.0)</code></pre>
+            <p class="calibre1">如果IE9运行兼容模式，则会恢复旧版的Mozilla和MSIE版本号，但Trident的版本号还是5.0。比如，下面就是IE9运行在IE7兼容模式下的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/4.0 (compatible; msie 7.0; windows nt 6.1; trident/5.0)</code></pre>
+            <p class="calibre1">所有这些改变都是为了让之前的用户代理检测脚本正常运作，同时还能为新脚本提供额外的信息。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Gecko</strong>
+            </p>
+            <p class="calibre1">Gecko渲染引擎是Firefox的核心。Gecko最初是作为通用Mozilla浏览器（即后来的Netscape 6）的一部分开发的。有一个针对Netscape 6的用户代理字符串规范，规定了未来的版本应该如何构造这个字符串。新的格式与之前一直沿用到4.<img src="../images/00080.gif" alt="x" class="calibre12"/>版的格式有了很大出入：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/mozillaversion (platform; encryption; os-or-cpu; language;
+  prereleaseversion)gecko/geckoversion
+  applicationproduct/applicationproductversion</code></pre>
+            <p class="calibre1">这个复杂的用户代理字符串包含了不少想法。下表列出了其中每一部分的含义。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">字符串</th>
+                <th class="calibre19">是否必需</th>
+                <th class="calibre19">说明</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">MozillaVersion</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">Mozilla版本</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Platform</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">浏览器所在的平台。可能的值包括Windows、Mac和X11（UNIX XWindows）</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Encryption</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">加密能力：U表示128位，I表示40位，N表示无加密</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">OS-or-CPU</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">浏览器所在的操作系统或计算机处理器类型。如果是Windows平台，则这里是Windows的版本（如WinNT、Win95）。如果是Mac平台，则这里是CPU类型（如68k、PPC for PowerPC或MacIntel）。如果是X11平台，则这里是通过<code class="calibre27">uname -sm</code>命名得到的UNIX操作系统名</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Language</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">浏览器的目标使用语言</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Prerelease Version</code>
+                </td>
+                <td class="calibre21">否</td>
+                <td class="calibre21">最初的设想是Mozilla预发布版的版本号，现在表示Gecko引擎的版本号</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">GeckoVersion</code>
+                </td>
+                <td class="calibre21">是</td>
+                <td class="calibre21">以yyyymmdd格式的日期表示的Gecko渲染引擎的版本</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">ApplicationProduct</code>
+                </td>
+                <td class="calibre21">否</td>
+                <td class="calibre21">使用Gecko的产品名称。可能是Netscape、Firefox等</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">ApplicationProductVersion</code>
+                </td>
+                <td class="calibre21">否</td>
+                <td class="calibre21">ApplicationProduct的版本，区别于MozillaVersion和GeckoVersion</td>
+              </tr>
+            </table>
+
+            <p class="calibre1">要更好地理解Gecko的用户代理字符串，最好是看几个不同的基于Gecko的浏览器返回的字符串。</p>
+            <p class="calibre1">Windowx XP上的Netscape 6.21：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows; u; windows nt 5.1; en-us; rv:0.9.4) gecko/20011128
+  netscape6/6.2.1</code></pre>
+            <p class="calibre1">Linux上的SeaMonkey 1.1a：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (x11; u; linux i686; en-us; rv:1.8.1b2) gecko/20060823 seamonkey/1.1a</code></pre>
+            <p class="calibre1">Windows XP上的Firefox 2.0.0.11：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows; u; windows nt 5.1; en-us; rv:1.8.1.11) gecko/20071127
+  firefox/2.0.0.11</code></pre>
+            <p class="calibre1">Mac OS X上的Camino 1.5.1：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (macintosh; u; intel mac os x; en; rv:1.8.1.6) gecko/20070809
+  camino/1.5.1</code></pre>
+            <p class="calibre1">所有这些字符串都表示使用的是基于Gecko的浏览器（只是版本不同）。有时候，相比于知道特定的浏览器，知道是不是基于Gecko才更重要。从第一个基于Gecko的浏览器发布开始，Mozilla版本就是5.0，一直没有变过。以后也不太可能会变。</p>
+            <p class="calibre1">在Firefox 4发布时，Mozilla简化了用户代理字符串。主要变化包括以下几方面。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">去掉了语言标记（即前面例子中的<code class="calibre11">"en-US"</code>）。</li>
+              <li class="di_1ji_wu_xu_lie_biao">在浏览器使用强加密时去掉加密标记（因为是默认了）。这意味着<code class="calibre11">I</code>和<code class="calibre11">N</code>还可能出现，但<code class="calibre11">U</code>不可能出现了。</li>
+              <li class="di_1ji_wu_xu_lie_biao">去掉了Windows平台上的平台标记，这是因为跟OS-or-CPU部分重复了，否则两个地方都会有<code class="calibre11">Windows</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">GeckoVersion固定为<code class="calibre11">"Gecko/20100101"</code>。</li>
+            </ul>
+            <p class="calibre1">下面是Firefox 4中用户代理字符串的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows nt 6.1; rv:2.0.1) gecko/20100101 firefox 4.0.1</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">WebKit</strong>
+            </p>
+            <p class="calibre1">2003年，苹果宣布将发布自己的浏览器Safari。Safari的渲染引擎叫WebKit，是基于Linux平台浏览器Konqueror使用的渲染引擎KHTML开发的。几年后，WebKit又拆分出自己的开源项目，专注于渲染引擎开发。</p>
+            <p class="calibre1">这个新浏览器和渲染引擎的开发者也面临与当初IE3.0时代同样的问题：怎样才能保证浏览器不被排除在流行的站点之外。答案就是在用户代理字符串中添加足够多的信息，让网站知道这个浏览器与其他浏览器是兼容的。于是Safari就有了下面这样的用户代理字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (platform; encryption; os-or-cpu; language)
+  applewebkit/applewebkitversion (khtml, like gecko) safari/safariversion</code></pre>
+            <p class="calibre1">下面是一个实际的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (macintosh; u; ppc mac os x; en) applewebkit/124 (khtml, like gecko)
+  safari/125.1</code></pre>
+            <p class="calibre1">这个字符串也很长，不仅包括苹果WebKit的版本，也包含Safari的版本。一开始还有是否需要将浏览器标识为Mozilla的争论，但考虑到兼容性很快就达成了一致。现在，所有基于WebKit的浏览器都将自己标识为Mozilla 5.0，与所有基于Gecko的浏览器一样。Safari版本通常是浏览器的构建编号，不一定表示发布的版本号。比如Safari 1.25在用户代理字符串中的版本是125.1，但也不一定始终这样对应。</p>
+            <p class="calibre1">Safari用户代理字符串中最受争议的部分是在1.0预发布版中添加的<code class="calibre11">"(KHTML, like Gecko)"</code>。由于有意想让客户端和服务器把Safari当成基于Gecko的浏览器（好像光添加<code class="calibre11">"Mozilla/5.0"</code>还不够），苹果也招来了很多开发者的反对。苹果的回应与微软当初IE遭受质疑时一样：Safari与Mozilla兼容，不能让网站以为用户使用了不受支持的浏览器而把Safari排斥在外。</p>
+            <p class="calibre1">Safari的用户代理字符串在第3版时有所改进。下面的版本标记现在用来表示Safari实际的版本号：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (macintosh; u; ppc mac os x; en) applewebkit/522.15.5
+  (khtml, like gecko) version/3.0.3 safari/522.15.5</code></pre>
+            <p class="calibre1">注意这个变化只针对Safari而不包括WebKit。因此，其他基于WebKit的浏览器可能不会有这个变化。一般来说，与Gecko一样，通常识别是不是WebKit比识别是不是Safari更重要。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Konqueror</strong>
+            </p>
+            <p class="calibre1">Konqueror是与KDE Linux桌面环境打包发布的浏览器，基于开源渲染引擎KHTML。虽然只有Linux平台的版本，Konqueror的用户却不少。为实现最大化兼容，Konqueror决定采用Internet Explore的用户代理字符串格式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (compatible; konqueror/version; os-or-cpu)</code></pre>
+            <p class="calibre1">不过，Konqueror 3.2为了与WebKit就标识为KHTML保持一致，也对格式做了一点修改：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (compatible; konqueror/version; os-or-cpu) khtml/khtmlversion
+  (like gecko)</code></pre>
+            <p class="calibre1">下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (compatible; konqueror/3.5; sunos) khtml/3.5.0 (like gecko)</code></pre>
+            <p class="calibre1">Konqueror和KHTML的版本号通常是一致的，有时候也只有子版本号不同。比如Konqueror是3.5，而KHTML是3.5.1。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="7" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Chrome</strong>
+            </p>
+            <p class="calibre1">谷歌的Chrome浏览器使用Blink作为渲染引擎，使用V8作为JavaScript引擎。Chrome的用户代理字符串包含所有WebKit的信息，另外又加上了Chrome及其版本的信息。其格式如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (platform; encryption; os-or-cpu; language)
+  applewebkit/applewebkitversion (khtml, like gecko)
+  chrome/chromeversion safari/safariversion</code></pre>
+            <p class="calibre1">以下是Chrome 7完整的用户代理字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows; u; windows nt 5.1; en-us) applewebkit/534.7
+  (khtml, like gecko) chrome/7.0.517.44 safari/534.7</code></pre>
+            <p class="calibre1">其中的Safari版本和WebKit版本有可能始终保持一致，但也不能肯定。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="8" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Opera</strong>
+            </p>
+            <p class="calibre1">在用户代理字符串方面引发争议最大的一个浏览器就是Opera。Opera默认的用户代理字符串是所有现代浏览器中最符合逻辑的，因为它正确标识了自己和版本。在Opera 8之前，其用户代理字符串都是这个格式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/version (os-or-cpu; encryption) [language]</code></pre>
+            <p class="calibre1">比如，Windows XP上的Opera 7.54的字符串是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/7.54 (windows nt 5.1; u) [en]</code></pre>
+            <p class="calibre1">Opera 8发布后，语言标记从括号外挪到了括号内，目的是与其他浏览器保持一致：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/version (os-or-cpu; encryption; language)</code></pre>
+            <p class="calibre1">Windows XP上的Opera 8的字符串是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/8.0 (windows nt 5.1; u; en)</code></pre>
+            <p class="calibre1">默认情况下，Opera会返回这个简单的用户代理字符串。这是唯一一个使用产品名称和版本完全标识自身的主流浏览器。不过，与其他浏览器一样，Opera也遇到了使用这种字符串的问题。虽然从技术角度看这是正确的，但网上已经有了很多浏览器检测代码只考虑Mozilla这个产品名称。还有不少代码专门针对IE或Gecko。为了不让这些检测代码判断错误，Opera坚持使用唯一标识自身的字符串。</p>
+            <p class="calibre1">从Opera 9开始，Opera也采用了两个策略改变自己的字符串。一是把自己标识为别的浏览器，如Firefox或IE。这时候的字符串跟Firefox和IE的一样，只不过末尾会多一个<code class="calibre11">"Opera"</code>及其版本号。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows nt 5.1; u; en; rv:1.8.1) gecko/20061208 firefox/2.0.0
+  opera 9.50
+
+mozilla/4.0 (compatible; msie 6.0; windows nt 5.1; en) opera 9.50</code></pre>
+            <p class="calibre1">第一个字符串把Opera 9.5标识为Firefox 2，同时保持了Opera版本信息。第二个字符串把Opera 9.5标识为IE6，也保持了Opera版本信息。虽然这些字符串可以通过针对Firefox和IE的测试，但也可以被识别为Opera。</p>
+            <p class="calibre1">另一个策略是伪装成Firefox或IE。这种情况下的用户代理字符串与Firefox和IE返回的一样，末尾也没有<code class="calibre11">"Opera"</code>及其版本信息。这样就根本没办法区分Opera与其他浏览器了。更严重的是，Opera还会根据访问的网站不同设置不同的用户代理字符串，却不通知用户。比如，导航到My Yahoo网站会导致Opera将自己伪装成Firefox。这就导致很难通过用户代理字符串来识别Opera。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                在Opera 7之前的版本中，Opera可以解析Windows操作系统字符串的含义。比如，Windows NT 5.1实际上表示Windows XP。因此Opera 6的用户代理字符串中会包含Windows XP而不是Windows NT 5.1。为了与其他浏览器表现更一致，Opera 7及后来的版本就改为使用官方报告的操作系统字符串，而不是自己转换的了。</p>
+            </blockquote>
+            <p class="calibre1">Opera 10又修改了字符串格式，变成了下面这样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/9.80 (os-or-cpu; encryption; language) presto/prestoversion version/version</code></pre>
+            <p class="calibre1">注意开头的版本号<code class="calibre11">Opera/9.80</code>是固定不变的。Opera没有9.8这个版本，但Opera工程师担心某些浏览器检测脚本会错误地把Opera/10.0当成Opera 1而不是Opera 10。因此，Opera 10新增了额外的Presto标识（Presto是Opera的渲染引擎）和版本标识。比如，下面是Windows 7上的Opera 10.63的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">opera/9.80 (windows nt 6.1; u; en) presto/2.6.30 version/10.63</code></pre>
+            <p class="calibre1">Opera最近的版本已经改为在更标准的字符串末尾追加<code class="calibre11">"OPR"</code>标识符和版本号。这样，除了末尾的<code class="calibre11">"OPR"</code>标识符和版本号，字符串的其他部分与WebKit浏览器是类似的。下面就是Windows 10上的Opera 52的用户代理字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko)
+chrome/65.0.3325.181 safari/537.36 opr/52.0.2871.64</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="9" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">iOS与Android</strong>
+            </p>
+            <p class="calibre1">iOS和Android移动操作系统上默认的浏览器都是基于WebKit的，因此具有与相应桌面浏览器一样的用户代理字符串。iOS设备遵循以下基本格式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (platform; encryption; os-or-cpu like mac os x; language)
+  applewebkit/applewebkitversion (khtml, like gecko) version/browserversion
+  mobile/mobileversion safari/safariversion</code></pre>
+            <p class="calibre1">注意其中用于辅助判断Mac操作系统的<code class="calibre11">"like Mac OS X"</code>和<code class="calibre11">"Mobile"</code>相关的标识。这里的Mobile标识除了说明这是移动WebKit之外并没有什么用。平台可能是<code class="calibre11">"iPhone"</code>、<code class="calibre11">"iPod"</code>或<code class="calibre11">"iPad"</code>，因设备而异。例如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (iphone; u; cpu iphone os 3_0 like mac os x; en-us)
+  applewebkit/528.18 (khtml, like gecko) version/4.0 mobile/7a341 safari/528.16</code></pre>
+            <p class="calibre1">注意在iOS 3以前，操作系统的版本号不会出现在用户代理字符串中。</p>
+            <p class="calibre1">默认的Android浏览器通常与iOS上的浏览器格式相同，只是没有<code class="calibre11">Mobile</code>后面的版本号（<code class="calibre11">"Mobile"</code>标识还有）。例如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">mozilla/5.0 (linux; u; android 2.2; en-us; nexus one build/frf91)
+  applewebkit/533.1 (khtml, like gecko) version/4.0 mobile safari/533.1</code></pre>
+            <p class="calibre1">这个用户代理字符串是谷歌Nexus One手机上的默认浏览器的。不过，其他Android设备上的浏览器也遵循相同的模式。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_300" class="calibre15">13.2.2 浏览器分析</h3>
+        <p class="calibre1">想要知道自己代码运行在什么浏览器上，大部分开发者会分析<code class="calibre11">window.navigator.userAgent</code>返回的字符串值。所有浏览器都会提供这个值，如果相信这些返回值并基于给定的一组浏览器检测这个字符串，最终会得到关于浏览器和操作系统的比较精确的结果。</p>
+        <p class="calibre1">相比于能力检测，用户代理检测还是有一定优势的。能力检测可以保证脚本不必理会浏览器而正常执行。现代浏览器用户代理字符串的过去、现在和未来格式都是有章可循的，我们能够利用它们准确识别浏览器。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">伪造用户代理</strong>
+            </p>
+            <p class="calibre1">通过检测用户代理来识别浏览器并不是完美的方式，毕竟这个字符串是可以造假的。只不过实现<code class="calibre11">window.navigator</code>对象的浏览器（即所有现代浏览器）都会提供<code class="calibre11">userAgent</code>这个只读属性。因此，简单地给这个属性设置其他值不会有效：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(window.navigator.useragent);
+// mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko)
+chrome/65.0.3325.181 safari/537.36
+
+window.navigator.useragent = 'foobar';
+
+console.log(window.navigator.useragent);
+// mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko)
+chrome/65.0.3325.181 safari/537.36</code></pre>
+            <p class="calibre1">不过，通过简单的办法可以绕过这个限制。比如，有些浏览器提供伪私有的<code class="calibre11">__defineGetter__</code>方法，利用它可以篡改用户代理字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(window.navigator.useragent);
+// mozilla/5.0 (windows nt 10.0; win64; x64) applewebkit/537.36 (khtml, like gecko)
+chrome/65.0.3325.181 safari/537.36
+
+window.navigator.__definegetter__('useragent', () =&gt; 'foobar');
+
+console.log(window.navigator.useragent);
+// foobar</code></pre>
+            <p class="calibre1">对付这种造假是一件吃力不讨好的事。检测用户代理是否以这种方式被篡改过是可能的，但总体来看还是一场猫捉老鼠的游戏。</p>
+            <p class="calibre1">与其劳心费力检测造假，不如更好地专注于浏览器识别。如果相信浏览器返回的用户代理字符串，那就可以用它来判断浏览器。如果怀疑脚本或浏览器可能篡改这个值，那最好还是使用能力检测。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">分析浏览器</strong>
+            </p>
+            <p class="calibre1">通过解析浏览器返回的用户代理字符串，可以极其准确地推断出下列相关的环境信息：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">浏览器</li>
+              <li class="di_1ji_wu_xu_lie_biao">浏览器版本</li>
+              <li class="di_1ji_wu_xu_lie_biao">浏览器渲染引擎</li>
+              <li class="di_1ji_wu_xu_lie_biao">设备类型（桌面/移动）</li>
+              <li class="di_1ji_wu_xu_lie_biao">设备生产商</li>
+              <li class="di_1ji_wu_xu_lie_biao">设备型号</li>
+              <li class="di_1ji_wu_xu_lie_biao">操作系统</li>
+              <li class="di_1ji_wu_xu_lie_biao">操作系统版本</li>
+            </ul>
+            <p class="calibre1">当然，新浏览器、新操作系统和新硬件设备随时可能出现，其中很多可能有着类似但并不相同的用户代理字符串。因此，用户代理解析程序需要与时俱进，频繁更新，以免落伍。自己手写的解析程序如果不及时更新或修订，很容易就过时了。本书上一版写过一个用户代理解析程序，但这一版并不推荐读者自己从头再写一个。相反，这里推荐一些GitHub上维护比较频繁的第三方用户代理解析程序：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">Bowser</li>
+              <li class="di_1ji_wu_xu_lie_biao">UAParser.js</li>
+              <li class="di_1ji_wu_xu_lie_biao">Platform.js</li>
+              <li class="di_1ji_wu_xu_lie_biao">CURRENT-DEVICE</li>
+              <li class="di_1ji_wu_xu_lie_biao">Google Closure</li>
+              <li class="di_1ji_wu_xu_lie_biao">Mootools</li>
+            </ul>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                Mozilla维基有一个页面“Compatibility/UADetectionLibraries”，其中提供了用户代理解析程序的列表，可以用来识别Mozilla浏览器（甚至所有主流浏览器）。这些解析程序是按照语言分组的。这个页面好像维护不频繁，但其中给出了所有主流的解析库。（注意JavaScript部分包含客户端库和Node.js库。）GitHub上的文章“Are We Detectable Yet?”中还有一张可视化的表格，能让我们对这些库的检测能力一目了然。</p>
+            </blockquote>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0101.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0103.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

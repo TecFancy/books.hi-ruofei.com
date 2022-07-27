@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0110.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0112.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_329" class="calibre9">15.1 Selectors API</h2>
+        <p class="calibre1">JavaScript库中最流行的一种能力就是根据CSS选择符的模式匹配DOM元素。比如，jQuery就完全以CSS选择符查询DOM获取元素引用，而不是使用<code class="calibre11">getElementById()</code>和<code class="calibre11">getElementsByTagName()</code>。</p>
+        <p class="calibre1">Selectors API（参见W3C网站上的Selectors API Level 1）是W3C推荐标准，规定了浏览器原生支持的CSS查询API。支持这一特性的所有JavaScript库都会实现一个基本的CSS解析器，然后使用已有的DOM方法搜索文档并匹配目标节点。虽然库开发者在不断改进其性能，但JavaScript代码能做到的毕竟有限。通过浏览器原生支持这个API，解析和遍历DOM树可以通过底层编译语言实现，性能也有了数量级的提升。</p>
+        <p class="calibre1">Selectors API Level 1的核心是两个方法：<code class="calibre11">querySelector()</code>和<code class="calibre11">querySelectorAll()</code>。在兼容浏览器中，<code class="calibre11">Document</code>类型和<code class="calibre11">Element</code>类型的实例上都会暴露这两个方法。</p>
+        <p class="calibre1">Selectors API Level 2规范在<code class="calibre11">Element</code>类型上新增了更多方法，比如<code class="calibre11">matches()</code>、<code class="calibre11">find()</code>和<code class="calibre11">findAll()</code>。不过，目前还没有浏览器实现或宣称实现<code class="calibre11">find()</code>和<code class="calibre11">findAll()</code>。</p>
+        <h3 id="nav_point_330" class="calibre15">15.1.1
+          <code class="calibre26">querySelector()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">querySelector()</code>方法接收CSS选择符参数，返回匹配该模式的第一个后代元素，如果没有匹配项则返回<code class="calibre11">null</code>。下面是一些例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 取得&lt;body&gt;元素
+let body = document.queryselector("body");
+
+// 取得id为"mydiv"的元素
+let mydiv = document.queryselector("#mydiv");
+
+// 取得类名为"selected"的第一个元素
+let selected = document.queryselector(".selected");
+
+// 取得类名为"button"的图片
+let img = document.body.queryselector("img.button");</code></pre>
+        <p class="calibre1">在<code class="calibre11">Document</code>上使用<code class="calibre11">querySelector()</code>方法时，会从文档元素开始搜索；在<code class="calibre11">Element</code>上使用<code class="calibre11">querySelector()</code>方法时，则只会从当前元素的后代中查询。</p>
+        <p class="calibre1">用于查询模式的CSS选择符可繁可简，依需求而定。如果选择符有语法错误或碰到不支持的选择符，则<code class="calibre11">querySelector()</code>方法会抛出错误。</p>
+        <h3 id="nav_point_331" class="calibre15">15.1.2
+          <code class="calibre26">querySelectorAll()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">querySelectorAll()</code>方法跟<code class="calibre11">querySelector()</code>一样，也接收一个用于查询的参数，但它会返回所有匹配的节点，而不止一个。这个方法返回的是一个<code class="calibre11">NodeList</code>的静态实例。</p>
+        <p class="calibre1">再强调一次，<code class="calibre11">querySelectorAll()</code>返回的<code class="calibre11">NodeList</code>实例一个属性和方法都不缺，但它是一个静态的“快照”，而非“实时”的查询。这样的底层实现避免了使用<code class="calibre11">NodeList</code>对象可能造成的性能问题。</p>
+        <p class="calibre1">以有效CSS选择符调用<code class="calibre11">querySelectorAll()</code>都会返回<code class="calibre11">NodeList</code>，无论匹配多少个元素都可以。如果没有匹配项，则返回空的<code class="calibre11">NodeList</code>实例。</p>
+        <p class="calibre1">与<code class="calibre11">querySelector()</code>一样，<code class="calibre11">querySelectorAll()</code>也可以在<code class="calibre11">Document</code>、<code class="calibre11">DocumentFragment</code>和<code class="calibre11">Element</code>类型上使用。下面是几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 取得id为"mydiv"的&lt;div&gt;元素中的所有&lt;em&gt;元素
+let ems = document.getelementbyid("mydiv").queryselectorall("em");
+
+// 取得所有类名中包含"selected"的元素
+let selecteds = document.queryselectorall(".selected");
+
+// 取得所有是&lt;p&gt;元素子元素的&lt;strong&gt;元素
+let strongs = document.queryselectorall("p strong");</code></pre>
+        <p class="calibre1">返回的<code class="calibre11">NodeList</code>对象可以通过<code class="calibre11">for-of</code>循环、<code class="calibre11">item()</code>方法或中括号语法取得个别元素。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let strongelements = document.queryselectorall("p strong");
+
+// 以下3个循环的效果一样
+
+for (let strong of strongelements) {
+  strong.classname = "important";
+}
+
+for (let i = 0; i &lt; strongelements.length; ++i) {
+  strongelements.item(i).classname = "important";
+}
+
+for (let i = 0; i &lt; strongelements.length; ++i) {
+  strongelements[i].classname = "important";
+}</code></pre>
+        <p class="calibre1">与<code class="calibre11">querySelector()</code>方法一样，如果选择符有语法错误或碰到不支持的选择符，则<code class="calibre11">querySelectorAll()</code>方法会抛出错误。</p>
+        <h3 id="nav_point_332" class="calibre15">15.1.3
+          <code class="calibre26">matches()</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">matches()</code>方法（在规范草案中称为<code class="calibre11">matchesSelector()</code>）接收一个CSS选择符参数，如果元素匹配则该选择符返回<code class="calibre11">true</code>，否则返回<code class="calibre11">false</code>。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (document.body.matches("body.page1")){
+  // true
+}</code></pre>
+        <p class="calibre1">使用这个方法可以方便地检测某个元素会不会被<code class="calibre11">querySelector()</code>或<code class="calibre11">querySelectorAll()</code>方法返回。</p>
+        <p class="calibre1">所有主流浏览器都支持<code class="calibre11">matches()</code>。Edge、Chrome、Firefox、Safari和Opera完全支持，IE9~11及一些移动浏览器支持带前缀的方法。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0110.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0112.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

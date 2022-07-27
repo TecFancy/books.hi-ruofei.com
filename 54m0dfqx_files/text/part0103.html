@@ -1,0 +1,561 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0102.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0104.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_301" class="calibre9">13.3 软件与硬件检测</h2>
+        <p class="calibre1">现代浏览器提供了一组与页面执行环境相关的信息，包括浏览器、操作系统、硬件和周边设备信息。这些属性可以通过暴露在<code class="calibre11">window.navigator</code>上的一组API获得。不过，这些API的跨浏览器支持还不够好，远未达到标准化的程度。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <strong class="calibre2">强烈</strong>建议在使用这些API之前先检测它们是否存在，因为其中多数都不是强制性的，且很多浏览器没有支持。另外，本节介绍的特性有时候不一定可靠。</p>
+        </blockquote>
+        <h3 id="nav_point_302" class="calibre15">13.3.1 识别浏览器与操作系统</h3>
+        <p class="calibre1">特性检测和用户代理字符串解析是当前常用的两种识别浏览器的方式。而<code class="calibre11">navigator</code>和<code class="calibre11">screen</code>对象也提供了关于页面所在软件环境的信息。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">navigator.oscpu</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.oscpu</code>属性是一个字符串，通常对应用户代理字符串中操作系统/系统架构相关信息。根据HTML实时标准：</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <code class="calibre11">oscpu</code>属性的获取方法必须返回空字符串或者表示浏览器所在平台的字符串，比如<code class="calibre11">"Windows NT 10.0; Win64; x64"</code>或<code class="calibre11">"Linux x86_64"</code>。</p>
+            </blockquote>
+            <p class="calibre1">比如，Windows 10上的Firefox的<code class="calibre11">oscpu</code>属性应该对应于以下加粗的部分：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(navigator.useragent);
+"mozilla/5.0 (windows nt 10.0; win64; x64; rv:58.0) gecko/20100101 firefox/58.0"
+console.log(navigator.oscpu);
+"windows nt 10.0; win64; x64"</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">navigator.vendor</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.vendor</code>属性是一个字符串，通常包含浏览器开发商信息。返回这个字符串是浏览器<code class="calibre11">navigator</code>兼容模式的一个功能。根据HTML实时标准：</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <code class="calibre11">navigator.vendor</code>返回一个空字符串，也可能返回字符串<code class="calibre11">"Apple Computer, Inc."</code>或字符串<code class="calibre11">"Google Inc."</code>。</p>
+            </blockquote>
+            <p class="calibre1">例如，Chrome中的这个<code class="calibre11">navigator.vendor</code>属性返回下面的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(navigator.vendor); // "google inc."</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">navigator.platform</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.platform</code>属性是一个字符串，通常表示浏览器所在的操作系统。根据HTML实时标准：</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <code class="calibre11">navigator.platform</code>必须返回一个字符串或表示浏览器所在平台的字符串，例如<code class="calibre11">"MacIntel"</code>、<code class="calibre11">"Win32"</code>、<code class="calibre11">"FreeBSD i386"</code>或<code class="calibre11">"WebTV OS"</code>。</p>
+            </blockquote>
+            <p class="calibre1">例如，Windows系统下Chrome中的这个<code class="calibre11">navigator.platform</code>属性返回下面的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(navigator.platform); // "win32"</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">screen.colorDepth</code>和<code class="calibre11">screen.pixelDepth</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">screen.colorDepth</code>和<code class="calibre11">screen.pixelDepth</code>返回一样的值，即显示器每像素颜色的位深。根据CSS对象模型（CSSOM）规范：</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <code class="calibre11">screen.colorDepth</code>和<code class="calibre11">screen.pixelDepth</code>属性应该返回输出设备中每像素用于显示颜色的位数，不包含alpha通道。</p>
+            </blockquote>
+            <p class="calibre1">Chrome中这两个属性的值如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(screen.colordepth); // 24
+console.log(screen.pixeldepth); // 24</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">screen.orientation</code>
+              </strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">screen.orientation</code>属性返回一个<code class="calibre11">ScreenOrientation</code>对象，其中包含Screen Orientation API定义的屏幕信息。这里面最有意思的属性是<code class="calibre11">angle</code>和<code class="calibre11">type</code>，前者返回相对于默认状态下屏幕的角度，后者返回以下4种枚举值之一：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">portrait-primary</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">portrait-secondary</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">landscape-primary</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">landscape-secondary</code>
+              </li>
+            </ul>
+            <p class="calibre1">例如，在Chrome移动版中，<code class="calibre11">screen.orientation</code>返回的信息如下：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 垂直看
+console.log(screen.orientation.type);   // portrait-primary
+console.log(screen.orientation.angle);  // 0
+
+// 向左转
+console.log(screen.orientation.type);   // landscape-primary
+console.log(screen.orientation.angle);  // 90
+
+// 向右转
+console.log(screen.orientation.type);   // landscape-secondary
+console.log(screen.orientation.angle);  // 270</code></pre>
+            <p class="calibre1">根据规范，这些值的初始化取决于浏览器和设备状态。因此，不能假设<code class="calibre11">portrait-primary</code>和<code class="calibre11">0</code>始终是初始值。这两个值主要用于确定设备旋转后浏览器的朝向变化。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_303" class="calibre15">13.3.2 浏览器元数据</h3>
+        <p class="calibre1">
+          <code class="calibre11">navigator</code>对象暴露出一些API，可以提供浏览器和操作系统的状态信息。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Geolocation API</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.geolocation</code>属性暴露了Geolocation API，可以让浏览器脚本感知当前设备的地理位置。这个API只在安全执行环境（通过HTTPS获取的脚本）中可用。</p>
+            <p class="calibre1">这个API可以查询宿主系统并尽可能精确地返回设备的位置信息。根据宿主系统的硬件和配置，返回结果的精度可能不一样。手机GPS的坐标系统可能具有极高的精度，而IP地址的精度就要差很多。根据Geolocation API规范：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">地理位置信息的主要来源是gps和ip地址、射频识别（rfid）、wi-fi及蓝牙mac地址、gsm/cdma蜂窝id以及用户输入等信息。</code></pre>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                浏览器也可能会利用Google Location Service（Chrome和Firefox）等服务确定位置。有时候，你可能会发现自己并没有GPS，但浏览器给出的坐标却非常精确。浏览器会收集所有可用的无线网络，包括Wi-Fi和蜂窝信号。拿到这些信息后，再去查询网络数据库。这样就可以精确地报告出你的设备位置。</p>
+            </blockquote>
+            <p class="calibre1">要获取浏览器当前的位置，可以使用<code class="calibre11">getCurrentPosition()</code>方法。这个方法返回一个<code class="calibre11">Coordinates</code>对象，其中包含的信息不一定完全依赖宿主系统的能力：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// getcurrentposition()会以position对象为参数调用传入的回调函数
+navigator.geolocation.getcurrentposition((position) =&gt; p = position);</code></pre>
+            <p class="calibre1">这个<code class="calibre11">position</code>对象中有一个表示查询时间的时间戳，以及包含坐标信息的<code class="calibre11">Coordinates</code>对象：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(p.timestamp);  // 1525364883361
+console.log(p.coords);     // coordinates {...}</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Coordinates</code>对象中包含标准格式的经度和纬度，以及以米为单位的精度。精度同样以确定设备位置的机制来判定。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(p.coords.latitude, p.coords.longitude);   // 37.4854409, -122.2325506
+console.log(p.coords.accuracy);                       // 58</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Coordinates</code>对象包含一个<code class="calibre11">altitude</code>（海拔高度）属性，是相对于1984世界大地坐标系（World Geodetic System，1984）地球表面的以米为单位的距离。此外也有一个<code class="calibre11">altitudeAccuracy</code>属性，这个精度值单位也是米。为了取得<code class="calibre11">Coordinates</code>中包含的这些信息，当前设备必须具备相应的能力（比如GPS或高度计）。很多设备因为没有能力测量高度，所以这两个值经常有一个或两个是空的。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(p.coords.altitude);          // -8.800000190734863
+console.log(p.coords.altitudeaccuracy);  // 200</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">Coordinates</code>对象包含一个<code class="calibre11">speed</code>属性，表示设备每秒移动的速度。还有一个<code class="calibre11">heading</code>（朝向）属性，表示相对于正北方向移动的角度（0 ≤
+              <code class="calibre11">heading</code>
+              &lt; 360）。为获取这些信息，当前设备必须具备相应的能力（比如加速计或指南针）。很多设备因为没有能力测量高度，所以这两个值经常有一个是空的，或者两个都是空的。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                设备不会根据两点的向量来测量速度和朝向。不过，如果可能的话，可以尝试基于两次连续的测量数据得到的向量来手动计算。当然，如果向量的精度不够，那么计算结果的精度肯定也不够。</p>
+            </blockquote>
+            <p class="calibre1">获取浏览器地理位置并不能保证成功。因此<code class="calibre11">getCurrentPosition()</code>方法也接收失败回调函数作为第二个参数，这个函数会收到一个<code class="calibre11">PositionError</code>对象。在失败的情况下，<code class="calibre11">PositionError</code>对象中会包含一个<code class="calibre11">code</code>属性和一个<code class="calibre11">message</code>属性，后者包含对错误的简短描述。<code class="calibre11">code</code>属性是一个整数，表示以下3种错误。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">PERMISSION_DENIED</code>：浏览器未被允许访问设备位置。页面第一次尝试访问Geolocation API时，浏览器会弹出确认对话框取得用户授权（每个域分别获取）。如果返回了这个错误码，则要么是用户不同意授权，要么是在不安全的环境下访问了Geolocation API。<code class="calibre11">message</code>属性还会提供额外信息。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">POSITION_UNAVAILABLE</code>：系统无法返回任何位置信息。这个错误码可能代表各种失败原因，但相对来说并不常见，因为只要设备能上网，就至少可以根据IP地址返回一个低精度的坐标。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">TIMEOUT</code>：系统不能在超时时间内返回位置信息。关于如何配置超时，会在后面介绍。</li>
+            </ul>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 浏览器会弹出确认对话框请用户允许访问geolocation api
+// 这个例子显示了用户拒绝之后的结果
+navigator.geolocation.getcurrentposition(
+  () =&gt; {},
+  (e) =&gt; {
+    console.log(e.code);     // 1
+    console.log(e.message);  // user denied geolocation
+  }
+);
+
+// 这个例子展示了在不安全的上下文中执行代码的结果
+navigator.geolocation.getcurrentposition(
+  () =&gt; {},
+  (e) =&gt; {
+    console.log(e.code);     // 1
+    console.log(e.message);  // only secure origins are allowed
+  }
+);</code></pre>
+            <p class="calibre1">Geolocation API位置请求可以使用<code class="calibre11">PositionOptions</code>对象来配置，作为第三个参数提供。这个对象支持以下3个属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">enableHighAccuracy</code>：布尔值，<code class="calibre11">true</code>表示返回的值应该尽量精确，默认值为<code class="calibre11">false</code>。默认情况下，设备通常会选择最快、最省电的方式返回坐标。这通常意味着返回的是不够精确的坐标。比如，在移动设备上，默认位置查询通常只会采用Wi-Fi和蜂窝网络的定位信息。而在<code class="calibre11">enableHighAccuracy</code>为<code class="calibre11">true</code>的情况下，则会使用设备的GPS确定设备位置，并返回这些值的混合结果。使用GPS会更耗时、耗电，因此在使用<code class="calibre11">enableHighAccuracy</code>配置时要仔细权衡一下。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">timeout</code>：毫秒，表示在以<code class="calibre11">TIMEOUT</code>状态调用错误回调函数之前等待的最长时间。默认值是0xFFFFFFFF（<img src="../images/00025.gif" alt="2^{32}-1" class="calibre12"/>）。0表示完全跳过系统调用而立即以<code class="calibre11">TIMEOUT</code>调用错误回调函数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">maximumAge</code>：毫秒，表示返回坐标的最长有效期，默认值为0。因为查询设备位置会消耗资源，所以系统通常会缓存坐标并在下次返回缓存的值（遵从位置缓存失效策略）。系统会计算缓存期，如果Geolocation API请求的配置要求比缓存的结果更新，则系统会重新查询并返回值。0表示强制系统忽略缓存的值，每次都重新查询。而<code class="calibre11">Infinity</code>会阻止系统重新查询，只会返回缓存的值。JavaScript可以通过检查<code class="calibre11">Position</code>对象的<code class="calibre11">timestamp</code>属性值是否重复来判断返回的是不是缓存值。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Connection State和NetworkInformation API</strong>
+            </p>
+            <p class="calibre1">浏览器会跟踪网络连接状态并以两种方式暴露这些信息：连接事件和<code class="calibre11">navigator.onLine</code>属性。在设备连接到网络时，浏览器会记录这个事实并在<code class="calibre11">window</code>对象上触发<code class="calibre11">online</code>事件。相应地，当设备断开网络连接后，浏览器会在<code class="calibre11">window</code>对象上触发<code class="calibre11">offline</code>事件。任何时候，都可以通过<code class="calibre11">navigator.onLine</code>属性来确定浏览器的联网状态。这个属性返回一个布尔值，表示浏览器是否联网。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const connectionstatechange = () =&gt; console.log(navigator.online);
+
+window.addeventlistener('online', connectionstatechange);
+window.addeventlistener('offline', connectionstatechange);
+
+// 设备联网时：
+// true
+
+// 设备断网时：
+// false</code></pre>
+            <p class="calibre1">当然，到底怎么才算联网取决于浏览器与系统实现。有些浏览器可能会认为只要连接到局域网就算“在线”，而不管是否真正接入了互联网。</p>
+            <p class="calibre1">
+              <code class="calibre11">navigator</code>对象还暴露了NetworkInformation API，可以通过<code class="calibre11">navigator.connection</code>属性使用。这个API提供了一些只读属性，并为连接属性变化事件处理程序定义了一个事件对象。</p>
+            <p class="calibre1">以下是NetworkInformation API暴露的属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">downlink</code>：整数，表示当前设备的带宽（以Mbit/s为单位），舍入到最接近的25kbit/s。这个值可能会根据历史网络吞吐量计算，也可能根据连接技术的能力来计算。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">downlinkMax</code>：整数，表示当前设备最大的下行带宽（以Mbit/s为单位），根据网络的第一跳来确定。因为第一跳不一定反映端到端的网络速度，所以这个值只能用作粗略的上限值。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">effectiveType</code>：字符串枚举值，表示连接速度和质量。这些值对应不同的蜂窝数据网络连接技术，但也用于分类无线网络。这个值有以下4种可能。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">slow-2g</code>
+                    <ul class="calibre37">
+                      <li class="di_1ji_wu_xu_lie_biao">往返时间 ＞ 2000ms</li>
+                      <li class="di_1ji_wu_xu_lie_biao">下行带宽 ＜ 50kbit/s</li>
+                    </ul>
+                  </li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">2g</code>
+                    <ul class="calibre37">
+                      <li class="di_1ji_wu_xu_lie_biao">2000ms ＞ 往返时间 ≥ 1400ms</li>
+                      <li class="di_1ji_wu_xu_lie_biao">70kbit/s ＞ 下行带宽 ≥ 50kbit/s</li>
+                    </ul>
+                  </li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">3g</code>
+                    <ul class="calibre37">
+                      <li class="di_1ji_wu_xu_lie_biao">1400ms ＞ 往返时间 ≥ 270ms</li>
+                      <li class="di_1ji_wu_xu_lie_biao">700kbit/s ＞ 下行带宽 ≥ 70kbit/s</li>
+                    </ul>
+                  </li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">4g</code>
+                    <ul class="calibre37">
+                      <li class="di_1ji_wu_xu_lie_biao">270ms ＞ 往返时间 ≥ 0ms</li>
+                      <li class="di_1ji_wu_xu_lie_biao">下行带宽 ≥ 700kbit/s</li>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">rtt</code>：毫秒，表示当前网络实际的往返时间，舍入为最接近的25毫秒。这个值可能根据历史网络吞吐量计算，也可能根据连接技术的能力来计算。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>：字符串枚举值，表示网络连接技术。这个值可能为下列值之一。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">bluetooth</code>：蓝牙。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">cellular</code>：蜂窝。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">ethernet</code>：以太网。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">none</code>：无网络连接。相当于<code class="calibre11">navigator.onLine === false</code>。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">mixed</code>：多种网络混合。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">other</code>：其他。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">unknown</code>：不确定。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">wifi</code>：Wi-Fi。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">
+                    <code class="calibre11">wimax</code>：WiMAX。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">saveData</code>：布尔值，表示用户设备是否启用了“节流”（reduced data）模式。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onchange</code>：事件处理程序，会在任何连接状态变化时激发一个<code class="calibre11">change</code>事件。可以通过<code class="calibre11">navigator.connection.addEventListener('change',changeHandler)</code>或<code class="calibre11">navigator.connection.onchange = changeHandler</code>等方式使用。<br class="calibre4"/>
+              </li>
+            </ul>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">Battery Status API</strong>
+            </p>
+            <p class="calibre1">浏览器可以访问设备电池及充电状态的信息。<code class="calibre11">navigator.getBattery()</code>方法会返回一个期约实例，解决为一个<code class="calibre11">BatteryManager</code>对象。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">navigator.getbattery().then((b) =&gt; console.log(b));
+// batterymanager { ... }</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">BatteryManager</code>包含4个只读属性，提供了设备电池的相关信息。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">charging</code>：布尔值，表示设备当前是否正接入电源充电。如果设备没有电池，则返回<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">chargingTime</code>：整数，表示预计离电池充满还有多少秒。如果电池已充满或设备没有电池，则返回0。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">dischargingTime</code>：整数，表示预计离电量耗尽还有多少秒。如果设备没有电池，则返回<code class="calibre11">Infinity</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">level</code>：浮点数，表示电量百分比。电量完全耗尽返回0.0，电池充满返回1.0。如果设备没有电池，则返回1.0。</li>
+            </ul>
+            <p class="calibre1">这个API还提供了4个事件属性，可用于设置在相应的电池事件发生时调用的回调函数。可以通过给<code class="calibre11">BatteryManager</code>添加事件监听器，也可以通过给事件属性赋值来使用这些属性。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onchargingchange</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onchargingtimechange</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ondischargingtimechange</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">onlevelchange</code>
+              </li>
+            </ul>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">navigator.getbattery().then((battery) =&gt; {
+  // 添加充电状态变化时的处理程序
+  const chargingchangehandler = () =&gt; console.log('chargingchange');
+  battery.onchargingchange = chargingchangehandler;
+  // 或
+  battery.addeventlistener('chargingchange', chargingchangehandler);
+
+  // 添加充电时间变化时的处理程序
+  const chargingtimechangehandler = () =&gt; console.log('chargingtimechange');
+  battery.onchargingtimechange = chargingtimechangehandler;
+  // 或
+  battery.addeventlistener('chargingtimechange', chargingtimechangehandler);
+
+  // 添加放电时间变化时的处理程序
+  const dischargingtimechangehandler = () =&gt; console.log('dischargingtimechange');
+  battery.ondischargingtimechange = dischargingtimechangehandler;
+  // 或
+  battery.addeventlistener('dischargingtimechange', dischargingtimechangehandler);
+
+  // 添加电量百分比变化时的处理程序
+  const levelchangehandler = () =&gt; console.log('levelchange');
+  battery.onlevelchange = levelchangehandler;
+  // 或
+  battery.addeventlistener('levelchange', levelchangehandler);
+});</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_304" class="calibre15">13.3.3 硬件</h3>
+        <p class="calibre1">浏览器检测硬件的能力相当有限。不过，<code class="calibre11">navigator</code>对象还是通过一些属性提供了基本信息。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">处理器核心数</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.hardwareConcurrency</code>属性返回浏览器支持的逻辑处理器核心数量，包含表示核心数的一个整数值（如果核心数无法确定，这个值就是1）。关键在于，这个值表示浏览器可以并行执行的最大工作线程数量，不一定是实际的CPU核心数。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">设备内存大小</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.deviceMemory</code>属性返回设备大致的系统内存大小，包含单位为GB的浮点数（舍入为最接近的2的幂：512MB返回0.5，4GB返回4）。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">最大触点数</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">navigator.maxTouchPoints</code>属性返回触摸屏支持的最大关联触点数量，包含一个整数值。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0102.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0104.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

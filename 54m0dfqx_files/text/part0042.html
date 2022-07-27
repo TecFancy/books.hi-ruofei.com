@@ -1,0 +1,797 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0041.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0043.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_107" class="calibre9">5.4 单例内置对象</h2>
+        <p class="calibre1">ECMA-262对内置对象的定义是“任何由ECMAScript实现提供、与宿主环境无关，并在ECMAScript程序开始执行时就存在的对象”。这就意味着，开发者不用显式地实例化内置对象，因为它们已经实例化好了。前面我们已经接触了大部分内置对象，包括<code class="calibre11">Object</code>、<code class="calibre11">Array</code>和<code class="calibre11">String</code>。本节介绍ECMA-262定义的另外两个单例内置对象：<code class="calibre11">Global</code>和<code class="calibre11">Math</code>。</p>
+        <h3 id="nav_point_108" class="calibre15">5.4.1
+          <code class="calibre26">Global</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">Global</code>对象是ECMAScript中最特别的对象，因为代码不会显式地访问它。ECMA-262规定<code class="calibre11">Global</code>对象为一种兜底对象，它所针对的是不属于任何对象的属性和方法。事实上，不存在全局变量或全局函数这种东西。在全局作用域中定义的变量和函数都会变成<code class="calibre11">Global</code>对象的属性 。本书前面介绍的函数，包括<code class="calibre11">isNaN()</code>、<code class="calibre11">isFinite()</code>、<code class="calibre11">parseInt()</code>和<code class="calibre11">parseFloat()</code>，实际上都是<code class="calibre11">Global</code>对象的方法。除了这些，<code class="calibre11">Global</code>对象上还有另外一些方法。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">URL编码方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">encodeURI()</code>和<code class="calibre11">encodeURIComponent()</code>方法用于编码统一资源标识符（URI），以便传给浏览器。有效的URI不能包含某些字符，比如空格。使用URI编码方法来编码URI可以让浏览器能够理解它们，同时又以特殊的UTF-8编码替换掉所有无效字符。</p>
+            <p class="calibre1">
+              <code class="calibre11">ecnodeURI()</code>方法用于对整个URI进行编码，比如<code class="calibre11">"www.wrox.com/illegal value.js"</code>。而<code class="calibre11">encodeURIComponent()</code>方法用于编码URI中单独的组件，比如前面URL中的<code class="calibre11">"illegal value.js"</code>。这两个方法的主要区别是，<code class="calibre11">encodeURI()</code>不会编码属于URL组件的特殊字符，比如冒号、斜杠、问号、井号，而<code class="calibre11">encodeURIComponent()</code>会编码它发现的所有非标准字符。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let uri = "http://www.wrox.com/illegal value.js#首页";
+
+// "http://www.wrox.com/illegal%20value.js#首页"
+console.log(encodeuri(uri));
+
+// "http%3a%2f%2fwww.wrox.com%2fillegal%20value.js%23start"
+console.log(encodeuricomponent(uri));</code></pre>
+            <p class="calibre1">这里使用<code class="calibre11">encodeURI()</code>编码后，除空格被替换为<code class="calibre11">%20</code>之外，没有任何变化。而<code class="calibre11">encodeURIComponent()</code>方法将所有非字母字符都替换成了相应的编码形式。这就是使用<code class="calibre11">encodeURI()</code>编码整个URI，但只使用<code class="calibre11">encodeURIComponent()</code>编码那些会追加到已有URI后面的字符串的原因。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                一般来说，使用<code class="calibre11">encodeURIComponent()</code>应该比使用<code class="calibre11">encodeURI()</code>的频率更高，这是因为编码查询字符串参数比编码基准URI的次数更多。</p>
+            </blockquote>
+            <p class="calibre1">与<code class="calibre11">encodeURI()</code>和<code class="calibre11">encodeURIComponent()</code>相对的是<code class="calibre11">decodeURI()</code>和<code class="calibre11">decodeURIComponent()</code>。<code class="calibre11">decodeURI()</code>只对使用<code class="calibre11">encodeURI()</code>编码过的字符解码。例如，<code class="calibre11">%20</code>会被替换为空格，但<code class="calibre11">%23</code>不会被替换为井号（<code class="calibre11">#</code>），因为井号不是由<code class="calibre11">encodeURI()</code>替换的。类似地，<code class="calibre11">decodeURIComponent()</code>解码所有被<code class="calibre11">encodeURIComponent()</code>编码的字符，基本上就是解码所有特殊值。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let uri = "http%3a%2f%2fwww.wrox.com%2fillegal%20value.js%23start";
+
+// http%3a%2f%2fwww.wrox.com%2fillegal value.js%23start
+console.log(decodeuri(uri));
+
+// http:// www.wrox.com/illegal value.js#首页
+console.log(decodeuricomponent(uri));</code></pre>
+            <p class="calibre1">这里，<code class="calibre11">uri</code>变量中包含一个使用<code class="calibre11">encodeURIComponent()</code>编码过的字符串。首先输出的是使用<code class="calibre11">decodeURI()</code>解码的结果，可以看到只用空格替换了<code class="calibre11">%20</code>。然后是使用<code class="calibre11">decodeURIComponent()</code>解码的结果，其中替换了所有特殊字符，并输出了没有包含任何转义的字符串。（这个字符串不是有效的URL。）</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                URI方法<code class="calibre11">encodeURI()</code>、<code class="calibre11">encodeURIComponent()</code>、<code class="calibre11">decodeURI()</code>和<code class="calibre11">decodeURIComponent()</code>取代了<code class="calibre11">escape()</code>和<code class="calibre11">unescape()</code>方法，后者在ECMA-262第3版中就已经废弃了。URI方法始终是首选方法，因为它们对所有Unicode字符进行编码，而原来的方法只能正确编码ASCII字符。不要在生产环境中使用<code class="calibre11">escape()</code>和<code class="calibre11">unescape()</code>。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">eval()</code>方法</strong>
+            </p>
+            <p class="calibre1">最后一个方法可能是整个ECMAScript语言中最强大的了，它就是<code class="calibre11">eval()</code>。这个方法就是一个完整的ECMAScript解释器，它接收一个参数，即一个要执行的ECMAScript（JavaScript）字符串。来看一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">eval("console.log('hi')");</code></pre>
+            <p class="calibre1">上面这行代码的功能与下一行等价：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log("hi");</code></pre>
+            <p class="calibre1">当解释器发现<code class="calibre11">eval()</code>调用时，会将参数解释为实际的ECMAScript语句，然后将其插入到该位置。通过<code class="calibre11">eval()</code>执行的代码属于该调用所在上下文，被执行的代码与该上下文拥有相同的作用域链。这意味着定义在包含上下文中的变量可以在<code class="calibre11">eval()</code>调用内部被引用，比如下面这个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let msg = "hello world";
+eval("console.log(msg)");  // "hello world"</code></pre>
+            <p class="calibre1">这里，变量<code class="calibre11">msg</code>是在<code class="calibre11">eval()</code>调用的外部上下文中定义的，而<code class="calibre11">console.log()</code>显示了文本<code class="calibre11">"hello world"</code>。这是因为第二行代码会被替换成一行真正的函数调用代码。类似地，可以在<code class="calibre11">eval()</code>内部定义一个函数或变量，然后在外部代码中引用，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">eval("function sayhi() { console.log('hi'); }");
+sayhi();</code></pre>
+            <p class="calibre1">这里，函数<code class="calibre11">sayHi()</code>是在<code class="calibre11">eval()</code>内部定义的。因为该调用会被替换为真正的函数定义，所以才可能在下一行代码中调用<code class="calibre11">sayHi()</code>。对于变量也是一样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">eval("let msg = 'hello world';");
+console.log(msg);  // reference error: msg is not defined</code></pre>
+            <p class="calibre1">通过<code class="calibre11">eval()</code>定义的任何变量和函数都不会被提升，这是因为在解析代码的时候，它们是被包含在一个字符串中的。它们只是在<code class="calibre11">eval()</code>执行的时候才会被创建。</p>
+            <p class="calibre1">在严格模式下，在<code class="calibre11">eval()</code>内部创建的变量和函数无法被外部访问。换句话说，最后两个例子会报错。同样，在严格模式下，赋值给<code class="calibre11">eval</code>也会导致错误：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">"use strict";
+eval = "hi";  // 导致错误</code></pre>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                解释代码字符串的能力是非常强大的，但也非常危险。在使用<code class="calibre11">eval()</code>的时候必须极为慎重，特别是在解释用户输入的内容时。因为这个方法会对XSS利用暴露出很大的攻击面。恶意用户可能插入会导致你网站或应用崩溃的代码。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Global</code>对象属性</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Global</code>对象有很多属性，其中一些前面已经提到过了。像<code class="calibre11">undefined</code>、<code class="calibre11">NaN</code>和<code class="calibre11">Infinity</code>等特殊值都是<code class="calibre11">Global</code>对象的属性。此外，所有原生引用类型构造函数，比如<code class="calibre11">Object</code>和<code class="calibre11">Function</code>，也都是<code class="calibre11">Global</code>对象的属性。下表列出了所有这些属性。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">属性</th>
+                <th class="calibre19">说明</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">undefined</code>
+                </td>
+                <td class="calibre21">特殊值<code class="calibre27">undefined</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">NaN</code>
+                </td>
+                <td class="calibre21">特殊值<code class="calibre27">NaN</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Infinity</code>
+                </td>
+                <td class="calibre21">特殊值<code class="calibre27">Infinity</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Object</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Object</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Array</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Array</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Function</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Function</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Boolean</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Boolean</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">String</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">String</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Number</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Number</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Date</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Date</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">RegExp</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">RegExp</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Symbol</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Symbol</code>的伪构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Error</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">Error</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">EvalError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">EvalError</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">RangeError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">RangeError</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">ReferenceError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">ReferenceError</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">SyntaxError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">SyntaxError</code>的构造函数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">TypeError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">TypeError</code>的构造函数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">URIError</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">URIError</code>的构造函数</td>
+              </tr>
+            </table>
+
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">window</code>对象</strong>
+            </p>
+            <p class="calibre1">虽然ECMA-262没有规定直接访问<code class="calibre11">Global</code>对象的方式，但浏览器将<code class="calibre11">window</code>对象实现为<code class="calibre11">Global</code>对象的代理。因此，所有全局作用域中声明的变量和函数都变成了<code class="calibre11">window</code>的属性。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var color = "red";
+
+function saycolor() {
+  console.log(window.color);
+}
+
+window.saycolor(); // "red"</code></pre>
+            <p class="calibre1">这里定义了一个名为<code class="calibre11">color</code>的全局变量和一个名为<code class="calibre11">sayColor()</code>的全局函数。在<code class="calibre11">sayColor()</code>内部，通过<code class="calibre11">window.color</code>访问了<code class="calibre11">color</code>变量，说明全局变量变成了<code class="calibre11">window</code>的属性。接着，又通过<code class="calibre11">window</code>对象直接调用了<code class="calibre11">window.sayColor()</code>函数，从而输出字符串。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                <code class="calibre11">window</code>对象在JavaScript中远不止实现了<code class="calibre11">ECMAScript</code>的<code class="calibre11">Global</code>对象那么简单。关于<code class="calibre11">window</code>对象的更多介绍，请参考第12章。</p>
+            </blockquote>
+            <p class="calibre1">另一种获取<code class="calibre11">Global</code>对象的方式是使用如下的代码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let global = function() {
+  return this;
+}();</code></pre>
+            <p class="calibre1">这段代码创建一个立即调用的函数表达式，返回了<code class="calibre11">this</code>的值。如前所述，当一个函数在没有明确（通过成为某个对象的方法，或者通过<code class="calibre11">call()</code>/<code class="calibre11">apply()</code>）指定<code class="calibre11">this</code>值的情况下执行时，<code class="calibre11">this</code>值等于<code class="calibre11">Global</code>对象。因此，调用一个简单返回<code class="calibre11">this</code>的函数是在任何执行上下文中获取<code class="calibre11">Global</code>对象的通用方式。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_109" class="calibre15">5.4.2
+          <code class="calibre26">Math</code>
+        </h3>
+        <p class="calibre1">ECMAScript提供了<code class="calibre11">Math</code>对象作为保存数学公式、信息和计算的地方。<code class="calibre11">Math</code>对象提供了一些辅助计算的属性和方法。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">Math</code>对象上提供的计算要比直接在JavaScript实现的快得多，因为<code class="calibre11">Math</code>对象上的计算使用了JavaScript引擎中更高效的实现和处理器指令。但使用<code class="calibre11">Math</code>计算的问题是精度会因浏览器、操作系统、指令集和硬件而异。</p>
+        </blockquote>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">Math</code>对象属性</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Math</code>对象有一些属性，主要用于保存数学中的一些特殊值。下表列出了这些属性。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">属性</th>
+                <th class="calibre19">说明</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.E</code>
+                </td>
+                <td class="calibre21">自然对数的基数e的值</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.LN10</code>
+                </td>
+                <td class="calibre21">10为底的自然对数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.LN2</code>
+                </td>
+                <td class="calibre21">2为底的自然对数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.LOG2E</code>
+                </td>
+                <td class="calibre21">以2为底e的对数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.LOG10E</code>
+                </td>
+                <td class="calibre21">以10为底e的对数</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.PI</code>
+                </td>
+                <td class="calibre21">π的值</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.SQRT1_2</code>
+                </td>
+                <td class="calibre21">1/2的平方根</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.SQRT2</code>
+                </td>
+                <td class="calibre21">2的平方根</td>
+              </tr>
+            </table>
+
+            <p class="calibre1">这些值的含义和用法超出了本书的范畴，但都是ECMAScript规范定义的，并可以在你需要时使用。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">min()</code>和<code class="calibre11">max()</code>方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Math</code>对象也提供了很多辅助执行简单或复杂数学计算的方法。</p>
+            <p class="calibre1">
+              <code class="calibre11">min()</code>和<code class="calibre11">max()</code>方法用于确定一组数值中的最小值和最大值。这两个方法都接收任意多个参数，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let max = math.max(3, 54, 32, 16);
+console.log(max);  // 54
+
+let min = math.min(3, 54, 32, 16);
+console.log(min);  // 3</code></pre>
+            <p class="calibre1">在3、54、32和16中，<code class="calibre11">Math.max()</code>返回54，<code class="calibre11">Math.min()</code>返回3。使用这两个方法可以避免使用额外的循环和<code class="calibre11">if</code>语句来确定一组数值的最大最小值。</p>
+            <p class="calibre1">要知道数组中的最大值和最小值，可以像下面这样使用扩展操作符：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let values = [1, 2, 3, 4, 5, 6, 7, 8];
+let max = math.max(...val);</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">舍入方法</strong>
+            </p>
+            <p class="calibre1">接下来是用于把小数值舍入为整数的4个方法：<code class="calibre11">Math.ceil()</code>、<code class="calibre11">Math.floor()</code>、<code class="calibre11">Math.round()</code>和<code class="calibre11">Math.fround()</code>。这几个方法处理舍入的方式如下所述。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Math.ceil()</code>方法始终向上舍入为最接近的整数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Math.floor()</code>方法始终向下舍入为最接近的整数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Math.round()</code>方法执行四舍五入。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Math.fround()</code>方法返回数值最接近的单精度（32位）浮点值表示。</li>
+            </ul>
+            <p class="calibre1">以下示例展示了这些方法的用法：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(math.ceil(25.9));   // 26
+console.log(math.ceil(25.5));   // 26
+console.log(math.ceil(25.1));   // 26
+
+console.log(math.round(25.9));  // 26
+console.log(math.round(25.5));  // 26
+console.log(math.round(25.1));  // 25
+
+console.log(math.fround(0.4));  // 0.4000000059604645
+console.log(math.fround(0.5));  // 0.5
+console.log(math.fround(25.9)); // 25.899999618530273
+
+console.log(math.floor(25.9));  // 25
+console.log(math.floor(25.5));  // 25
+console.log(math.floor(25.1));  // 25</code></pre>
+            <p class="calibre1">对于25和26（不包含）之间的所有值，<code class="calibre11">Math.ceil()</code>都会返回26，因为它始终向上舍入。<code class="calibre11">Math.round()</code>只在数值大于等于<code class="calibre11">25.5</code>时返回26，否则返回25。最后，<code class="calibre11">Math.floor()</code>对所有25和26（不包含）之间的值都返回25。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">random()</code>方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Math.random()</code>方法返回一个0~1范围内的随机数，其中包含0但不包含1。对于希望显示随机名言或随机新闻的网页，这个方法是非常方便的。可以基于如下公式使用<code class="calibre11">Math.random()</code>从一组整数中随机选择一个数：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">number = math.floor(math.random() * total_number_of_choices + first_possible_value)</code></pre>
+            <p class="calibre1">这里使用了<code class="calibre11">Math.floor()</code>方法，因为<code class="calibre11">Math.random()</code>始终返回小数，即便乘以一个数再加上一个数也是小数。因此，如果想从1~10范围内随机选择一个数，代码就是这样的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = math.floor(math.random() * 10 + 1);</code></pre>
+            <p class="calibre1">这样就有10个可能的值（1~10），其中最小的值是1。如果想选择一个2~10范围内的值，则代码就要写成这样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = math.floor(math.random() * 9 + 2);</code></pre>
+            <p class="calibre1">2~10只有9个数，所以可选总数（<code class="calibre11">total_number_of_choices</code>）是9，而最小可能的值（<code class="calibre11">first_possible_value</code>）是2。很多时候，通过函数来算出可选总数和最小可能的值可能更方便，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function selectfrom(lowervalue, uppervalue) {
+  let choices = uppervalue - lowervalue + 1;
+  return math.floor(math.random() * choices + lowervalue);
+}
+
+let num = selectfrom(2,10);
+console.log(num);  // 2~10范围内的值，其中包含2和10</code></pre>
+            <p class="calibre1">这里的函数<code class="calibre11">selectFrom()</code>接收两个参数：应该返回的最小值和最大值。通过将这两个值相减再加<code class="calibre11">1</code>得到可选总数，然后再套用上面的公式。于是，调用<code class="calibre11">selectFrom(2,10)</code>就可以从2~10（包含）范围内选择一个值了。使用这个函数，从一个数组中随机选择一个元素就很容易，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let colors = ["red", "green", "blue", "yellow", "black", "purple", "brown"];
+let color = colors[selectfrom(0, colors.length-1)];</code></pre>
+            <p class="calibre1">在这个例子中，传给<code class="calibre11">selecFrom()</code>的第二个参数是数组长度减1，即数组最大的索引值。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                <code class="calibre11">Math.random()</code>方法在这里出于演示目的是没有问题的。如果是为了加密而需要生成随机数（传给生成器的输入需要较高的不确定性），那么建议使用<code class="calibre11">window.crypto.getRandomValues()</code>。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">其他方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Math</code>对象还有很多涉及各种简单或高阶数运算的方法。讨论每种方法的具体细节或者它们的适用场景超出了本书的范畴。不过，下表还是总结了<code class="calibre11">Math</code>对象的其他方法。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">方法</th>
+                <th class="calibre19">说明</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.abs(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的绝对值</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.e<i class="calibre6">x</i>p(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">Math.E</code>的<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>次幂</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.e<i class="calibre6">x</i>pm1(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">等于<code class="calibre27">Math.e<i class="calibre6">x</i>p(<i class="calibre6">x</i>) - 1</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.log(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的自然对数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.log1p(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">等于<code class="calibre27">1 + Math.log(<i class="calibre6">x</i>)</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.pow(<i class="calibre6">x</i>,
+                    <i class="calibre6">power</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的<code class="calibre27">
+                    <i class="calibre6">power</i>
+                  </code>次幂</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.hypot(<i class="calibre6">...nums</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">nums</i>
+                  </code>中每个数平方和的平方根</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.clz32(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回32位整数<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的前置零的数量</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.sign(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回表示<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>符号的<code class="calibre27">1</code>、<code class="calibre27">0</code>、<code class="calibre27">-0</code>或<code class="calibre27">-1</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.trunc(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的整数部分，删除所有小数</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.sqrt(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的平方根</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.cbrt(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的立方根</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.acos(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反余弦</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.acosh(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反双曲余弦</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.asin(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反正弦</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.asinh(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反双曲正弦</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.atan(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反正切</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.atanh(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的反双曲正切</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.atan2(<i class="calibre6">y</i>,
+                    <i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">y</i>/<i class="calibre6">x</i>
+                  </code>的反正切</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.cos(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的余弦</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">Math.sin(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的正弦</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">Math.tan(<i class="calibre6">x</i>)</code>
+                </td>
+                <td class="calibre21">返回<code class="calibre27">
+                    <i class="calibre6">x</i>
+                  </code>的正切</td>
+              </tr>
+            </table>
+
+            <p class="calibre1">即便这些方法都是由ECMA-262定义的，对正弦、余弦、正切等计算的实现仍然取决于浏览器，因为计算这些值的方式有很多种。结果，这些方法的精度可能因实现而异。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0041.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0043.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

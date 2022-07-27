@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0160.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0162.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_519" class="calibre9">21.4 旧版IE的常见错误</h2>
+        <p class="calibre1">IE曾是最难调试JavaScript错误的浏览器之一。该浏览器的旧版本抛出的错误通常比较短，比较含糊，缺少上下文。接下来几节分别讨论旧版IE中可能会出现的常见且难于调试的JavaScript错误。因为这些浏览器不支持ES6，所以代码会考虑向后兼容。</p>
+        <h3 id="nav_point_520" class="calibre15">21.4.1 无效字符</h3>
+        <p class="calibre1">JavaScript文件中的代码必须由特定字符构成。在检测到JavaScript文件中存在无效字符时，IE会抛出<code class="calibre11">"invalid character"</code>错误。所谓无效字符，指的是JavaScript语法中没有定义过的字符。例如，一个看起来像减号而实际上并不是减号的字符（Unicode值为<code class="calibre11">\u2013</code>）。这个字符不能用于代替减号（ASCII码为45），因为它不是JavaScript语法定义的减号。这个特殊字符经常会被自动插入Word文档，因此如果把它从Word文档复制到文本编辑器然后在IE中运行，IE就会报告文件中包含非法字符。其他浏览器也类似，Firefox抛出<code class="calibre11">"illegal character"</code>错误，Safari报告语法错误，而Opera则报告<code class="calibre11">ReferenceError</code>（因为把这个字符当成了未定义标识符来解释）。</p>
+        <h3 id="nav_point_521" class="calibre15">21.4.2 未找到成员</h3>
+        <p class="calibre1">如前所述，旧版IE中所有DOM对象都是用COM对象实现的，并非原生JavaScript对象。在涉及垃圾回收时，这可能会导致很多奇怪的行为。其中，<code class="calibre11">"member not found"</code>错误是IE中垃圾回收程序常报告的错误。</p>
+        <p class="calibre1">这个错误通常会在给一个已被销毁的对象赋值时发生。这个对象必须是COM对象才会出现这个消息。最好的一个例子就是<code class="calibre11">event</code>对象。IE的<code class="calibre11">event</code>对象是作为<code class="calibre11">window</code>的一个属性存在的，会在事件发生时创建，在事件处理程序执行完毕后销毁。因此，如果你想在稍后会执行的闭包中使用<code class="calibre11">event</code>对象，尝试给<code class="calibre11">event</code>对象赋值就会导致这个错误，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.onclick = function() {
+  var event = window.event;
+  settimeout(function(){
+    event.returnvalue = false; // 未找到成员
+  }, 1000);
+};</code></pre>
+        <p class="calibre1">在这个例子中，文档被添加了单击事件处理程序。事件处理程序把<code class="calibre11">window.event</code>对象保存在一个名为<code class="calibre11">event</code>的本地变量中。然后，在传递给<code class="calibre11">setTimeout()</code>的闭包中引用这个事件变量。当<code class="calibre11">onclick</code>事件处理程序退出后，<code class="calibre11">event</code>对象会被销毁，因此闭包中对它的引用也就不存在了，于是就会报告未找到成员错误。之所以给<code class="calibre11">event.returnValue</code>赋值会导致<code class="calibre11">"member not found"</code>错误，是因为不能给已将其成员销毁的COM对象赋值。</p>
+        <h3 id="nav_point_522" class="calibre15">21.4.3 未知运行时错误</h3>
+        <p class="calibre1">使用<code class="calibre11">innerHTML</code>或<code class="calibre11">outerHTML</code>属性以下面一种方式添加HTML时会发生未知运行时错误：比如将块级元素插入行内元素，或者在表格的任何部分（<code class="calibre11">&lt;table&gt;</code>、<code class="calibre11">&lt;tbody&gt;</code>等）访问了其中一个属性。例如，从技术角度来说，<code class="calibre11">&lt;p&gt;</code>标签不能包含另一个块级元素，如<code class="calibre11">&lt;div&gt;</code>，因此以下代码会导致未知运行时错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">p.innerhtml = "&lt;div&gt;hi&lt;/div&gt;"; // where p contains a &lt;p&gt; element</code></pre>
+        <p class="calibre1">在将块级元素插入不恰当的位置时，其他浏览器会尝试纠正，这样就不会发生错误，但IE在这种情况下要严格得多。</p>
+        <h3 id="nav_point_523" class="calibre15">21.4.4 语法错误</h3>
+        <p class="calibre1">通常，当IE报告语法错误时，原因是很清楚的。一般来说，可以通过错误消息追踪到少了一个分号或括号错配。不过，有一种情况下报告的语法错误并不清楚。</p>
+        <p class="calibre1">如果网页中引用的一个外部JavaScript文件由于某种原因返回了非JavaScript代码，则IE会抛出语法错误。例如，错误地把<code class="calibre11">&lt;script&gt;</code>标签的<code class="calibre11">src</code>属性设置为指向一个HTML文件，就会导致语法错误。通常会报告该语法错误发生在脚本第一行的第一个字符。Opera和Safari此时也会报告语法错误，但它们也会报告是引用文件不当导致的问题。IE没有这些信息，因此需要仔细检查引用的每个外部JavaScript文件。Firefox会忽略作为JavaScript引用的非JavaScript文件导致的解析错误。</p>
+        <p class="calibre1">这种错误通常发生在服务器端动态生成JavaScript的情况下。很多服务器端语言会在发生运行时错误时，自动向输出中插入HTML。这种输出显然会导致JavaScript语法错误。如果你碰到了难以排除的语法错误，可以仔细检查所有外部文件，确保没有文件包含服务器由于错误而插入的HTML。</p>
+        <h3 id="nav_point_524" class="calibre15">21.4.5 系统找不到指定资源</h3>
+        <p class="calibre1">还有一个可能最没用的消息：“The system cannot locate the resource specified”（系统找不到指定资源）。这个错误会在JavaScript向某个URL发送请求，而该URL长度超过了IE允许的最大URL长度（2083个字符）时发生。这个长度限制不仅针对JavaScript，而且针对IE本身。（其他浏览器没有这么严格地限制URL长度。）另外，IE对URL路径还有2048个字符的限制。下面的代码会导致这个错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function createlongurl(url) {
+  var s = "?";
+  for (var i = 0, len = 2500; i &lt; len; i++){
+    s += "a";
+  }
+
+  return url + s;
+}
+
+var x = new xmlhttprequest();
+x.open("get", createlongurl("http://www.somedomain.com/"), true);
+x.send(null);</code></pre>
+        <p class="calibre1">在这个例子中，<code class="calibre11">XMLHttpRequest</code>对象尝试向超过URL长度限制的地址发送请求。在调用<code class="calibre11">open()</code>方法时，错误会发生。为避免这种错误，一个办法是缩短请求成功所需的查询字符串，比如缩短参数名或去掉不必要的数据。另一个办法是改为使用POST请求，不用查询字符串而通过请求体发送数据。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0160.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0162.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

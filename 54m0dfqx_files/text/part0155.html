@@ -1,0 +1,758 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0154.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0156.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_496" class="calibre9">20.12 Web Cryptography API</h2>
+        <p class="calibre1">Web Cryptography API描述了一套密码学工具，规范了JavaScript如何以安全和符合惯例的方式实现加密。这些工具包括生成、使用和应用加密密钥对，加密和解密消息，以及可靠地生成随机数。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            加密接口的组织方式有点奇怪，其外部是一个<code class="calibre11">Crypto</code>对象，内部是一个<code class="calibre11">SubtleCrypto</code>对象。在Web Cryptography API标准化之前，<code class="calibre11">window.crypto</code>属性在不同浏览器中的实现差异非常大。为实现跨浏览器兼容，标准API都暴露在<code class="calibre11">SubtleCrypto</code>对象上。</p>
+        </blockquote>
+        <h3 id="nav_point_497" class="calibre15">20.12.1 生成随机数</h3>
+        <p class="calibre1">在需要生成随机值时，很多人会使用<code class="calibre11">Math.random()</code>。这个方法在浏览器中是以<strong class="calibre2">伪随机数生成器</strong>（PRNG，PseudoRandom Number Generator）方式实现的。所谓“伪”指的是生成值的过程不是真的随机。PRNG生成的值只是<strong class="calibre2">模拟了</strong>随机的特性。浏览器的PRNG并未使用真正的随机源，只是对一个内部状态应用了固定的算法。每次调用<code class="calibre11">Math.random()</code>，这个内部状态都会被一个算法修改，而结果会被转换为一个新的随机值。例如，V8引擎使用了一个名为xorshift128+的算法来执行这种修改。</p>
+        <p class="calibre1">由于算法本身是固定的，其输入<strong class="calibre2">只是</strong>之前的状态，因此随机数顺序也是确定的。xorshift128+使用128位内部状态，而算法的设计让任何初始状态在重复自身之前都会产生2<sup class="calibre29">128</sup>–1个伪随机值。这种循环被称为<strong class="calibre2">置换循环</strong>（permutation cycle），而这个循环的长度被称为一个<strong class="calibre2">周期</strong>（period）。很明显，如果攻击者知道PRNG的内部状态，就可以预测后续生成的伪随机值。如果开发者无意中使用PRNG生成了私有密钥用于加密，则攻击者就可以利用PRNG的这个特性算出私有密钥。</p>
+        <p class="calibre1">伪随机数生成器主要用于快速计算出看起来随机的值。不过并不适合用于加密计算。为解决这个问题，<strong class="calibre2">密码学安全伪随机数生成器</strong>（CSPRNG，Cryptographically Secure PseudoRandom Number Generator）额外增加了一个熵作为输入，例如测试硬件时间或其他无法预计行为的系统特性。这样一来，计算速度明显比常规PRNG慢很多，但CSPRNG生成的值就很难预测，可以用于加密了。</p>
+        <p class="calibre1">Web Cryptography API引入了CSPRNG，这个CSPRNG可以通过<code class="calibre11">crypto.getRandomValues()</code>在全局<code class="calibre11">Crypto</code>对象上访问。与<code class="calibre11">Math.random()</code>返回一个介于0和1之间的浮点数不同，<code class="calibre11">getRandomValues()</code>会把随机值写入作为参数传给它的定型数组。定型数组的类不重要，因为底层缓冲区会被随机的二进制位填充。</p>
+        <p class="calibre1">下面的例子展示了生成5个8位随机值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const array = new uint8array(1);
+
+for (let i=0; i&lt;5; ++i) {
+  console.log(crypto.getrandomvalues(array));
+}
+
+// uint8array [41]
+// uint8array [250]
+// uint8array [51]
+// uint8array [129]
+// uint8array [35]</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">getRandomValues()</code>最多可以生成2<sup class="calibre29">16</sup>（65 536）字节，超出则会抛出错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const fooarray = new uint8array(2 ** 16);
+console.log(window.crypto.getrandomvalues(fooarray)); // uint32array(16384) [...]
+
+const bararray = new uint8array((2 ** 16) + 1);
+console.log(window.crypto.getrandomvalues(bararray)); // error</code></pre>
+        <p class="calibre1">要使用CSPRNG重新实现<code class="calibre11">Math.random()</code>，可以通过生成一个随机的32位数值，然后用它去除最大的可能值<code class="calibre11">0xFFFFFFFF</code>。这样就会得到一个介于0和1之间的值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function randomfloat() {
+  // 生成32位随机值
+  const fooarray = new uint32array(1);
+
+  // 最大值是2^32 –1
+  const maxuint32 = 0xffffffff;
+
+  // 用最大可能的值来除
+  return crypto.getrandomvalues(fooarray)[0] / maxuint32;
+}
+
+console.log(randomfloat()); // 0.5033651619458955</code></pre>
+        <h3 id="nav_point_498" class="calibre15">20.12.2 使用<code class="calibre26">SubtleCrypto</code>对象</h3>
+        <p class="calibre1">Web Cryptography API重头特性都暴露在了<code class="calibre11">SubtleCrypto</code>对象上，可以通过<code class="calibre11">window.crypto.subtle</code>访问：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(crypto.subtle); // subtlecrypto {}</code></pre>
+        <p class="calibre1">这个对象包含一组方法，用于执行常见的密码学功能，如加密、散列、签名和生成密钥。因为所有密码学操作都在原始二进制数据上执行，所以<code class="calibre11">SubtleCrypto</code>的每个方法都要用到<code class="calibre11">ArrayBuffer</code>和<code class="calibre11">ArrayBufferView</code>类型。由于字符串是密码学操作的重要应用场景，因此<code class="calibre11">TextEncoder</code>和<code class="calibre11">TextDecoder</code>是经常与<code class="calibre11">SubtleCrypto</code>一起使用的类，用于实现二进制数据与字符串之间的相互转换。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">SubtleCrypto</code>对象只能在安全上下文（https）中使用。在不安全的上下文中，<code class="calibre11">subtle</code>属性是<code class="calibre11">undefined</code>。</p>
+        </blockquote>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">生成密码学摘要</strong>
+            </p>
+            <p class="calibre1">计算数据的密码学摘要是非常常用的密码学操作。这个规范支持4种摘要算法：SHA-1和3种SHA-2。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">SHA-1（Secure Hash Algorithm 1）</strong>：架构类似MD5的散列函数。接收任意大小的输入，生成160位消息散列。由于容易受到碰撞攻击，这个算法已经不再安全。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">SHA-2（Secure Hash Algorithm 2）</strong>：构建于相同耐碰撞单向压缩函数之上的一套散列函数。规范支持其中3种：SHA-256、SHA-384和SHA-512。生成的消息摘要可以是256位（SHA-256）、384位（SHA-384）或512位（SHA-512）。这个算法被认为是安全的，广泛应用于很多领域和协议，包括TLS、PGP和加密货币（如比特币）。</li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">SubtleCrypto.digest()</code>方法用于生成消息摘要。要使用的散列算法通过字符串<code class="calibre11">"SHA-1"</code>、<code class="calibre11">"SHA-256"</code>、<code class="calibre11">"SHA-384"</code>或<code class="calibre11">"SHA-512"</code>指定。下面的代码展示了一个使用SHA-256为字符串<code class="calibre11">"foo"</code>生成消息摘要的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const textencoder = new textencoder();
+  const message = textencoder.encode('foo');
+  const messagedigest = await crypto.subtle.digest('sha-256', message);
+
+  console.log(new uint32array(messagedigest));
+})();
+
+// uint32array(8) [1806968364, 2412183400, 1011194873, 876687389,
+//                 1882014227, 2696905572, 2287897337, 2934400610]</code></pre>
+            <p class="calibre1">通常，在使用时，二进制的消息摘要会转换为十六进制字符串格式。通过将二进制数据按8位进行分割，然后再调用<code class="calibre11">toString(16)</code>就可以把任何数组缓冲区转换为十六进制字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const textencoder = new textencoder();
+  const message = textencoder.encode('foo');
+  const messagedigest = await crypto.subtle.digest('sha-256', message);
+
+  const hexdigest = array.from(new uint8array(messagedigest))
+    .map((x) =&gt; x.tostring(16).padstart(2, '0'))
+    .join('');
+
+  console.log(hexdigest);
+})();
+
+// 2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae</code></pre>
+            <p class="calibre1">软件公司通常会公开自己软件二进制安装包的摘要，以便用户验证自己下载到的确实是该公司发布的版本（而不是被恶意软件篡改过的版本）。下面的例子演示了下载Firefox v67.0，通过SHA-512计算其散列，再下载其SHA-512二进制验证摘要，最后检查两个十六进制字符串匹配：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const mozillacdnurl = '// download-
+origin.cdn.mozilla.net/pub/firefox/releases/67.0 /';
+  const firefoxbinaryfilename = 'linux-x86_64/en-us/firefox-67.0.tar.bz2';
+  const firefoxshafilename = 'sha512sums';
+
+  console.log('fetching firefox binary...');
+  const filearraybuffer = await (await fetch(mozillacdnurl + firefoxbinaryfilename))
+      .arraybuffer();
+
+  console.log('calculating firefox digest...');
+  const firefoxbinarydigest = await crypto.subtle.digest('sha-512', filearraybuffer);
+  const firefoxhexdigest = array.from(new uint8array(firefoxbinarydigest))
+    .map((x) =&gt; x.tostring(16).padstart(2, '0'))
+    .join('');
+
+  console.log('fetching published binary digests...');
+  // sha文件包含此次发布的所有firefox二进制文件的摘要，
+  // 因此要根据其格式进制拆分
+  const shapairs = (await (await fetch(mozillacdnurl + firefoxshafilename)).text())
+      .split(/\n/).map((x) =&gt; x.split(/\s+/));
+
+  let verified = false;
+
+  console.log('checking calculated digest against published digests...');
+  for (const [sha, filename] of shapairs) {
+    if (filename === firefoxbinaryfilename) {
+      if (sha === firefoxhexdigest) {
+        verified = true;
+        break;
+      }
+    }
+  }
+
+  console.log('verified:', verified);
+})();
+
+// fetching firefox binary...
+// calculating firefox digest...
+// fetching published binary digests...
+// checking calculated digest against published digests...
+// verified: true</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">CryptoKey</code>与算法</strong>
+            </p>
+            <p class="calibre1">如果没了密钥，那密码学也就没什么意义了。<code class="calibre11">SubtleCrypto</code>对象使用<code class="calibre11">CryptoKey</code>类的实例来生成密钥。<code class="calibre11">CryptoKey</code>类支持多种加密算法，允许控制密钥抽取和使用。</p>
+            <p class="calibre1">
+              <code class="calibre11">CryptoKey</code>类支持以下算法，按各自的父密码系统归类。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">RSA（Rivest-Shamir-Adleman）</strong>：公钥密码系统，使用两个大素数获得一对公钥和私钥，可用于签名/验证或加密/解密消息。RSA的陷门函数被称为<strong class="calibre2">分解难题</strong>（factoring problem）。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">RSASSA-PKCS1-v1_5</strong>：RSA的一个应用，用于使用私钥给消息签名，允许使用公钥验证签名。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">SSA（Signature Schemes with Appendix），表示算法支持签名生成和验证操作。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">PKCS1（Public-Key Cryptography Standards #1），表示算法展示出的RSA密钥必需的数学特性。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">RSASSA-PKCS1-v1_5是确定性的，意味着同样的消息和密钥每次都会生成相同的签名。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">RSA-PSS</strong>：RSA的另一个应用，用于签名和验证消息。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">PSS（Probabilistic Signature Scheme），表示生成签名时会加盐以得到随机签名。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">与RSASSA-PKCS1-v1_5不同，同样的消息和密钥每次都会生成不同的签名。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">与RSASSA-PKCS1-v1_5不同，RSA-PSS有可能约简到RSA分解难题的难度。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">通常，虽然RSASSA-PKCS1-v1_5仍被认为是安全的，但RSA-PSS应该用于代替RSASSA-PKCS1-v1_5。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">RSA-OAEP</strong>：RSA的一个应用，用于使用公钥加密消息，用私钥来解密。<ul class="calibre28">
+                  <li class="di_1ji_wu_xu_lie_biao">OAEP（Optimal Asymmetric Encryption Padding），表示算法利用了Feistel网络在加密前处理未加密的消息。</li>
+                  <li class="di_1ji_wu_xu_lie_biao">OAEP主要将确定性RSA加密模式转换为概率性加密模式。</li>
+                </ul>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">ECC（Elliptic-Curve Cryptography）</strong>：公钥密码系统，使用一个素数和一个椭圆曲线获得一对公钥和私钥，可用于签名/验证消息。ECC的陷门函数被称为<strong class="calibre2">椭圆曲线离散对数问题</strong>（elliptic curve discrete logarithm problem）。ECC被认为优于RSA。虽然RSA和ECC在密码学意义上都很强，但ECC密钥比RSA密钥短，而且ECC密码学操作比RSA操作快。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">ECDSA（Elliptic Curve Digital Signature Algorithm）</strong>：ECC的一个应用，用于签名和验证消息。这个算法是<strong class="calibre2">数字签名算法</strong>（DSA，Digital Signature Algorithm）的一个椭圆曲线风格的变体。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">ECDH（Elliptic Curve Diffie-Hellman）</strong>：ECC的密钥生成和密钥协商应用，允许两方通过公开通信渠道建立共享的机密。这个算法是<strong class="calibre2">Diffie-Hellman密钥交换</strong>（DH，Diffie-Hellman key exchange）协议的一个椭圆曲线风格的变体。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">AES（Advanced Encryption Standard）</strong>：对称密钥密码系统，使用派生自置换组合网络的分组密码加密和解密数据。AES在不同<strong class="calibre2">模式</strong>下使用，不同模式算法的特性也不同。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">AES-CTR</strong>：AES的<strong class="calibre2">计数器模式</strong>（counter mode）。这个模式使用递增计数器生成其密钥流，其行为类似密文流。使用时必须为其提供一个随机数，用作初始化向量。AES-CTR加密/解密可以并行。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">AES-CBC</strong>：AES的<strong class="calibre2">密码分组链模式</strong>（cipher block chaining mode）。在加密纯文本的每个分组之前，先使用之前密文分组求XOR，也就是名字中的“链”。使用一个初始化向量作为第一个分组的XOR输入。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">AES-GCM</strong>：AES的<strong class="calibre2">伽罗瓦/计数器模式</strong>（Galois/Counter mode）。这个模式使用计数器和初始化向量生成一个值，这个值会与每个分组的纯文本计算XOR。与CBC不同，这个模式的XOR输入不依赖之前分组密文。因此GCM模式可以并行。由于其卓越的性能，AES-GCM在很多网络安全协议中得到了应用。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">AES-KW</strong>：AES的<strong class="calibre2">密钥包装模式</strong>（key wrapping mode）。这个算法将加密密钥包装为一个可移植且加密的格式，可以在不信任的渠道中传输。传输之后，接收方可以解包密钥。与其他AES模式不同，AES-KW不需要初始化向量。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">HMAC（Hash-Based Message Authentication Code）</strong>：用于生成<strong class="calibre2">消息认证码</strong>的算法，用于验证通过不可信网络接收的消息没有被修改过。两方使用散列函数和共享私钥来签名和验证消息。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">KDF（Key Derivation Functions）</strong>：可以使用散列函数从主密钥获得一个或多个密钥的算法。KDF能够生成不同长度的密钥，也能把密钥转换为不同格式。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">HKDF（HMAC-Based Key Derivation Function）</strong>：密钥推导函数，与高熵输入（如已有密钥）一起使用。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">PBKDF2（Password-Based Key Derivation Function 2）</strong>：密钥推导函数，与低熵输入（如密钥字符串）一起使用。</li>
+            </ul>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                <code class="calibre11">CryptoKey</code>支持很多算法，但其中只有部分算法能够用于<code class="calibre11">SubtleCrypto</code>的方法。要了解哪个方法支持什么算法，可以参考W3C网站上Web Cryptography API规范的“Algorithm Overview”。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">生成<code class="calibre11">CryptoKey</code>
+              </strong>
+            </p>
+            <p class="calibre1">使用<code class="calibre11">SubtleCrypto.generateKey()</code>方法可以生成随机<code class="calibre11">CryptoKey</code>，这个方法返回一个期约，解决为一个或多个<code class="calibre11">CryptoKey</code>实例。使用时需要给这个方法传入一个指定目标算法的参数对象、一个表示密钥是否可以从<code class="calibre11">CryptoKey</code>对象中提取出来的布尔值，以及一个表示这个密钥可以与哪个<code class="calibre11">SubtleCrypto</code>方法一起使用的字符串数组（<code class="calibre11">keyUsages</code>）。</p>
+            <p class="calibre1">由于不同的密码系统需要不同的输入来生成密钥，上述参数对象为每种密码系统都规定了必需的输入：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">RSA密码系统使用<code class="calibre11">RsaHashedKeyGenParams</code>对象；</li>
+              <li class="di_1ji_wu_xu_lie_biao">ECC密码系统使用<code class="calibre11">EcKeyGenParams</code>对象；</li>
+              <li class="di_1ji_wu_xu_lie_biao">HMAC密码系统使用<code class="calibre11">HmacKeyGenParams</code>对象；</li>
+              <li class="di_1ji_wu_xu_lie_biao">AES密码系统使用<code class="calibre11">AesKeyGenParams</code>对象。</li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">keyUsages</code>对象用于说明密钥可以与哪个算法一起使用。至少要包含下列中的一个字符串：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">encrypt</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">decrypt</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">sign</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">verify</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">deriveKey</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">deriveBits</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">wrapKey</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">unwrapKey</code>
+              </li>
+            </ul>
+            <p class="calibre1">假设要生成一个满足如下条件的对称密钥：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">支持AES-CTR算法；</li>
+              <li class="di_1ji_wu_xu_lie_biao">密钥长度128位；</li>
+              <li class="di_1ji_wu_xu_lie_biao">不能从<code class="calibre11">CryptoKey</code>对象中提取；</li>
+              <li class="di_1ji_wu_xu_lie_biao">可以跟<code class="calibre11">encrypt()</code>和<code class="calibre11">decrypt()</code>方法一起使用。</li>
+            </ul>
+            <p class="calibre1">那么可以参考如下代码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const params = {
+    name: 'aes-ctr',
+    length: 128
+  };
+
+  const keyusages = ['encrypt', 'decrypt'];
+
+  const key = await crypto.subtle.generatekey(params, false, keyusages);
+
+  console.log(key);
+  // cryptokey {type: "secret", extractable: true, algorithm: {...}, usages: array(2)}
+})();</code></pre>
+            <p class="calibre1">假设要生成一个满足如下条件的非对称密钥：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">支持ECDSA算法；</li>
+              <li class="di_1ji_wu_xu_lie_biao">使用P-256椭圆曲线；</li>
+              <li class="di_1ji_wu_xu_lie_biao">可以从<code class="calibre11">CryptoKey</code>中提取；</li>
+              <li class="di_1ji_wu_xu_lie_biao">可以跟<code class="calibre11">sign()</code>和<code class="calibre11">verify()</code>方法一起使用。</li>
+            </ul>
+            <p class="calibre1">那么可以参考如下代码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const params = {
+    name: 'ecdsa',
+    namedcurve: 'p-256'
+  };
+
+  const keyusages = ['sign', 'verify'];
+
+  const {publickey, privatekey} = await crypto.subtle.generatekey(params, true,
+      keyusages);
+
+  console.log(publickey);
+  // cryptokey {type: "public", extractable: true, algorithm: {...}, usages: array(1)}
+
+  console.log(privatekey);
+  // cryptokey {type: "private", extractable: true, algorithm: {...}, usages: array(1)}
+})();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">导出和导入密钥</strong>
+            </p>
+            <p class="calibre1">如果密钥是可提取的，那么就可以在<code class="calibre11">CryptoKey</code>对象内部暴露密钥原始的二进制内容。使用<code class="calibre11">exportKey()</code>方法并指定目标格式（<code class="calibre11">"raw"</code>、<code class="calibre11">"pkcs8"</code>、<code class="calibre11">"spki"</code>或<code class="calibre11">"jwk"</code>）就可以取得密钥。这个方法返回一个期约，解决后的<code class="calibre11">ArrayBuffer</code>中包含密钥：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const params = {
+    name: 'aes-ctr',
+    length: 128
+  };
+  const keyusages = ['encrypt', 'decrypt'];
+
+  const key = await crypto.subtle.generatekey(params, true, keyusages);
+
+  const rawkey = await crypto.subtle.exportkey('raw', key);
+
+  console.log(new uint8array(rawkey));
+  // uint8array[93, 122, 66, 135, 144, 182, 119, 196, 234, 73, 84, 7, 139, 43, 238,
+  // 110]
+})();</code></pre>
+            <p class="calibre1">与<code class="calibre11">exportKey()</code>相反的操作要使用<code class="calibre11">importKey()</code>方法实现。<code class="calibre11">importKey()</code>方法的签名实际上是<code class="calibre11">generateKey()</code>和<code class="calibre11">exportKey()</code>的组合。下面的方法会生成密钥、导出密钥，然后再导入密钥：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const params = {
+    name: 'aes-ctr',
+    length: 128
+  };
+  const keyusages = ['encrypt', 'decrypt'];
+  const keyformat = 'raw';
+  const isextractable = true;
+
+  const key = await crypto.subtle.generatekey(params, isextractable, keyusages);
+
+  const rawkey = await crypto.subtle.exportkey(keyformat, key);
+
+  const importedkey = await crypto.subtle.importkey(keyformat, rawkey, params.name,
+      isextractable, keyusages);
+
+  console.log(importedkey);
+  // cryptokey {type: "secret", extractable: true, algorithm: {...}, usages: array(2)}
+})();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">从主密钥派生密钥</strong>
+            </p>
+            <p class="calibre1">使用<code class="calibre11">SubtleCrypto</code>对象可以通过可配置的属性从已有密钥获得新密钥。<code class="calibre11">SubtleCrypto</code>支持一个<code class="calibre11">deriveKey()</code>方法和一个<code class="calibre11">deriveBits()</code>方法，前者返回一个解决为<code class="calibre11">CryptoKey</code>的期约，后者返回一个解决为<code class="calibre11">ArrayBuffer</code>的期约。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                <code class="calibre11">deriveKey()</code>与<code class="calibre11">deriveBits()</code>的区别很微妙，因为调用<code class="calibre11">deriveKey()</code>实际上与调用<code class="calibre11">deriveBits()</code>之后再把结果传给<code class="calibre11">importKey()</code>相同。</p>
+            </blockquote>
+            <p class="calibre1">
+              <code class="calibre11">deriveBits()</code>方法接收一个算法参数对象、主密钥和输出的位长作为参数。当两个人分别拥有自己的密钥对，但希望获得共享的加密密钥时可以使用这个方法。下面的例子使用ECDH算法基于两个密钥对生成了对等密钥，并确保它们派生相同的密钥位：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const ellipticcurve = 'p-256';
+  const algoidentifier = 'ecdh';
+  const derivedkeysize = 128;
+
+  const params = {
+    name: algoidentifier,
+    namedcurve: ellipticcurve
+  };
+
+  const keyusages = ['derivebits'];
+
+  const keypaira = await crypto.subtle.generatekey(params, true, keyusages);
+  const keypairb = await crypto.subtle.generatekey(params, true, keyusages);
+
+  // 从a的公钥和b的私钥派生密钥位
+  const derivedbitsab = await crypto.subtle.derivebits(
+      object.assign({ public: keypaira.publickey }, params),
+      keypairb.privatekey,
+      derivedkeysize);
+
+  // 从b的公钥和a的私钥派生密钥位
+  const derivedbitsba = await crypto.subtle.derivebits(
+      object.assign({ public: keypairb.publickey }, params),
+      keypaira.privatekey,
+      derivedkeysize);
+
+  const arrayab = new uint32array(derivedbitsab);
+  const arrayba = new uint32array(derivedbitsba);
+
+  // 确保密钥数组相等
+  console.log(
+      arrayab.length === arrayba.length &amp;&amp;
+      arrayab.every((val, i) =&gt; val === arrayba[i])); // true
+})();</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">deriveKey()</code>方法是类似的，只不过返回的是<code class="calibre11">CryptoKey</code>的实例而不是<code class="calibre11">ArrayBuffer</code>。下面的例子基于一个原始字符串，应用PBKDF2算法将其导入一个原始主密钥，然后派生了一个AES-GCM格式的新密钥：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const password = 'foobar';
+  const salt = crypto.getrandomvalues(new uint8array(16));
+  const algoidentifier = 'pbkdf2';
+  const keyformat = 'raw';
+  const isextractable = false;
+
+  const params = {
+    name: algoidentifier
+  };
+
+  const masterkey = await window.crypto.subtle.importkey(
+    keyformat,
+    (new textencoder()).encode(password),
+    params,
+    isextractable,
+    ['derivekey']
+  );
+
+  const deriveparams = {
+    name: 'aes-gcm',
+    length: 128
+  };
+
+  const derivedkey = await window.crypto.subtle.derivekey(
+    object.assign({salt, iterations: 1e5, hash: 'sha-256'}, params),
+    masterkey,
+    deriveparams,
+    isextractable,
+    ['encrypt']
+  );
+
+  console.log(derivedkey);
+  // cryptokey {type: "secret", extractable: false, algorithm: {...}, usages: array(1)}
+})();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用非对称密钥签名和验证消息</strong>
+            </p>
+            <p class="calibre1">通过<code class="calibre11">SubtleCrypto</code>对象可以使用公钥算法用私钥生成签名，或者用公钥验证签名。这两种操作分别通过<code class="calibre11">SubtleCrypto.sign()</code>和<code class="calibre11">SubtleCrypto.verify()</code>方法完成。</p>
+            <p class="calibre1">签名消息需要传入参数对象以指定算法和必要的值、<code class="calibre11">CryptoKey</code>和要签名的<code class="calibre11">ArrayBuffer</code>或<code class="calibre11">ArrayBufferView</code>。下面的例子会生成一个椭圆曲线密钥对，并使用私钥签名消息：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const keyparams = {
+    name: 'ecdsa',
+    namedcurve: 'p-256'
+  };
+
+  const keyusages = ['sign', 'verify'];
+
+  const {publickey, privatekey} = await crypto.subtle.generatekey(keyparams, true,
+      keyusages);
+
+  const message = (new textencoder()).encode('i am satoshi nakamoto');
+
+  const signparams = {
+    name: 'ecdsa',
+    hash: 'sha-256'
+  };
+
+  const signature = await crypto.subtle.sign(signparams, privatekey, message);
+
+  console.log(new uint32array(signature));
+  // uint32array(16) [2202267297, 698413658, 1501924384, 691450316, 778757775, ... ]
+})();</code></pre>
+            <p class="calibre1">希望通过这个签名验证消息的人可以使用公钥和<code class="calibre11">SubtleCrypto.verify()</code>方法。这个方法的签名几乎与<code class="calibre11">sign()</code>相同，只是必须提供公钥以及签名。下面的例子通过验证生成的签名扩展了前面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const keyparams = {
+    name: 'ecdsa',
+    namedcurve: 'p-256'
+  };
+
+  const keyusages = ['sign', 'verify'];
+
+  const {publickey, privatekey} = await crypto.subtle.generatekey(keyparams, true,
+      keyusages);
+
+  const message = (new textencoder()).encode('i am satoshi nakamoto');
+
+  const signparams = {
+    name: 'ecdsa',
+    hash: 'sha-256'
+  };
+
+  const signature = await crypto.subtle.sign(signparams, privatekey, message);
+
+  const verified = await crypto.subtle.verify(signparams, publickey, signature,
+      message);
+
+  console.log(verified); // true
+})();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="7" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">使用对称密钥加密和解密</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">SubtleCrypto</code>对象支持使用公钥和对称算法加密和解密消息。这两种操作分别通过<code class="calibre11">SubtleCrypto.encrypt()</code>和<code class="calibre11">SubtleCrypto.decrypt()</code>方法完成。</p>
+            <p class="calibre1">加密消息需要传入参数对象以指定算法和必要的值、加密密钥和要加密的数据。下面的例子会生成对称AES-CBC密钥，用它加密消息，最后解密消息：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const algoidentifier = 'aes-cbc';
+
+  const keyparams = {
+    name: algoidentifier,
+    length: 256
+  };
+
+  const keyusages = ['encrypt', 'decrypt'];
+
+  const key = await crypto.subtle.generatekey(keyparams, true,
+      keyusages);
+
+  const originalplaintext = (new textencoder()).encode('i am satoshi nakamoto');
+
+  const encryptdecryptparams = {
+    name: algoidentifier,
+    iv: crypto.getrandomvalues(new uint8array(16))
+  };
+
+  const ciphertext = await crypto.subtle.encrypt(encryptdecryptparams, key,
+      originalplaintext);
+
+  console.log(ciphertext);
+  // arraybuffer(32) {}
+
+  const decryptedplaintext = await crypto.subtle.decrypt(encryptdecryptparams, key,
+      ciphertext);
+
+  console.log((new textdecoder()).decode(decryptedplaintext));
+  // i am satoshi nakamoto
+})();</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="8" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">包装和解包密钥</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">SubtleCrypto</code>对象支持包装和解包密钥，以便在非信任渠道传输。这两种操作分别通过<code class="calibre11">SubtleCrypto.wrapKey()</code>和<code class="calibre11">SubtleCrypto.unwrapKey()</code>方法完成。</p>
+            <p class="calibre1">包装密钥需要传入一个格式字符串、要包装的<code class="calibre11">CryptoKey</code>实例、要执行包装的<code class="calibre11">CryptoKey</code>，以及一个参数对象用于指定算法和必要的值。下面的例子生成了一个对称AES-GCM密钥，用AES-KW来包装这个密钥，最后又将包装的密钥解包：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(async function() {
+  const keyformat = 'raw';
+  const extractable = true;
+
+  const wrappingkeyalgoidentifier = 'aes-kw';
+  const wrappingkeyusages = ['wrapkey', 'unwrapkey'];
+  const wrappingkeyparams = {
+    name: wrappingkeyalgoidentifier,
+    length: 256
+  };
+
+  const keyalgoidentifier = 'aes-gcm';
+  const keyusages = ['encrypt'];
+  const keyparams = {
+    name: keyalgoidentifier,
+    length: 256
+  };
+
+  const wrappingkey = await crypto.subtle.generatekey(wrappingkeyparams, extractable,
+      wrappingkeyusages);
+
+  console.log(wrappingkey);
+  // cryptokey {type: "secret", extractable: true, algorithm: {...}, usages: array(2)}
+
+  const key = await crypto.subtle.generatekey(keyparams, extractable, keyusages);
+
+  console.log(key);
+  // cryptokey {type: "secret", extractable: true, algorithm: {...}, usages: array(1)}
+
+  const wrappedkey = await crypto.subtle.wrapkey(keyformat, key, wrappingkey,
+      wrappingkeyalgoidentifier);
+
+  console.log(wrappedkey);
+  // arraybuffer(40) {}
+
+  const unwrappedkey = await crypto.subtle.unwrapkey(keyformat, wrappedkey,
+      wrappingkey, wrappingkeyparams, keyparams, extractable, keyusages);
+
+  console.log(unwrappedkey);
+  // cryptokey {type: "secret", extractable: true, algorithm: {...}, usages: array(1)}
+})()</code></pre>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0154.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0156.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

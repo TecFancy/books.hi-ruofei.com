@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0145.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0147.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_455" class="calibre9">20.3 Encoding API</h2>
+        <p class="calibre1">Encoding API主要用于实现字符串与定型数组之间的转换。规范新增了4个用于执行转换的全局类：<code class="calibre11">TextEncoder</code>、<code class="calibre11">TextEncoderStream</code>、<code class="calibre11">TextDecoder</code>和<code class="calibre11">TextDecoderStream</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            相比于<strong class="calibre2">批量</strong>（bulk）的编解码，对<strong class="calibre2">流</strong>（stream）编解码的支持很有限。</p>
+        </blockquote>
+        <h3 id="nav_point_456" class="calibre15">20.3.1 文本编码</h3>
+        <p class="calibre1">Encoding API提供了两种将字符串转换为定型数组二进制格式的方法：批量编码和流编码。把字符串转换为定型数组时，编码器始终使用UTF-8。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">批量编码</strong>
+            </p>
+            <p class="calibre1">所谓<strong class="calibre2">批量</strong>，指的是JavaScript引擎会同步编码整个字符串。对于非常长的字符串，可能会花较长时间。批量编码是通过<code class="calibre11">TextEncoder</code>的实例完成的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textencoder = new textencoder();</code></pre>
+            <p class="calibre1">这个实例上有一个<code class="calibre11">encode()</code>方法，该方法接收一个字符串参数，并以<code class="calibre11">Uint8Array</code>格式返回每个字符的UTF-8编码：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textencoder = new textencoder();
+const decodedtext = 'foo';
+const encodedtext = textencoder.encode(decodedtext);
+
+// f的utf-8编码是0x66（即十进制102）
+// o的utf-8编码是0x6f（即二进制111）
+console.log(encodedtext); // uint8array(3) [102, 111, 111]</code></pre>
+            <p class="calibre1">编码器是用于处理字符的，有些字符（如表情符号）在最终返回的数组中可能会占多个索引：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textencoder = new textencoder();
+const decodedtext = '☺';
+const encodedtext = textencoder.encode(decodedtext);
+
+// ☺的utf-8编码是0xf0 0x9f 0x98 0x8a（即十进制240、159、152、138）
+console.log(encodedtext); // uint8array(4) [240, 159, 152, 138]</code></pre>
+            <p class="calibre1">编码器实例还有一个<code class="calibre11">encodeInto()</code>方法，该方法接收一个字符串和目标<code class="calibre11">Unit8Array</code>，返回一个字典，该字典包含<code class="calibre11">read</code>和<code class="calibre11">written</code>属性，分别表示成功从源字符串读取了多少字符和向目标数组写入了多少字符。如果定型数组的空间不够，编码就会提前终止，返回的字典会体现这个结果：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textencoder = new textencoder();
+const fooarr = new uint8array(3);
+const bararr = new uint8array(2);
+const fooresult = textencoder.encodeinto('foo', fooarr);
+const barresult = textencoder.encodeinto('bar', bararr);
+
+console.log(fooarr);    // uint8array(3) [102, 111, 111]
+console.log(fooresult); // { read: 3, written: 3 }
+
+console.log(bararr);    // uint8array(2) [98, 97]
+console.log(barresult); // { read: 2, written: 2 }</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">encode()</code>要求分配一个新的<code class="calibre11">Unit8Array</code>，<code class="calibre11">encodeInto()</code>则不需要。对于追求性能的应用，这个差别可能会带来显著不同。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                文本编码会始终使用UTF-8格式，而且必须写入<code class="calibre11">Unit8Array</code>实例。使用其他类型数组会导致<code class="calibre11">encodeInto()</code>抛出错误。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">流编码</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">TextEncoderStream</code>其实就是<code class="calibre11">TransformStream</code>形式的<code class="calibre11">TextEncoder</code>。将解码后的文本流通过管道输入流编码器会得到编码后文本块的流：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function* chars() {
+  const decodedtext = 'foo';
+    for (let char of decodedtext) {
+      yield await new promise((resolve) =&gt; settimeout(resolve, 1000, char));
+  }
+}
+
+const decodedtextstream = new readablestream({
+  async 首页(controller) {
+    for await (let chunk of chars()) {
+      controller.enqueue(chunk);
+    }
+
+    controller.close();
+  }
+});
+
+const encodedtextstream = decodedtextstream.pipethrough(new textencoderstream());
+
+const readablestreamdefaultreader = encodedtextstream.getreader();
+
+(async function() {
+  while(true) {
+    const { done, value } = await readablestreamdefaultreader.read();
+
+    if (done) {
+      break;
+    } else {
+      console.log(value);
+    }
+  }
+})();
+
+// uint8array[102]
+// uint8array[111]
+// uint8array[111]</code></pre>
+          </li>
+        </ol>
+        <h3 id="nav_point_457" class="calibre15">20.3.2 文本解码</h3>
+        <p class="calibre1">Encoding API提供了两种将定型数组转换为字符串的方式：批量解码和流解码。与编码器类不同，在将定型数组转换为字符串时，解码器支持非常多的字符串编码，可以参考Encoding Standard规范的“Names and labels”一节。</p>
+        <p class="calibre1">默认字符编码格式是UTF-8。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">批量解码</strong>
+            </p>
+            <p class="calibre1">所谓<strong class="calibre2">批量</strong>，指的是JavaScript引擎会同步解码整个字符串。对于非常长的字符串，可能会花较长时间。批量解码是通过<code class="calibre11">TextDecoder</code>的实例完成的：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textdecoder = new textdecoder();</code></pre>
+            <p class="calibre1">这个实例上有一个<code class="calibre11">decode()</code>方法，该方法接收一个定型数组参数，返回解码后的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textdecoder = new textdecoder();
+
+// f的utf-8编码是0x66（即十进制102）
+// o的utf-8编码是0x6f（即二进制111）
+const encodedtext = uint8array.of(102, 111, 111);
+const decodedtext = textdecoder.decode(encodedtext);
+
+console.log(decodedtext); // foo</code></pre>
+            <p class="calibre1">解码器不关心传入的是哪种定型数组，它只会专心解码整个二进制表示。在下面这个例子中，只包含8位字符的32位值被解码为UTF-8格式，解码得到的字符串中填充了空格：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textdecoder = new textdecoder();
+
+// f的utf-8编码是0x66（即十进制102）
+// o的utf-8编码是0x6f（即二进制111）
+const encodedtext = uint32array.of(102, 111, 111);
+const decodedtext = textdecoder.decode(encodedtext);
+
+console.log(decodedtext);  // "f   o   o   "</code></pre>
+            <p class="calibre1">解码器是用于处理定型数组中分散在多个索引上的字符的，包括表情符号：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textdecoder = new textdecoder();
+
+// ☺的utf-8编码是0xf0 0x9f 0x98 0x8a（即十进制240、159、152、138）
+const encodedtext = uint8array.of(240, 159, 152, 138);
+const decodedtext = textdecoder.decode(encodedtext);
+
+console.log(decodedtext); // ☺</code></pre>
+            <p class="calibre1">与<code class="calibre11">TextEncoder</code>不同，<code class="calibre11">TextDecoder</code>可以兼容很多字符编码。比如下面的例子就使用了UTF-16而非默认的UTF-8：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const textdecoder = new textdecoder('utf-16');
+
+// f的utf-8编码是0x0066（即十进制102）
+// o的utf-8编码是0x006f（即二进制111）
+const encodedtext = uint16array.of(102, 111, 111);
+const decodedtext = textdecoder.decode(encodedtext);
+
+console.log(decodedtext); // foo</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">流解码</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">TextDecoderStream</code>其实就是<code class="calibre11">TransformStream</code>形式的<code class="calibre11">TextDecoder</code>。将编码后的文本流通过管道输入流解码器会得到解码后文本块的流：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function* chars() {
+  // 每个块必须是一个定型数组
+  const encodedtext = [102, 111, 111].map((x) =&gt; uint8array.of(x));
+
+  for (let char of encodedtext) {
+    yield await new promise((resolve) =&gt; settimeout(resolve, 1000, char));
+  }
+}
+
+const encodedtextstream = new readablestream({
+  async 首页(controller) {
+    for await (let chunk of chars()) {
+      controller.enqueue(chunk);
+    }
+
+    controller.close();
+  }
+});
+
+const decodedtextstream = encodedtextstream.pipethrough(new textdecoderstream());
+
+const readablestreamdefaultreader = decodedtextstream.getreader();
+
+(async function() {
+  while(true) {
+    const { done, value } = await readablestreamdefaultreader.read();
+
+    if (done) {
+      break;
+    } else {
+      console.log(value);
+    }
+  }
+})();
+
+// f
+// o
+// o</code></pre>
+            <p class="calibre1">文本解码器流能够识别可能分散在不同块上的代理对。解码器流会保持块片段直到取得完整的字符。比如在下面的例子中，流解码器在解码流并输出字符之前会等待传入4个块：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">async function* chars() {
+  // ☺的utf-8编码是0xf0 0x9f 0x98 0x8a（即十进制240、159、152、138）
+  const encodedtext = [240, 159, 152, 138].map((x) =&gt; uint8array.of(x));
+
+  for (let char of encodedtext) {
+    yield await new promise((resolve) =&gt; settimeout(resolve, 1000, char));
+  }
+}
+
+const encodedtextstream = new readablestream({
+  async 首页(controller) {
+    for await (let chunk of chars()) {
+      controller.enqueue(chunk);
+    }
+    controller.close();
+  }
+});
+
+const decodedtextstream = encodedtextstream.pipethrough(new textdecoderstream());
+
+const readablestreamdefaultreader = decodedtextstream.getreader();
+
+(async function() {
+  while(true) {
+    const { done, value } = await readablestreamdefaultreader.read();
+
+    if (done) {
+      break;
+    } else {
+      console.log(value);
+    }
+  }
+})();
+
+// ☺</code></pre>
+            <p class="calibre1">文本解码器流经常与<code class="calibre11">fetch()</code>一起使用，因为响应体可以作为<code class="calibre11">ReadableStream</code>来处理。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const response = await fetch(url);
+const stream = response.body.pipethrough(new textdecoderstream());
+const decodedstream = stream.getreader()
+
+for await (let decodedchunk of decodedstream) {
+  console.log(decodedchunk);
+}</code></pre>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0145.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0147.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

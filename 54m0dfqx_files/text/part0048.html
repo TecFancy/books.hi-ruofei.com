@@ -1,0 +1,432 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0047.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0049.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_133" class="calibre9">6.4
+          <code class="calibre26">Map</code>
+        </h2>
+        <p class="calibre1">ECMAScript 6以前，在JavaScript中实现“键/值”式存储可以使用<code class="calibre11">Object</code>来方便高效地完成，也就是使用对象属性作为键，再使用属性来引用值。但这种实现并非没有问题，为此TC39委员会专门为“键/值”存储定义了一个规范。</p>
+        <p class="calibre1">作为ECMAScript 6的新增特性，<code class="calibre11">Map</code>是一种新的集合类型，为这门语言带来了真正的键/值存储机制。<code class="calibre11">Map</code>的大多数特性都可以通过<code class="calibre11">Object</code>类型实现，但二者之间还是存在一些细微的差异。具体实践中使用哪一个，还是值得细细甄别。</p>
+        <h3 id="nav_point_134" class="calibre15">6.4.1 基本API</h3>
+        <p class="calibre1">使用<code class="calibre11">new</code>关键字和<code class="calibre11">Map</code>构造函数可以创建一个空映射：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();</code></pre>
+        <p class="calibre1">如果想在创建的同时初始化实例，可以给<code class="calibre11">Map</code>构造函数传入一个可迭代对象，需要包含键/值对数组。可迭代对象中的每个键/值对都会按照迭代顺序插入到新映射实例中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用嵌套数组初始化映射
+const m1 = new map([
+  ["key1", "val1"],
+  ["key2", "val2"],
+  ["key3", "val3"]
+]);
+alert(m1.size); // 3
+
+// 使用自定义迭代器初始化映射
+const m2 = new map({
+  [symbol.iterator]: function*() {
+    yield ["key1", "val1"];
+    yield ["key2", "val2"];
+    yield ["key3", "val3"];
+  }
+});
+alert(m2.size); // 3
+
+// 映射期待的键/值对，无论是否提供
+const m3 = new map([[]]);
+alert(m3.has(undefined));  // true
+alert(m3.get(undefined));  // undefined</code></pre>
+        <p class="calibre1">初始化之后，可以使用<code class="calibre11">set()</code>方法再添加键/值对。另外，可以使用<code class="calibre11">get()</code>和<code class="calibre11">has()</code>进行查询，可以通过<code class="calibre11">size</code>属性获取映射中的键/值对的数量，还可以使用<code class="calibre11">delete()</code>和<code class="calibre11">clear()</code>删除值。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();
+
+alert(m.has("firstname"));  // false
+alert(m.get("firstname"));  // undefined
+alert(m.size);              // 0
+
+m.set("firstname", "matt")
+ .set("lastname", "frisbie");
+
+alert(m.has("firstname")); // true
+alert(m.get("firstname")); // matt
+alert(m.size);             // 2
+
+m.delete("firstname");     // 只删除这一个键/值对
+
+alert(m.has("firstname")); // false
+alert(m.has("lastname"));  // true
+alert(m.size);             // 1
+
+m.clear(); // 清除这个映射实例中的所有键/值对
+
+alert(m.has("firstname")); // false
+alert(m.has("lastname"));  // false
+alert(m.size);             // 0</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">set()</code>方法返回映射实例，因此可以把多个操作连缀起来，包括初始化声明：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map().set("key1", "val1");
+
+m.set("key2", "val2")
+ .set("key3", "val3");
+
+alert(m.size); // 3</code></pre>
+        <p class="calibre1">与<code class="calibre11">Object</code>只能使用数值、字符串或符号作为键不同，<code class="calibre11">Map</code>可以使用任何JavaScript数据类型作为键。<code class="calibre11">Map</code>内部使用SameValueZero比较操作（ECMAScript规范内部定义，语言中不能使用），基本上相当于使用严格对象相等的标准来检查键的匹配性。与<code class="calibre11">Object</code>类似，映射的值是没有限制的。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();
+
+const functionkey = function() {};
+const symbolkey = symbol();
+const objectkey = new object();
+
+m.set(functionkey, "functionvalue");
+m.set(symbolkey, "symbolvalue");
+m.set(objectkey, "objectvalue");
+
+alert(m.get(functionkey));  // functionvalue
+alert(m.get(symbolkey));    // symbolvalue
+alert(m.get(objectkey));    // objectvalue
+
+// samevaluezero比较意味着独立实例不冲突
+alert(m.get(function() {})); // undefined</code></pre>
+        <p class="calibre1">与严格相等一样，在映射中用作键和值的对象及其他“集合”类型，在自己的内容或属性被修改时仍然保持不变：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();
+
+const objkey = {},
+      objval = {},
+      arrkey = [],
+      arrval = [];
+
+m.set(objkey, objval);
+m.set(arrkey, arrval);
+
+objkey.foo = "foo";
+objval.bar = "bar";
+arrkey.push("foo");
+arrval.push("bar");
+
+console.log(m.get(objkey)); // {bar: "bar"}
+console.log(m.get(arrkey)); // ["bar"]</code></pre>
+        <p class="calibre1">SameValueZero比较也可能导致意想不到的冲突：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();
+
+const a = 0/"", // nan
+      b = 0/"", // nan
+      pz = +0,
+      nz = -0;
+
+alert(a === b);   // false
+alert(pz === nz); // true
+
+m.set(a, "foo");
+m.set(pz, "bar");
+
+alert(m.get(b));  // foo
+alert(m.get(nz)); // bar</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            SameValueZero是ECMAScript规范新增的相等性比较算法。关于ECMAScript的相等性比较，可以参考MDN文档中的文章“Equality Comparisons and Sameness”。</p>
+        </blockquote>
+        <h3 id="nav_point_135" class="calibre15">6.4.2 顺序与迭代</h3>
+        <p class="calibre1">与<code class="calibre11">Object</code>类型的一个主要差异是，<code class="calibre11">Map</code>实例会维护键值对的插入顺序，因此可以根据插入顺序执行迭代操作。</p>
+        <p class="calibre1">映射实例可以提供一个迭代器（<code class="calibre11">Iterator</code>），能以插入顺序生成<code class="calibre11">[key, value]</code>形式的数组。可以通过<code class="calibre11">entries()</code>方法（或者<code class="calibre11">Symbol.iterator</code>属性，它引用<code class="calibre11">entries()</code>）取得这个迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map([
+  ["key1", "val1"],
+  ["key2", "val2"],
+  ["key3", "val3"]
+]);
+
+alert(m.entries === m[symbol.iterator]); // true
+
+for (let pair of m.entries()) {
+  alert(pair);
+}
+// [key1,val1]
+// [key2,val2]
+// [key3,val3]
+
+for (let pair of m[symbol.iterator]()) {
+  alert(pair);
+}
+// [key1,val1]
+// [key2,val2]
+// [key3,val3]</code></pre>
+        <p class="calibre1">因为<code class="calibre11">entries()</code>是默认迭代器，所以可以直接对映射实例使用扩展操作，把映射转换为数组：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map([
+  ["key1", "val1"],
+  ["key2", "val2"],
+  ["key3", "val3"]
+]);
+
+console.log([...m]); // [[key1,val1],[key2,val2],[key3,val3]]</code></pre>
+        <p class="calibre1">如果不使用迭代器，而是使用回调方式，则可以调用映射的<code class="calibre11">forEach(callback, opt_thisArg)</code>方法并传入回调，依次迭代每个键/值对。传入的回调接收可选的第二个参数，这个参数用于重写回调内部<code class="calibre11">this</code>的值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map([
+  ["key1", "val1"],
+  ["key2", "val2"],
+  ["key3", "val3"]
+]);
+
+m.foreach((val, key) =&gt; alert(`${key} -&gt; ${val}`));
+// key1 -&gt; val1
+// key2 -&gt; val2
+// key3 -&gt; val3</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">keys()</code>和<code class="calibre11">values()</code>分别返回以插入顺序生成键和值的迭代器：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map([
+  ["key1", "val1"],
+  ["key2", "val2"],
+  ["key3", "val3"]
+]);
+
+for (let key of m.keys()) {
+  alert(key);
+}
+// key1
+// key2
+// key3
+
+for (let key of m.values()) {
+  alert(key);
+}
+// value1
+// value2
+// value3</code></pre>
+        <p class="calibre1">键和值在迭代器遍历时是可以修改的，但映射内部的引用则无法修改。当然，这并不妨碍修改作为键或值的对象内部的属性，因为这样并不影响它们在映射实例中的身份：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m1 = new map([
+  ["key1", "val1"]
+]);
+
+// 作为键的字符串原始值是不能修改的
+for (let key of m1.keys()) {
+  key = "newkey";
+  alert(key);             // newkey
+  alert(m1.get("key1"));  // val1
+}
+
+const keyobj = {id: 1};
+
+const m = new map([
+  [keyobj, "val1"]
+]);
+
+// 修改了作为键的对象的属性，但对象在映射内部仍然引用相同的值
+for (let key of m.keys()) {
+  key.id = "newkey";
+  alert(key);            // {id: "newkey"}
+  alert(m.get(keyobj));  // val1
+}
+alert(keyobj);           // {id: "newkey"}</code></pre>
+        <h3 id="nav_point_136" class="calibre15">6.4.3 选择<code class="calibre26">Object</code>还是<code class="calibre26">Map</code>
+        </h3>
+        <p class="calibre1">对于多数Web开发任务来说，选择<code class="calibre11">Object</code>还是<code class="calibre11">Map</code>只是个人偏好问题，影响不大。不过，对于在乎内存和性能的开发者来说，对象和映射之间确实存在显著的差别。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">内存占用</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">Object</code>和<code class="calibre11">Map</code>的工程级实现在不同浏览器间存在明显差异，但存储单个键/值对所占用的内存数量都会随键的数量线性增加。批量添加或删除键/值对则取决于各浏览器对该类型内存分配的工程实现。不同浏览器的情况不同，但给定固定大小的内存，<code class="calibre11">Map</code>大约可以比<code class="calibre11">Object</code>多存储50%的键/值对。</p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">插入性能</strong>
+            </p>
+            <p class="calibre1">向<code class="calibre11">Object</code>和<code class="calibre11">Map</code>中插入新键/值对的消耗大致相当，不过插入<code class="calibre11">Map</code>在所有浏览器中一般会稍微快一点儿。对这两个类型来说，插入速度并不会随着键/值对数量而线性增加。如果代码涉及大量插入操作，那么显然<code class="calibre11">Map</code>的性能更佳。</p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">查找速度</strong>
+            </p>
+            <p class="calibre1">与插入不同，从大型<code class="calibre11">Object</code>和<code class="calibre11">Map</code>中查找键/值对的性能差异极小，但如果只包含少量键/值对，则<code class="calibre11">Object</code>有时候速度更快。在把<code class="calibre11">Object</code>当成数组使用的情况下（比如使用连续整数作为属性），浏览器引擎可以进行优化，在内存中使用更高效的布局。这对<code class="calibre11">Map</code>来说是不可能的。对这两个类型而言，查找速度不会随着键/值对数量增加而线性增加。如果代码涉及大量查找操作，那么某些情况下可能选择<code class="calibre11">Object</code>更好一些。</p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">删除性能</strong>
+            </p>
+            <p class="calibre1">使用<code class="calibre11">delete</code>删除<code class="calibre11">Object</code>属性的性能一直以来饱受诟病，目前在很多浏览器中仍然如此。为此，出现了一些伪删除对象属性的操作，包括把属性值设置为<code class="calibre11">undefined</code>或<code class="calibre11">null</code>。但很多时候，这都是一种讨厌的或不适宜的折中。而对大多数浏览器引擎来说，<code class="calibre11">Map</code>的<code class="calibre11">delete()</code>操作都比插入和查找更快。如果代码涉及大量删除操作，那么毫无疑问应该选择<code class="calibre11">Map</code>。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0047.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0049.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0048.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0050.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_137" class="calibre9">6.5
+          <code class="calibre26">WeakMap</code>
+        </h2>
+        <p class="calibre1">ECMAScript 6新增的“弱映射”（<code class="calibre11">WeakMap</code>）是一种新的集合类型，为这门语言带来了增强的键/值对存储机制。<code class="calibre11">WeakMap</code>是<code class="calibre11">Map</code>的“兄弟”类型，其API也是<code class="calibre11">Map</code>的子集。<code class="calibre11">WeakMap</code>中的“weak”（弱），描述的是JavaScript垃圾回收程序对待“弱映射”中键的方式。</p>
+        <h3 id="nav_point_138" class="calibre15">6.5.1 基本API</h3>
+        <p class="calibre1">可以使用<code class="calibre11">new</code>关键字实例化一个空的<code class="calibre11">WeakMap</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();</code></pre>
+        <p class="calibre1">弱映射中的键只能是<code class="calibre11">Object</code>或者继承自<code class="calibre11">Object</code>的类型，尝试使用非对象设置键会抛出<code class="calibre11">TypeError</code>。值的类型没有限制。</p>
+        <p class="calibre1">如果想在初始化时填充弱映射，则构造函数可以接收一个可迭代对象，其中需要包含键/值对数组。可迭代对象中的每个键/值都会按照迭代顺序插入新实例中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const key1 = {id: 1},
+      key2 = {id: 2},
+      key3 = {id: 3};
+// 使用嵌套数组初始化弱映射
+const wm1 = new weakmap([
+  [key1, "val1"],
+  [key2, "val2"],
+  [key3, "val3"]
+]);
+alert(wm.get(key1)); // val1
+alert(wm.get(key2)); // val2
+alert(wm.get(key3)); // val3
+
+// 初始化是全有或全无的操作
+// 只要有一个键无效就会抛出错误，导致整个初始化失败
+const wm2 = new weakmap([
+  [key1, "val1"],
+  ["badkey", "val2"],
+  [key3, "val3"]
+]);
+// typeerror: invalid value used as weakmap key
+typeof wm2;
+// referenceerror: wm2 is not defined
+
+// 原始值可以先包装成对象再用作键
+const stringkey = new string("key1");
+const wm3 = new weakmap([
+  stringkey, "val1"
+]);
+alert(wm3.get(stringkey)); // "val1"</code></pre>
+        <p class="calibre1">初始化之后可以使用<code class="calibre11">set()</code>再添加键/值对，可以使用<code class="calibre11">get()</code>和<code class="calibre11">has()</code>查询，还可以使用<code class="calibre11">delete()</code>删除：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();
+
+const key1 = {id: 1},
+      key2 = {id: 2};
+
+alert(wm.has(key1)); // false
+alert(wm.get(key1)); // undefined
+
+wm.set(key1, "matt")
+  .set(key2, "frisbie");
+
+alert(wm.has(key1)); // true
+alert(wm.get(key1)); // matt
+
+wm.delete(key1);     // 只删除这一个键/值对
+
+alert(wm.has(key1)); // false
+alert(wm.has(key2)); // true</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">set()</code>方法返回弱映射实例，因此可以把多个操作连缀起来，包括初始化声明：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const key1 = {id: 1},
+      key2 = {id: 2},
+      key3 = {id: 3};
+
+const wm = new weakmap().set(key1, "val1");
+
+wm.set(key2, "val2")
+  .set(key3, "val3");
+
+alert(wm.get(key1)); // val1
+alert(wm.get(key2)); // val2
+alert(wm.get(key3)); // val3</code></pre>
+        <h3 id="nav_point_139" class="calibre15">6.5.2 弱键</h3>
+        <p class="calibre1">
+          <code class="calibre11">WeakMap</code>中“weak”表示弱映射的键是“弱弱地拿着”的。意思就是，这些键不属于正式的引用，不会阻止垃圾回收。但要注意的是，弱映射中值的引用可<strong class="calibre2">不是</strong>“弱弱地拿着”的。只要键存在，键/值对就会存在于映射中，并被当作对值的引用，因此就不会被当作垃圾回收。</p>
+        <p class="calibre1">来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();
+
+wm.set({}, "val");</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">set()</code>方法初始化了一个新对象并将它用作一个字符串的键。因为没有指向这个对象的其他引用，所以当这行代码执行完成后，这个对象键就会被当作垃圾回收。然后，这个键/值对就从弱映射中消失了，使其成为一个空映射。在这个例子中，因为值也没有被引用，所以这对键/值被破坏以后，值本身也会成为垃圾回收的目标。</p>
+        <p class="calibre1">再看一个稍微不同的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();
+
+const container = {
+  key: {}
+};
+
+wm.set(container.key, "val");
+
+function removereference() {
+  container.key = null;
+}</code></pre>
+        <p class="calibre1">这一次，<code class="calibre11">container</code>对象维护着一个对弱映射键的引用，因此这个对象键不会成为垃圾回收的目标。不过，如果调用了<code class="calibre11">removeReference()</code>，就会摧毁键对象的最后一个引用，垃圾回收程序就可以把这个键/值对清理掉。</p>
+        <h3 id="nav_point_140" class="calibre15">6.5.3 不可迭代键</h3>
+        <p class="calibre1">因为<code class="calibre11">WeakMap</code>中的键/值对任何时候都可能被销毁，所以没必要提供迭代其键/值对的能力。当然，也用不着像<code class="calibre11">clear()</code>这样一次性销毁所有键/值的方法。<code class="calibre11">WeakMap</code>
+          确实没有这个方法。因为不可能迭代，所以也不可能在不知道对象引用的情况下从弱映射中取得值。即便代码可以访问<code class="calibre11">WeakMap</code>实例，也没办法看到其中的内容。</p>
+        <p class="calibre1">
+          <code class="calibre11">WeakMap</code>实例之所以限制只能用对象作为键，是为了保证只有通过键对象的引用才能取得值。如果允许原始值，那就没办法区分初始化时使用的字符串字面量和初始化之后使用的一个相等的字符串了。</p>
+        <h3 id="nav_point_141" class="calibre15">6.5.4 使用弱映射</h3>
+        <p class="calibre1">
+          <code class="calibre11">WeakMap</code>实例与现有JavaScript对象有着很大不同，可能一时不容易说清楚应该怎么使用它。这个问题没有唯一的答案，但已经出现了很多相关策略。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">私有变量</strong>
+            </p>
+            <p class="calibre1">弱映射造就了在JavaScript中实现真正私有变量的一种新方式。前提很明确：私有变量会存储在弱映射中，以对象实例为键，以私有成员的字典为值。</p>
+            <p class="calibre1">下面是一个示例实现：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();
+
+class user {
+  constructor(id) {
+    this.idproperty = symbol('id');
+    this.setid(id);
+  }
+
+  setprivate(property, value) {
+    const privatemembers = wm.get(this) || {};
+    privatemembers[property] = value;
+    wm.set(this, privatemembers);
+  }
+
+  getprivate(property) {
+    return wm.get(this)[property];
+  }
+
+  setid(id) {
+    this.setprivate(this.idproperty, id);
+  }
+
+  getid() {
+    return this.getprivate(this.idproperty);
+  }
+}
+
+const user = new user(123);
+alert(user.getid()); // 123
+user.setid(456);
+alert(user.getid()); // 456
+
+// 并不是真正私有的
+alert(wm.get(user)[user.idproperty]); // 456</code></pre>
+            <p class="calibre1">慧眼独具的读者会发现，对于上面的实现，外部代码只需要拿到对象实例的引用和弱映射，就可以取得“私有”变量了。为了避免这种访问，可以用一个闭包把<code class="calibre11">WeakMap</code>包装起来，这样就可以把弱映射与外界完全隔离开了：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const user = (() =&gt; {
+  const wm = new weakmap();
+
+  class user {
+    constructor(id) {
+      this.idproperty = symbol('id');
+      this.setid(id);
+    }
+
+    setprivate(property, value) {
+      const privatemembers = wm.get(this) || {};
+      privatemembers[property] = value;
+      wm.set(this, privatemembers);
+    }
+
+    getprivate(property) {
+      return wm.get(this)[property];
+    }
+
+    setid(id) {
+      this.setprivate(this.idproperty, id);
+    }
+
+    getid(id) {
+      return this.getprivate(this.idproperty);
+    }
+  }
+  return user;
+})();
+
+const user = new user(123);
+alert(user.getid()); // 123
+user.setid(456);
+alert(user.getid()); // 456</code></pre>
+            <p class="calibre1">这样，拿不到弱映射中的健，也就无法取得弱映射中对应的值。虽然这防止了前面提到的访问，但整个代码也完全陷入了ES6之前的闭包私有变量模式。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">DOM节点元数据</strong>
+            </p>
+            <p class="calibre1">因为<code class="calibre11">WeakMap</code>实例不会妨碍垃圾回收，所以非常适合保存关联元数据。来看下面这个例子，其中使用了常规的<code class="calibre11">Map</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const m = new map();
+
+const loginbutton = document.queryselector('#login');
+
+// 给这个节点关联一些元数据
+m.set(loginbutton, {disabled: true});</code></pre>
+            <p class="calibre1">假设在上面的代码执行后，页面被JavaScript改变了，原来的登录按钮从DOM树中被删掉了。但由于映射中还保存着按钮的引用，所以对应的DOM节点仍然会逗留在内存中，除非明确将其从映射中删除或者等到映射本身被销毁。</p>
+            <p class="calibre1">如果这里使用的是弱映射，如以下代码所示，那么当节点从DOM树中被删除后，垃圾回收程序就可以立即释放其内存（假设没有其他地方引用这个对象）：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const wm = new weakmap();
+
+const loginbutton = document.queryselector('#login');
+
+// 给这个节点关联一些元数据
+wm.set(loginbutton, {disabled: true});</code></pre>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0048.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0050.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0163.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0165.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_527" class="calibre9">22.1 浏览器对XML DOM的支持</h2>
+        <p class="calibre1">因为很多浏览器在正式标准问世之前就开始实现XML解析方案，所以不同浏览器对标准的支持不仅有级别上的差异，也有实现上的差异。DOM Level 3增加了解析和序列化能力。不过，在DOM Level 3制定完成时，大多数浏览器也已实现了自己的解析方案。</p>
+        <h3 id="nav_point_528" class="calibre15">22.1.1 DOM Level 2 Core</h3>
+        <p class="calibre1">正如第12章所述，DOM Level 2增加了<code class="calibre11">document.implementation</code>的<code class="calibre11">createDocument()</code>方法。有读者可能还记得，可以像下面这样创建空XML文档：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xmldom = document.implementation.createdocument(namespaceuri, root, doctype);</code></pre>
+        <p class="calibre1">在JavaScript中处理XML时，<code class="calibre11">root</code>参数通常只会使用一次，因为这个参数定义的是XML DOM中<code class="calibre11">document</code>元素的标签名。<code class="calibre11">namespaceUri</code>参数用得很少，因为在JavaScript中很难管理命名空间。<code class="calibre11">doctype</code>参数则更是少用。</p>
+        <p class="calibre1">要创建一个<code class="calibre11">document</code>对象标签名为<code class="calibre11">&lt;root&gt;</code>的新XML文档，可以使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let xmldom = document.implementation.createdocument("", "root", null);
+
+console.log(xmldom.documentelement.tagname); // "root"
+
+let child = xmldom.createelement("child");
+xmldom.documentelement.appendchild(child);</code></pre>
+        <p class="calibre1">这个例子创建了一个XML DOM文档，该文档没有默认的命名空间和文档类型。注意，即使不指定命名空间和文档类型，参数还是要传的。命名空间传入空字符串表示不应用命名空间，文档类型传入<code class="calibre11">null</code>表示没有文档类型。<code class="calibre11">xmldom</code>变量包含DOM Level 2
+          <code class="calibre11">Document</code>类型的实例，包括第12章介绍的所有DOM方法和属性。在这个例子中，我们打印了<code class="calibre11">document</code>元素的标签名，然后又为它创建并添加了一个新的子元素。</p>
+        <p class="calibre1">要检查浏览器是否支持DOM Level 2 XML，可以使用如下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let hasxmldom = document.implementation.hasfeature("xml", "2.0");</code></pre>
+        <p class="calibre1">实践中，很少需要凭空创建XML文档，然后使用DOM方法来系统创建XML数据结构。更多是把XML文档解析为DOM结构，或者相反。因为DOM Level 2并未提供这种功能，所以出现了一些事实标准。</p>
+        <h3 id="nav_point_529" class="calibre15">22.1.2
+          <code class="calibre26">DOMParser</code>类型</h3>
+        <p class="calibre1">Firefox专门为把XML解析为DOM文档新增了<code class="calibre11">DOMParser</code>类型，后来所有其他浏览器也实现了该类型。要使用<code class="calibre11">DOMParser</code>，需要先创建它的一个实例，然后再调用<code class="calibre11">parseFromString()</code>方法。这个方法接收两个参数：要解析的XML字符串和内容类型（始终应该是<code class="calibre11">"text/html"</code>）。返回值是<code class="calibre11">Document</code>的实例。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let parser = new domparser();
+let xmldom = parser.parsefromstring("&lt;root&gt;&lt;child/&gt;&lt;/root&gt;", "text/xml");
+
+console.log(xmldom.documentelement.tagname); // "root"
+console.log(xmldom.documentelement.firstchild.tagname); // "child"
+
+let anotherchild = xmldom.createelement("child");
+xmldom.documentelement.appendchild(anotherchild);
+
+let children = xmldom.getelementsbytagname("child");
+console.log(children.length); // 2</code></pre>
+        <p class="calibre1">这个例子把简单的XML字符串解析为DOM文档。得到的DOM结构中<code class="calibre11">&lt;root&gt;</code>是<code class="calibre11">document</code>元素，它有个子元素<code class="calibre11">&lt;child&gt;</code>。然后就可以使用DOM方法与返回的文档进行交互。</p>
+        <p class="calibre1">
+          <code class="calibre11">DOMParser</code>只能解析格式良好的XML，因此不能把HTML解析为HTML文档。在发生解析错误时，不同浏览器的行为也不一样。Firefox、Opera、Safari和Chrome在发生解析错误时，<code class="calibre11">parseFromString()</code>方法仍会返回一个<code class="calibre11">Document</code>对象，只不过其<code class="calibre11">document</code>元素是<code class="calibre11">&lt;parsererror&gt;</code>，该元素的内容为解析错误的描述。下面是一个解析错误的示例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;parsererror xmlns="http://www.mozilla.org/newlayout/xml/parsererror.xml"&gt;xml
+parsing error: no element found location: file:// /i:/my%20writing/my%20books/
+professional%20javascript/second%20edition/examples/ch15/domparserexample2.js line
+number 1, column 7:&lt;sourcetext&gt;&amp;lt;root&amp;gt; ------^&lt;/sourcetext&gt;&lt;/parsererror&gt;</code></pre>
+        <p class="calibre1">Firefox和Opera都会返回这种格式的文档。Safari和Chrome返回的文档会把<code class="calibre11">&lt;parsererror&gt;</code>元素嵌入在发生解析错误的位置。早期IE版本会在调用<code class="calibre11">parseFromString()</code>的地方抛出解析错误。由于这些差异，最好使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>来判断是否发生了解析错误，如果没有错误，则通过<code class="calibre11">getElementsByTagName()</code>方法查找文档中是否包含<code class="calibre11">&lt;parsererror&gt;</code>元素，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let parser = new domparser(),
+  xmldom,
+  errors;
+try {
+  xmldom = parser.parsefromstring("&lt;root&gt;", "text/xml");
+  errors = xmldom.getelementsbytagname("parsererror");
+  if (errors.length &gt; 0) {
+    throw new error("parsing error!");
+  }
+} catch (ex) {
+  console.log("parsing error!");
+}</code></pre>
+        <p class="calibre1">这个例子中解析的XML字符串少一个<code class="calibre11">&lt;/root&gt;</code>标签，因此会导致解析错误。IE此时会抛出错误。Firefox和Opera此时会返回<code class="calibre11">document</code>元素为<code class="calibre11">&lt;parsererror&gt;</code>的文档，而在Chrome和Safari返回的文档中，<code class="calibre11">&lt;parsererror&gt;</code>是<code class="calibre11">&lt;root&gt;</code>的第一个子元素。调用<code class="calibre11">getElementsByTagName("parsererror")</code>可适用于后两种情况。如果该方法返回了任何元素，就说明有错误，会弹警告框给出提示。当然，此时可以进一步解析出错误信息并显示出来。</p>
+        <h3 id="nav_point_530" class="calibre15">22.1.3
+          <code class="calibre26">XMLSerializer</code>类型</h3>
+        <p class="calibre1">与<code class="calibre11">DOMParser</code>相对，Firefox也增加了<code class="calibre11">XMLSerializer</code>类型用于提供相反的功能：把DOM文档序列化为XML字符串。此后，<code class="calibre11">XMLSerializer</code>也得到了所有主流浏览器的支持。</p>
+        <p class="calibre1">要序列化DOM文档，必须创建<code class="calibre11">XMLSerializer</code>的新实例，然后把文档传给<code class="calibre11">serializeToString()</code>方法，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let serializer = new xmlserializer();
+let xml = serializer.serializetostring(xmldom);
+console.log(xml);</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">serializeToString()</code>方法返回的值是打印效果不好的字符串，因此肉眼看起来有点困难。</p>
+        <p class="calibre1">
+          <code class="calibre11">XMLSerializer</code>能够序列化任何有效的DOM对象，包括个别节点和HTML文档。在把HTML文档传给<code class="calibre11">serializeToString()</code>时，这个文档会被当成XML文档，因此得到的结果是格式良好的。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            如果给<code class="calibre11">serializeToString()</code>传入非DOM对象，就会导致抛出错误。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0163.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0165.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

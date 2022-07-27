@@ -1,0 +1,922 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0040.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0042.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_103" class="calibre9">5.3 原始值包装类型</h2>
+        <p class="calibre1">为了方便操作原始值，ECMAScript提供了3种特殊的引用类型：<code class="calibre11">Boolean</code>、<code class="calibre11">Number</code>和<code class="calibre11">String</code>。这些类型具有本章介绍的其他引用类型一样的特点，但也具有与各自原始类型对应的特殊行为。每当用到某个原始值的方法或属性时，后台都会创建一个相应原始包装类型的对象，从而暴露出操作原始值的各种方法。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let s1 = "some text";
+let s2 = s1.substring(2);</code></pre>
+        <p class="calibre1">在这里，<code class="calibre11">s1</code>是一个包含字符串的变量，它是一个原始值。第二行紧接着在<code class="calibre11">s1</code>上调用了<code class="calibre11">substring()</code>方法，并把结果保存在<code class="calibre11">s2</code>中。我们知道，原始值本身不是对象，因此逻辑上不应该有方法。而实际上这个例子又确实按照预期运行了。这是因为后台进行了很多处理，从而实现了上述操作。具体来说，当第二行访问<code class="calibre11">s1</code>时，是以读模式访问的，也就是要从内存中读取变量保存的值。在以读模式访问字符串值的任何时候，后台都会执行以下3步：</p>
+        <p class="calibre1">(1) 创建一个<code class="calibre11">String</code>类型的实例；</p>
+        <p class="calibre1">(2) 调用实例上的特定方法；</p>
+        <p class="calibre1">(3) 销毁实例。</p>
+        <p class="calibre1">可以把这3步想象成执行了如下3行ECMAScript代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let s1 = new string("some text");
+let s2 = s1.substring(2);
+s1 = null;</code></pre>
+        <p class="calibre1">这种行为可以让原始值拥有对象的行为。对布尔值和数值而言，以上3步也会在后台发生，只不过使用的是<code class="calibre11">Boolean</code>和<code class="calibre11">Number</code>包装类型而已。</p>
+        <p class="calibre1">引用类型与原始值包装类型的主要区别在于对象的生命周期。在通过<code class="calibre11">new</code>实例化引用类型后，得到的实例会在离开作用域时被销毁，而自动创建的原始值包装对象则只存在于访问它的那行代码执行期间。这意味着不能在运行时给原始值添加属性和方法。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let s1 = "some text";
+s1.color = "red";
+console.log(s1.color);  // undefined</code></pre>
+        <p class="calibre1">这里的第二行代码尝试给字符串<code class="calibre11">s1</code>添加了一个<code class="calibre11">color</code>属性。可是，第三行代码访问<code class="calibre11">color</code>属性时，它却不见了。原因就是第二行代码运行时会临时创建一个<code class="calibre11">String</code>对象，而当第三行代码执行时，这个对象已经被销毁了。实际上，第三行代码在这里创建了自己的<code class="calibre11">String</code>对象，但这个对象没有<code class="calibre11">color</code>属性。</p>
+        <p class="calibre1">可以显式地使用<code class="calibre11">Boolean</code>、<code class="calibre11">Number</code>和<code class="calibre11">String</code>构造函数创建原始值包装对象。不过应该在确实必要时再这么做，否则容易让开发者疑惑，分不清它们到底是原始值还是引用值。在原始值包装类型的实例上调用<code class="calibre11">typeof</code>会返回<code class="calibre11">"object"</code>，所有原始值包装对象都会转换为布尔值<code class="calibre11">true</code>。</p>
+        <p class="calibre1">另外，<code class="calibre11">Object</code>构造函数作为一个工厂方法，能够根据传入值的类型返回相应原始值包装类型的实例。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let obj = new object("some text");
+console.log(obj instanceof string);  // true</code></pre>
+        <p class="calibre1">如果传给<code class="calibre11">Object</code>的是字符串，则会创建一个<code class="calibre11">String</code>的实例。如果是数值，则会创建<code class="calibre11">Number</code>的实例。布尔值则会得到<code class="calibre11">Boolean</code>的实例。</p>
+        <p class="calibre1">注意，使用<code class="calibre11">new</code>调用原始值包装类型的构造函数，与调用同名的转型函数并不一样。例如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let value = "25";
+let number = number(value);    // 转型函数
+console.log(typeof number);    // "number"
+let obj = new number(value);   // 构造函数
+console.log(typeof obj);       // "object"</code></pre>
+        <p class="calibre1">在这个例子中，变量<code class="calibre11">number</code>中保存的是一个值为25的原始数值，而变量<code class="calibre11">obj</code>中保存的是一个<code class="calibre11">Number</code>的实例。</p>
+        <p class="calibre1">虽然不推荐显式创建原始值包装类型的实例，但它们对于操作原始值的功能是很重要的。每个原始值包装类型都有相应的一套方法来方便数据操作。</p>
+        <h3 id="nav_point_104" class="calibre15">5.3.1
+          <code class="calibre26">Boolean</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">Boolean</code>是对应布尔值的引用类型。要创建一个<code class="calibre11">Boolean</code>对象，就使用<code class="calibre11">Boolean</code>构造函数并传入<code class="calibre11">true</code>或<code class="calibre11">false</code>，如下例所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let booleanobject = new boolean(true);</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">Boolean</code>的实例会重写<code class="calibre11">valueOf()</code>方法，返回一个原始值<code class="calibre11">true</code>或<code class="calibre11">false</code>。<code class="calibre11">toString()</code>方法被调用时也会被覆盖，返回字符串<code class="calibre11">"true"</code>或<code class="calibre11">"false"</code>。不过，<code class="calibre11">Boolean</code>对象在ECMAScript中用得很少。不仅如此，它们还容易引起误会，尤其是在布尔表达式中使用<code class="calibre11">Boolean</code>对象时，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let falseobject = new boolean(false);
+let result = falseobject &amp;&amp; true;
+console.log(result); // true
+
+let falsevalue = false;
+result = falsevalue &amp;&amp; true;
+console.log(result); // false</code></pre>
+        <p class="calibre1">在这段代码中，我们创建一个值为<code class="calibre11">false</code>的<code class="calibre11">Boolean</code>对象。然后，在一个布尔表达式中通过<code class="calibre11">&amp;&amp;</code>操作将这个对象与一个原始值<code class="calibre11">true</code>组合起来。在布尔算术中，<code class="calibre11">false &amp;&amp; true</code>等于<code class="calibre11">false</code>。可是，这个表达式是对<code class="calibre11">falseObject</code>对象而不是对它表示的值（<code class="calibre11">false</code>）求值。前面刚刚说过，所有对象在布尔表达式中都会自动转换为<code class="calibre11">true</code>，因此<code class="calibre11">falseObject</code>在这个表达式里实际上表示一个<code class="calibre11">true</code>值。那么<code class="calibre11">true &amp;&amp; true</code>当然是<code class="calibre11">true</code>。</p>
+        <p class="calibre1">除此之外，原始值和引用值（<code class="calibre11">Boolean</code>对象）还有几个区别。首先，<code class="calibre11">typeof</code>操作符对原始值返回<code class="calibre11">"boolean"</code>，但对引用值返回<code class="calibre11">"object"</code>。同样，<code class="calibre11">Boolean</code>对象是<code class="calibre11">Boolean</code>类型的实例，在使用<code class="calibre11">instaceof</code>操作符时返回<code class="calibre11">true</code>，但对原始值则返回<code class="calibre11">false</code>，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(typeof falseobject);             // object
+console.log(typeof falsevalue);              // boolean
+console.log(falseobject instanceof boolean); // true
+console.log(falsevalue instanceof boolean);  // false</code></pre>
+        <p class="calibre1">理解原始布尔值和<code class="calibre11">Boolean</code>对象之间的区别非常重要，强烈建议永远不要使用后者。</p>
+        <h3 id="nav_point_105" class="calibre15">5.3.2
+          <code class="calibre26">Number</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">Number</code>是对应数值的引用类型。要创建一个<code class="calibre11">Number</code>对象，就使用<code class="calibre11">Number</code>构造函数并传入一个数值，如下例所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let numberobject = new number(10);</code></pre>
+        <p class="calibre1">与<code class="calibre11">Boolean</code>类型一样，<code class="calibre11">Number</code>类型重写了<code class="calibre11">valueOf()</code>、<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>方法。<code class="calibre11">valueOf()</code>方法返回<code class="calibre11">Number</code>对象表示的原始数值，另外两个方法返回数值字符串。<code class="calibre11">toString()</code>方法可选地接收一个表示基数的参数，并返回相应基数形式的数值字符串，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 10;
+console.log(num.tostring());   // "10"
+console.log(num.tostring(2));  // "1010"
+console.log(num.tostring(8));  // "12"
+console.log(num.tostring(10)); // "10"
+console.log(num.tostring(16)); // "a"</code></pre>
+        <p class="calibre1">除了继承的方法，<code class="calibre11">Number</code>类型还提供了几个用于将数值格式化为字符串的方法。</p>
+        <p class="calibre1">
+          <code class="calibre11">toFixed()</code>方法返回包含指定小数点位数的数值字符串，如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 10;
+console.log(num.tofixed(2)); // "10.00"</code></pre>
+        <p class="calibre1">这里的<code class="calibre11">toFixed()</code>方法接收了参数<code class="calibre11">2</code>，表示返回的数值字符串要包含两位小数。结果返回值为<code class="calibre11">"10.00"</code>，小数位填充了0。如果数值本身的小数位超过了参数指定的位数，则四舍五入到最接近的小数位：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 10.005;
+console.log(num.tofixed(2)); // "10.01"</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">toFixed()</code>自动舍入的特点可以用于处理货币。不过要注意的是，多个浮点数值的数学计算不一定得到精确的结果。比如，<code class="calibre11">0.1 + 0.2 = 0.30000000000000004</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">toFixed()</code>方法可以表示有0~20个小数位的数值。某些浏览器可能支持更大的范围，但这是通常被支持的范围。</p>
+        </blockquote>
+        <p class="calibre1">另一个用于格式化数值的方法是<code class="calibre11">toExponential()</code>，返回以科学记数法（也称为指数记数法）表示的数值字符串。与<code class="calibre11">toFixed()</code>一样，<code class="calibre11">toExponential()</code>也接收一个参数，表示结果中小数的位数。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 10;
+console.log(num.toexponential(1));  // "1.0e+1"</code></pre>
+        <p class="calibre1">这段代码的输出为<code class="calibre11">"1.0e+1"</code>。一般来说，这么小的数不用表示为科学记数法形式。如果想得到数值最适当的形式，那么可以使用<code class="calibre11">toPrecision()</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">toPrecision()</code>方法会根据情况返回最合理的输出结果，可能是固定长度，也可能是科学记数法形式。这个方法接收一个参数，表示结果中数字的总位数（不包含指数）。来看几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let num = 99;
+console.log(num.toprecision(1)); // "1e+2"
+console.log(num.toprecision(2)); // "99"
+console.log(num.toprecision(3)); // "99.0"</code></pre>
+        <p class="calibre1">在这个例子中，首先要用1位数字表示数值99，得到<code class="calibre11">"1e+2"</code>，也就是100。因为99不能只用1位数字来精确表示，所以这个方法就将它舍入为100，这样就可以只用1位数字（及其科学记数法形式）来表示了。用2位数字表示99得到<code class="calibre11">"99"</code>，用3位数字则是<code class="calibre11">"99.0"</code>。本质上，<code class="calibre11">toPrecision()</code>方法会根据数值和精度来决定调用<code class="calibre11">toFixed()</code>还是<code class="calibre11">toExponential()</code>。为了以正确的小数位精确表示数值，这3个方法都会向上或向下舍入。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">toPrecision()</code>方法可以表示带1~21个小数位的数值。某些浏览器可能支持更大的范围，但这是通常被支持的范围。</p>
+        </blockquote>
+        <p class="calibre1">与<code class="calibre11">Boolean</code>对象类似，<code class="calibre11">Number</code>对象也为数值提供了重要能力。但是，考虑到两者存在同样的潜在问题，因此并不建议直接实例化<code class="calibre11">Number</code>对象。在处理原始数值和引用数值时，<code class="calibre11">typeof</code>和<code class="calibre11">instacnceof</code>操作符会返回不同的结果，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let numberobject = new number(10);
+let numbervalue = 10;
+console.log(typeof numberobject);             // "object"
+console.log(typeof numbervalue);              // "number"
+console.log(numberobject instanceof number);  // true
+console.log(numbervalue instanceof number);   // false</code></pre>
+        <p class="calibre1">原始数值在调用<code class="calibre11">typeof</code>时始终返回<code class="calibre11">"number"</code>，而<code class="calibre11">Number</code>对象则返回<code class="calibre11">"object"</code>。类似地，<code class="calibre11">Number</code>对象是<code class="calibre11">Number</code>类型的实例，而原始数值不是。</p>
+        <p class="calibre1">
+          <strong class="calibre2">
+            <code class="calibre11">isInteger()</code>方法与安全整数</strong>
+        </p>
+        <p class="calibre1">ES6新增了<code class="calibre11">Number.isInteger()</code>方法，用于辨别一个数值是否保存为整数。有时候，小数位的0可能会让人误以为数值是一个浮点值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(number.isinteger(1));    // true
+console.log(number.isinteger(1.00)); // true
+console.log(number.isinteger(1.01)); // false</code></pre>
+        <p class="calibre1">IEEE 754数值格式有一个特殊的数值范围，在这个范围内二进制值可以表示一个整数值。这个数值范围从<code class="calibre11">Number.MIN_SAFE_INTEGER</code>（<img src="../images/00005.gif" alt="-2^{53}+1" class="calibre12"/>）到<code class="calibre11">Number.MAX_SAFE_INTEGER</code>（<img src="../images/00042.gif" alt="2^{53}-1" class="calibre12"/>）。对超出这个范围的数值，即使尝试保存为整数，IEEE 754编码格式也意味着二进制值可能会表示一个完全不同的数值。为了鉴别整数是否在这个范围内，可以使用<code class="calibre11">Number.isSafeInteger()</code>方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(number.issafeinteger(-1 * (2 ** 53)));      // false
+console.log(number.issafeinteger(-1 * (2 ** 53) + 1));  // true
+
+console.log(number.issafeinteger(2 ** 53));             // false
+console.log(number.issafeinteger((2 ** 53) - 1));       // true</code></pre>
+        <h3 id="nav_point_106" class="calibre15">5.3.3
+          <code class="calibre26">String</code>
+        </h3>
+        <p class="calibre1">
+          <code class="calibre11">String</code>是对应字符串的引用类型。要创建一个<code class="calibre11">String</code>对象，使用<code class="calibre11">String</code>构造函数并传入一个数值，如下例所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringobject = new string("hello world");</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">String</code>对象的方法可以在所有字符串原始值上调用。3个继承的方法<code class="calibre11">valueOf()</code>、<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>都返回对象的原始字符串值。</p>
+        <p class="calibre1">每个<code class="calibre11">String</code>对象都有一个<code class="calibre11">length</code>属性，表示字符串中字符的数量。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.length); // "11"</code></pre>
+        <p class="calibre1">这个例子输出了字符串<code class="calibre11">"hello world"</code>中包含的字符数量：<code class="calibre11">11</code>。注意，即使字符串中包含双字节字符（而不是单字节的ASCII字符），也仍然会按单字符来计数。</p>
+        <p class="calibre1">
+          <code class="calibre11">String</code>类型提供了很多方法来解析和操作字符串。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">JavaScript字符</strong>
+            </p>
+            <p class="calibre1">JavaScript字符串由16位码元（code unit）组成。对多数字符来说，每16位码元对应一个字符。换句话说，字符串的<code class="calibre11">length</code>属性表示字符串包含多少16位码元：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "abcde";
+
+console.log(message.length); // 5</code></pre>
+            <p class="calibre1">此外，<code class="calibre11">charAt()</code>方法返回给定索引位置的字符，由传给方法的整数参数指定。具体来说，这个方法查找指定索引位置的16位码元，并返回该码元对应的字符：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "abcde";
+
+console.log(message.charat(2)); // "c"</code></pre>
+            <p class="calibre1">JavaScript字符串使用了两种Unicode编码混合的策略：UCS-2和UTF-16。对于可以采用16位编码的字符（U+0000~U+FFFF），这两种编码实际上是一样的。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                要深入了解关于字符编码的内容，推荐Joel Spolsky写的博客文章：“The Absolute Minimum Every Software Developer Absolutely, Positively Must Know About Unicode and Character Sets (No Excuses!)”。</p>
+              <p class="calibre1">另一个有用的资源是Mathias Bynens的博文：“JavaScript's Internal Character Encoding: UCS-2 or UTF-16?”。</p>
+            </blockquote>
+            <p class="calibre1">使用<code class="calibre11">charCodeAt()</code>方法可以查看指定码元的字符编码。这个方法返回指定索引位置的码元值，索引以整数指定。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "abcde";
+
+// unicode "latin small letter c"的编码是u+0063
+console.log(message.charcodeat(2));  // 99
+
+// 十进制99等于十六进制63
+console.log(99 === 0x63);            // true</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">fromCharCode()</code>方法用于根据给定的UTF-16码元创建字符串中的字符。这个方法可以接受任意多个数值，并返回将所有数值对应的字符拼接起来的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// unicode "latin small letter a"的编码是u+0061
+// unicode "latin small letter b"的编码是u+0062
+// unicode "latin small letter c"的编码是u+0063
+// unicode "latin small letter d"的编码是u+0064
+// unicode "latin small letter e"的编码是u+0065
+
+console.log(string.fromcharcode(0x61, 0x62, 0x63, 0x64, 0x65));  // "abcde"
+
+// 0x0061 === 97
+// 0x0062 === 98
+// 0x0063 === 99
+// 0x0064 === 100
+// 0x0065 === 101
+
+console.log(string.fromcharcode(97, 98, 99, 100, 101));          // "abcde"</code></pre>
+            <p class="calibre1">对于U+0000~U+FFFF范围内的字符，<code class="calibre11">length</code>、<code class="calibre11">charAt()</code>、<code class="calibre11">charCodeAt()</code>和<code class="calibre11">fromCharCode()</code>返回的结果都跟预期是一样的。这是因为在这个范围内，每个字符都是用16位表示的，而这几个方法也都基于16位码元完成操作。只要字符编码大小与码元大小一一对应，这些方法就能如期工作。</p>
+            <p class="calibre1">这个对应关系在扩展到Unicode增补字符平面时就不成立了。问题很简单，即16位只能唯一表示65 536个字符。这对于大多数语言字符集是足够了，在Unicode中称为<strong class="calibre2">基本多语言平面</strong>（BMP）。为了表示更多的字符，Unicode采用了一个策略，即每个字符使用另外16位去选择一个<strong class="calibre2">增补平面</strong>。这种每个字符使用两个16位码元的策略称为<strong class="calibre2">代理对</strong>。</p>
+            <p class="calibre1">在涉及增补平面的字符时，前面讨论的字符串方法就会出问题。比如，下面的例子中使用了一个笑脸表情符号，也就是一个使用代理对编码的字符：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// "smiling face with smiling eyes" 表情符号的编码是u+1f60a
+// 0x1f60a === 128522
+let message = "ab☺de";
+
+console.log(message.length);          // 6
+console.log(message.charat(1));       // b
+console.log(message.charat(2));       // &lt;?&gt;
+console.log(message.charat(3));       // &lt;?&gt;
+console.log(message.charat(4));       // d
+
+console.log(message.charcodeat(1));   // 98
+console.log(message.charcodeat(2));   // 55357
+console.log(message.charcodeat(3));   // 56842
+console.log(message.charcodeat(4));   // 100
+
+console.log(string.fromcodepoint(0x1f60a)); // ☺
+
+console.log(string.fromcharcode(97, 98, 55357, 56842, 100, 101)); // ab☺de</code></pre>
+            <p class="calibre1">这些方法仍然将16位码元当作一个字符，事实上索引2和索引3对应的码元应该被看成一个代理对，只对应一个字符。<code class="calibre11">fromCharCode()</code>方法仍然返回正确的结果，因为它实际上是基于提供的二进制表示直接组合成字符串。浏览器可以正确解析代理对（由两个码元构成），并正确地将其识别为一个Unicode笑脸字符。</p>
+            <p class="calibre1">为正确解析既包含单码元字符又包含代理对字符的字符串，可以使用<code class="calibre11">codePointAt()</code>来代替<code class="calibre11">charCodeAt()</code>。跟使用<code class="calibre11">charCodeAt()</code>时类似，<code class="calibre11">codePointAt()</code>接收16位码元的索引并返回该索引位置上的码点（code point）。<strong class="calibre2">码点</strong>是Unicode中一个字符的完整标识。比如，<code class="calibre11">"c"</code>的码点是0x0063，而"☺"的码点是0x1F60A。码点可能是16位，也可能是32位，而<code class="calibre11">codePointAt()</code>方法可以从指定码元位置识别完整的码点。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "ab☺de";
+
+console.log(message.codepointat(1)); // 98
+console.log(message.codepointat(2)); // 128522
+console.log(message.codepointat(3)); // 56842
+console.log(message.codepointat(4)); // 100</code></pre>
+            <p class="calibre1">注意，如果传入的码元索引并非代理对的开头，就会返回错误的码点。这种错误只有检测单个字符的时候才会出现，可以通过从左到右按正确的码元数遍历字符串来规避。迭代字符串可以智能地识别代理对的码点：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log([..."ab☺de"]); // ["a", "b", "☺", "d", "e"]</code></pre>
+            <p class="calibre1">与<code class="calibre11">charCodeAt()</code>有对应的<code class="calibre11">codePointAt()</code>一样，<code class="calibre11">fromCharCode()</code>也有一个对应的<code class="calibre11">fromCodePoint()</code>。这个方法接收任意数量的码点，返回对应字符拼接起来的字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(string.fromcharcode(97, 98, 55357, 56842, 100, 101));  // ab☺de
+console.log(string.fromcodepoint(97, 98, 128522, 100, 101));       // ab☺de</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">normalize()</code>方法</strong>
+            </p>
+            <p class="calibre1">某些Unicode字符可以有多种编码方式。有的字符既可以通过一个BMP字符表示，也可以通过一个代理对表示。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// u+00c5：上面带圆圈的大写拉丁字母a
+console.log(string.fromcharcode(0x00c5));          // å
+
+// u+212b：长度单位“埃”
+console.log(string.fromcharcode(0x212b));          // å
+
+// u+004：大写拉丁字母a
+// u+030a：上面加个圆圈
+console.log(string.fromcharcode(0x0041, 0x030a));  // å</code></pre>
+            <p class="calibre1">比较操作符不在乎字符看起来是什么样的，因此这3个字符互不相等。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let a1 = string.fromcharcode(0x00c5),
+    a2 = string.fromcharcode(0x212b),
+    a3 = string.fromcharcode(0x0041, 0x030a);
+
+console.log(a1, a2, a3); // å, å, å
+
+console.log(a1 === a2);  // false
+console.log(a1 === a3);  // false
+console.log(a2 === a3);  // false</code></pre>
+            <p class="calibre1">为解决这个问题，Unicode提供了4种规范化形式，可以将类似上面的字符规范化为一致的格式，无论底层字符的代码是什么。这4种规范化形式是：NFD（Normalization Form D）、NFC（Normalization Form C）、NFKD（Normalization Form KD）和NFKC（Normalization Form KC）。可以使用<code class="calibre11">normalize()</code>方法对字符串应用上述规范化形式，使用时需要传入表示哪种形式的字符串：<code class="calibre11">"NFD"</code>、<code class="calibre11">"NFC"</code>、<code class="calibre11">"NFKD"</code>或<code class="calibre11">"NFKC"</code>。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                这4种规范化形式的具体细节超出了本书范围，有兴趣的读者可以自行参考<em class="calibre6">UAX 15#: Unicode Normalization Forms</em>中的1.2节“Normalization Forms”。</p>
+            </blockquote>
+            <p class="calibre1">通过比较字符串与其调用<code class="calibre11">normalize()</code>的返回值，就可以知道该字符串是否已经规范化了：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let a1 = string.fromcharcode(0x00c5),
+    a2 = string.fromcharcode(0x212b),
+    a3 = string.fromcharcode(0x0041, 0x030a);
+
+// u+00c5是对0+212b进行nfc/nfkc规范化之后的结果
+console.log(a1 === a1.normalize("nfd"));  // false
+console.log(a1 === a1.normalize("nfc"));  // true
+console.log(a1 === a1.normalize("nfkd")); // false
+console.log(a1 === a1.normalize("nfkc")); // true
+
+// u+212b是未规范化的
+console.log(a2 === a2.normalize("nfd"));  // false
+console.log(a2 === a2.normalize("nfc"));  // false
+console.log(a2 === a2.normalize("nfkd")); // false
+console.log(a2 === a2.normalize("nfkc")); // false
+
+// u+0041/u+030a是对0+212b进行nfd/nfkd规范化之后的结果
+console.log(a3 === a3.normalize("nfd"));  // true
+console.log(a3 === a3.normalize("nfc"));  // false
+console.log(a3 === a3.normalize("nfkd")); // true
+console.log(a3 === a3.normalize("nfkc")); // false</code></pre>
+            <p class="calibre1">选择同一种规范化形式可以让比较操作符返回正确的结果：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let a1 = string.fromcharcode(0x00c5),
+    a2 = string.fromcharcode(0x212b),
+    a3 = string.fromcharcode(0x0041, 0x030a);
+
+console.log(a1.normalize("nfd") === a2.normalize("nfd"));    // true
+console.log(a2.normalize("nfkc") === a3.normalize("nfkc"));  // true
+console.log(a1.normalize("nfc") === a3.normalize("nfc"));    // true</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串操作方法</strong>
+            </p>
+            <p class="calibre1">本节介绍几个操作字符串值的方法。首先是<code class="calibre11">concat()</code>，用于将一个或多个字符串拼接成一个新字符串。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello ";
+let result = stringvalue.concat("world");
+
+console.log(result);      // "hello world"
+console.log(stringvalue); // "hello"</code></pre>
+            <p class="calibre1">在这个例子中，对<code class="calibre11">stringValue</code>调用<code class="calibre11">concat()</code>方法的结果是得到<code class="calibre11">"hello world"</code>，但<code class="calibre11">stringValue</code>的值保持不变。<code class="calibre11">concat()</code>方法可以接收任意多个参数，因此可以一次性拼接多个字符串，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello ";
+let result = stringvalue.concat("world", "!");
+
+console.log(result);      // "hello world!"
+console.log(stringvalue); // "hello"</code></pre>
+            <p class="calibre1">这个修改后的例子将字符串<code class="calibre11">"world"</code>和<code class="calibre11">"!"</code>追加到了<code class="calibre11">"hello "</code>后面。虽然<code class="calibre11">concat()</code>方法可以拼接字符串，但更常用的方式是使用加号操作符（<code class="calibre11">+</code>）。而且多数情况下，对于拼接多个字符串来说，使用加号更方便。</p>
+            <p class="calibre1">ECMAScript提供了3个从字符串中提取子字符串的方法：<code class="calibre11">slice()</code>、<code class="calibre11">substr()</code>和<code class="calibre11">substring()</code>。这3个方法都返回调用它们的字符串的一个子字符串，而且都接收一或两个参数。第一个参数表示子字符串开始的位置，第二个参数表示子字符串结束的位置。对<code class="calibre11">slice()</code>和<code class="calibre11">substring()</code>而言，第二个参数是提取结束的位置（即该位置之前的字符会被提取出来）。对<code class="calibre11">substr()</code>而言，第二个参数表示返回的子字符串数量。任何情况下，省略第二个参数都意味着提取到字符串末尾。与<code class="calibre11">concat()</code>方法一样，<code class="calibre11">slice()</code>、<code class="calibre11">substr()</code>和<code class="calibre11">substring()</code>也不会修改调用它们的字符串，而只会返回提取到的原始新字符串值。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.slice(3));       // "lo world"
+console.log(stringvalue.substring(3));   // "lo world"
+console.log(stringvalue.substr(3));      // "lo world"
+console.log(stringvalue.slice(3, 7));    // "lo w"
+console.log(stringvalue.substring(3,7)); // "lo w"
+console.log(stringvalue.substr(3, 7));   // "lo worl"</code></pre>
+            <p class="calibre1">在这个例子中，<code class="calibre11">slice()</code>、<code class="calibre11">substr()</code>和<code class="calibre11">substring()</code>是以相同方式被调用的，而且多数情况下返回的值也相同。如果只传一个参数<code class="calibre11">3</code>，则所有方法都将返回<code class="calibre11">"lo world"</code>，因为<code class="calibre11">"hello"</code>中<code class="calibre11">"l"</code>位置为3。如果传入两个参数<code class="calibre11">3</code>和<code class="calibre11">7</code>，则<code class="calibre11">slice()</code>和<code class="calibre11">substring()</code>返回<code class="calibre11">"lo w"</code>（因为<code class="calibre11">"world"</code>中<code class="calibre11">"o"</code>在位置7，不包含），而<code class="calibre11">substr()</code>返回<code class="calibre11">"lo worl"</code>，因为第二个参数对它而言表示返回的字符数。</p>
+            <p class="calibre1">当某个参数是负值时，这3个方法的行为又有不同。比如，<code class="calibre11">slice()</code>方法将所有负值参数都当成字符串长度加上负参数值。</p>
+            <p class="calibre1">而<code class="calibre11">substr()</code>方法将第一个负参数值当成字符串长度加上该值，将第二个负参数值转换为0。<code class="calibre11">substring()</code>方法会将所有负参数值都转换为0。看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.slice(-3));         // "rld"
+console.log(stringvalue.substring(-3));     // "hello world"
+console.log(stringvalue.substr(-3));        // "rld"
+console.log(stringvalue.slice(3, -4));      // "lo w"
+console.log(stringvalue.substring(3, -4));  // "hel"
+console.log(stringvalue.substr(3, -4));     // "" (empty string)</code></pre>
+            <p class="calibre1">这个例子明确演示了3个方法的差异。在给<code class="calibre11">slice()</code>和<code class="calibre11">substr()</code>传入负参数时，它们的返回结果相同。这是因为<code class="calibre11">-3</code>会被转换为<code class="calibre11">8</code>（长度加上负参数），实际上调用的是<code class="calibre11">slice(8)</code>和<code class="calibre11">substr(8)</code>。而<code class="calibre11">substring()</code>方法返回整个字符串，因为<code class="calibre11">-3</code>会转换为<code class="calibre11">0</code>。</p>
+            <p class="calibre1">在第二个参数是负值时，这3个方法各不相同。<code class="calibre11">slice()</code>方法将第二个参数转换为<code class="calibre11">7</code>，实际上相当于调用<code class="calibre11">slice(3, 7)</code>，因此返回<code class="calibre11">"lo w"</code>。而<code class="calibre11">substring()</code>方法会将第二个参数转换为<code class="calibre11">0</code>，相当于调用<code class="calibre11">substring(3, 0)</code>，等价于<code class="calibre11">substring(0, 3)</code>，这是因为这个方法会将较小的参数作为起点，将较大的参数作为终点。对<code class="calibre11">substr()</code>来说，第二个参数会被转换为<code class="calibre11">0</code>，意味着返回的字符串包含零个字符，因而会返回一个空字符串。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串位置方法</strong>
+            </p>
+            <p class="calibre1">有两个方法用于在字符串中定位子字符串：<code class="calibre11">indexOf()</code>和<code class="calibre11">lastIndexOf()</code>。这两个方法从字符串中搜索传入的字符串，并返回位置（如果没找到，则返回<code class="calibre11">-1</code>）。两者的区别在于，<code class="calibre11">indexOf()</code>方法从字符串开头开始查找子字符串，而<code class="calibre11">lastIndexOf()</code>方法从字符串末尾开始查找子字符串。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.indexof("o"));     // 4
+console.log(stringvalue.lastindexof("o")); // 7</code></pre>
+            <p class="calibre1">这里，字符串中第一个<code class="calibre11">"o"</code>的位置是4，即<code class="calibre11">"hello"</code>中的<code class="calibre11">"o"</code>。最后一个<code class="calibre11">"o"</code>的位置是7，即<code class="calibre11">"world"</code>中的<code class="calibre11">"o"</code>。如果字符串中只有一个<code class="calibre11">"o"</code>，则<code class="calibre11">indexOf()</code>和<code class="calibre11">lastIndexOf()</code>返回同一个位置。</p>
+            <p class="calibre1">这两个方法都可以接收可选的第二个参数，表示开始搜索的位置。这意味着，<code class="calibre11">indexOf()</code>会从这个参数指定的位置开始向字符串末尾搜索，忽略该位置之前的字符；<code class="calibre11">lastIndexOf()</code>则会从这个参数指定的位置开始向字符串开头搜索，忽略该位置之后直到字符串末尾的字符。下面看一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.indexof("o", 6));     // 7
+console.log(stringvalue.lastindexof("o", 6)); // 4</code></pre>
+            <p class="calibre1">在传入第二个参数<code class="calibre11">6</code>以后，结果跟前面的例子恰好相反。这一次，<code class="calibre11">indexOf()</code>返回<code class="calibre11">7</code>，因为它从位置6（字符<code class="calibre11">"w"</code>）开始向后搜索字符串，在位置7找到了<code class="calibre11">"o"</code>。而<code class="calibre11">lastIndexOf()</code>返回<code class="calibre11">4</code>，因为它从位置6开始反向搜索至字符串开头，因此找到了<code class="calibre11">"hello"</code>中的<code class="calibre11">"o"</code>。像这样使用第二个参数并循环调用<code class="calibre11">indexOf()</code>或<code class="calibre11">lastIndexOf()</code>，就可以在字符串中找到所有的目标子字符串，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "lorem ipsum dolor sit amet, consectetur adipisicing elit";
+let positions = new array();
+let pos = stringvalue.indexof("e");
+
+while(pos &gt; -1) {
+  positions.push(pos);
+  pos = stringvalue.indexof("e", pos + 1);
+}
+
+console.log(positions); // [3,24,32,35,52]</code></pre>
+            <p class="calibre1">这个例子逐步增大开始搜索的位置，通过<code class="calibre11">indexOf()</code>遍历了整个字符串。首先取得第一个<code class="calibre11">"e"</code>的位置，然后进入循环，将上一次的位置加1再传给<code class="calibre11">indexOf()</code>，确保搜索到最后一个子字符串实例之后。每个位置都保存在<code class="calibre11">positions</code>数组中，可供以后使用。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="5" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串包含方法</strong>
+            </p>
+            <p class="calibre1">ECMAScript 6增加了3个用于判断字符串中是否包含另一个字符串的方法：<code class="calibre11">startsWith()</code>、<code class="calibre11">endsWith()</code>和<code class="calibre11">includes()</code>。这些方法都会从字符串中搜索传入的字符串，并返回一个表示是否包含的布尔值。它们的区别在于，<code class="calibre11">startsWith()</code>检查开始于索引0的匹配项，<code class="calibre11">endsWith()</code>检查开始于索引<code class="calibre11">(string.length - substring.length)</code>的匹配项，而<code class="calibre11">includes()</code>检查整个字符串：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "foobarbaz";
+
+console.log(message.startswith("foo"));  // true
+console.log(message.startswith("bar"));  // false
+
+console.log(message.endswith("baz"));    // true
+console.log(message.endswith("bar"));    // false
+
+console.log(message.includes("bar"));    // true
+console.log(message.includes("qux"));    // false</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">startsWith()</code>和<code class="calibre11">includes()</code>方法接收可选的第二个参数，表示开始搜索的位置。如果传入第二个参数，则意味着这两个方法会从指定位置向着字符串末尾搜索，忽略该位置之前的所有字符。下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "foobarbaz";
+
+console.log(message.startswith("foo"));     // true
+console.log(message.startswith("foo", 1));  // false
+
+console.log(message.includes("bar"));       // true
+console.log(message.includes("bar", 4));    // false</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">endsWith()</code>方法接收可选的第二个参数，表示应该当作字符串末尾的位置。如果不提供这个参数，那么默认就是字符串长度。如果提供这个参数，那么就好像字符串只有那么多字符一样：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "foobarbaz";
+
+console.log(message.endswith("bar"));     // false
+console.log(message.endswith("bar", 6));  // true</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="6" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">trim()</code>方法</strong>
+            </p>
+            <p class="calibre1">ECMAScript在所有字符串上都提供了<code class="calibre11">trim()</code>方法。这个方法会创建字符串的一个副本，删除前、后所有空格符，再返回结果。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "  hello world  ";
+let trimmedstringvalue = stringvalue.trim();
+console.log(stringvalue);         // "  hello world "
+console.log(trimmedstringvalue);  // "hello world"</code></pre>
+            <p class="calibre1">由于<code class="calibre11">trim()</code>返回的是字符串的副本，因此原始字符串不受影响，即原本的前、后空格符都会保留。</p>
+            <p class="calibre1">另外，<code class="calibre11">trimLeft()</code>和<code class="calibre11">trimRight()</code>方法分别用于从字符串开始和末尾清理空格符。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="7" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">repeat()</code>方法</strong>
+            </p>
+            <p class="calibre1">ECMAScript在所有字符串上都提供了<code class="calibre11">repeat()</code>方法。这个方法接收一个整数参数，表示要将字符串复制多少次，然后返回拼接所有副本后的结果。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "na ";
+console.log(stringvalue.repeat(16) + "batman");
+// na na na na na na na na na na na na na na na na batman</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="8" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">padStart()</code>和<code class="calibre11">padEnd()</code>方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">padStart()</code>和<code class="calibre11">padEnd()</code>方法会复制字符串，如果小于指定长度，则在相应一边填充字符，直至满足长度条件。这两个方法的第一个参数是长度，第二个参数是可选的填充字符串，默认为空格（U+0020）。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "foo";
+
+console.log(stringvalue.padstart(6));       // "   foo"
+console.log(stringvalue.padstart(9, "."));  // "......foo"
+
+console.log(stringvalue.padend(6));         // "foo   "
+console.log(stringvalue.padend(9, "."));    // "foo......"</code></pre>
+            <p class="calibre1">可选的第二个参数并不限于一个字符。如果提供了多个字符的字符串，则会将其拼接并截断以匹配指定长度。此外，如果长度小于或等于字符串长度，则会返回原始字符串。</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "foo";
+
+console.log(stringvalue.padstart(8, "bar")); // "barbafoo"
+console.log(stringvalue.padstart(2));        // "foo"
+
+console.log(stringvalue.padend(8, "bar"));   // "foobarba"
+console.log(stringvalue.padend(2));          // "foo"</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="9" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串迭代与解构</strong>
+            </p>
+            <p class="calibre1">字符串的原型上暴露了一个<code class="calibre11">@@iterator</code>方法，表示可以迭代字符串的每个字符。可以像下面这样手动使用迭代器：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "abc";
+let stringiterator = message[symbol.iterator]();
+
+console.log(stringiterator.next());  // {value: "a", done: false}
+console.log(stringiterator.next());  // {value: "b", done: false}
+console.log(stringiterator.next());  // {value: "c", done: false}
+console.log(stringiterator.next());  // {value: undefined, done: true}</code></pre>
+            <p class="calibre1">在<code class="calibre11">for-of</code>循环中可以通过这个迭代器按序访问每个字符：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (const c of "abcde") {
+  console.log(c);
+}
+
+// a
+// b
+// c
+// d
+// e</code></pre>
+            <p class="calibre1">有了这个迭代器之后，字符串就可以通过解构操作符来解构了。比如，可以更方便地把字符串分割为字符数组：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let message = "abcde";
+
+console.log([...message]); // ["a", "b", "c", "d", "e"]</code></pre>
+            <p class="calibre1"></p>
+          </li>
+          <li value="10" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串大小写转换</strong>
+            </p>
+            <p class="calibre1">下一组方法涉及大小写转换，包括4个方法：<code class="calibre11">toLowerCase()</code>、<code class="calibre11">toLocaleLowerCase()</code>、<code class="calibre11">toUpperCase()</code>和<code class="calibre11">toLocaleUpperCase()</code>。<code class="calibre11">toLowerCase()</code>和<code class="calibre11">toUpperCase()</code>方法是原来就有的方法，与<code class="calibre11">java.lang.String</code>中的方法同名。<code class="calibre11">toLocaleLowerCase()</code>和<code class="calibre11">toLocaleUpperCase()</code>方法旨在基于特定地区实现。在很多地区，地区特定的方法与通用的方法是一样的。但在少数语言中（如土耳其语），Unicode大小写转换需应用特殊规则，要使用地区特定的方法才能实现正确转换。下面是几个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "hello world";
+console.log(stringvalue.tolocaleuppercase());  // "hello world"
+console.log(stringvalue.touppercase());        // "hello world"
+console.log(stringvalue.tolocalelowercase());  // "hello world"
+console.log(stringvalue.tolowercase());        // "hello world"</code></pre>
+            <p class="calibre1">这里，<code class="calibre11">toLowerCase()</code>和<code class="calibre11">toLocaleLowerCase()</code>都返回<code class="calibre11">hello world</code>，而<code class="calibre11">toUpperCase()</code>和<code class="calibre11">toLocaleUpperCase()</code>都返回<code class="calibre11">HELLO WORLD</code>。通常，如果不知道代码涉及什么语言，则最好使用地区特定的转换方法。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="11" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">字符串模式匹配方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">String</code>类型专门为在字符串中实现模式匹配设计了几个方法。第一个就是<code class="calibre11">match()</code>方法，这个方法本质上跟<code class="calibre11">RegExp</code>对象的<code class="calibre11">exec()</code>方法相同。<code class="calibre11">match()</code>方法接收一个参数，可以是一个正则表达式字符串，也可以是一个<code class="calibre11">RegExp</code>对象。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let pattern = /.at/;
+
+// 等价于pattern.exec(text)
+let matches = text.match(pattern);
+console.log(matches.index);      // 0
+console.log(matches[0]);         // "cat"
+console.log(pattern.lastindex);  // 0</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">match()</code>方法返回的数组与<code class="calibre11">RegExp</code>对象的<code class="calibre11">exec()</code>方法返回的数组是一样的：第一个元素是与整个模式匹配的字符串，其余元素则是与表达式中的捕获组匹配的字符串（如果有的话）。</p>
+            <p class="calibre1">另一个查找模式的字符串方法是<code class="calibre11">search()</code>。这个方法唯一的参数与<code class="calibre11">match()</code>方法一样：正则表达式字符串或<code class="calibre11">RegExp</code>对象。这个方法返回模式第一个匹配的位置索引，如果没找到则返回-1。<code class="calibre11">search()</code>始终从字符串开头向后匹配模式。看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let pos = text.search(/at/);
+console.log(pos);  // 1</code></pre>
+            <p class="calibre1">这里，<code class="calibre11">search(/at/)</code>返回<code class="calibre11">1</code>，即<code class="calibre11">"at"</code>的第一个字符在字符串中的位置。</p>
+            <p class="calibre1">为简化子字符串替换操作，ECMAScript提供了<code class="calibre11">replace()</code>方法。这个方法接收两个参数，第一个参数可以是一个<code class="calibre11">RegExp</code>对象或一个字符串（这个字符串不会转换为正则表达式），第二个参数可以是一个字符串或一个函数。如果第一个参数是字符串，那么只会替换第一个子字符串。要想替换所有子字符串，第一个参数必须为正则表达式并且带全局标记，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let result = text.replace("at", "ond");
+console.log(result);  // "cond, bat, sat, fat"
+
+result = text.replace(/at/g, "ond");
+console.log(result);  // "cond, bond, sond, fond"</code></pre>
+            <p class="calibre1">在这个例子中，字符串<code class="calibre11">"at"</code>先传给<code class="calibre11">replace()</code>函数，而替换文本是<code class="calibre11">"ond"</code>。结果是<code class="calibre11">"cat"</code>被修改为<code class="calibre11">"cond"</code>，而字符串的剩余部分保持不变。通过将第一个参数改为带全局标记的正则表达式，字符串中的所有<code class="calibre11">"at"</code>都被替换成了<code class="calibre11">"ond"</code>。</p>
+            <p class="calibre1">第二个参数是字符串的情况下，有几个特殊的字符序列，可以用来插入正则表达式操作的值。ECMA-262中规定了下表中的值。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">字符序列</th>
+                <th class="calibre19">替换文本</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">$$</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">$</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">$&amp;</code>
+                </td>
+                <td class="calibre21">匹配整个模式的子字符串。与<code class="calibre27">RegExp.lastMatch</code>相同</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">$'</code>
+                </td>
+                <td class="calibre21">匹配的子字符串之前的字符串。与<code class="calibre27">RegExp.rightContext</code>相同</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">$`</code>
+                </td>
+                <td class="calibre21">匹配的子字符串之后的字符串。与<code class="calibre27">RegExp.leftContext</code>相同</td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">$<i class="calibre6">n</i>
+                  </code>
+                </td>
+                <td class="calibre21">匹配第<code class="calibre27">
+                    <i class="calibre6">n</i>
+                  </code>个捕获组的字符串，其中<code class="calibre27">
+                    <i class="calibre6">n</i>
+                  </code>是0~9。比如，<code class="calibre27">$1</code>是匹配第一个捕获组的字符串，<code class="calibre27">$2</code>是匹配第二个捕获组的字符串，以此类推。如果没有捕获组，则值为空字符串</td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">$<i class="calibre6">nn</i>
+                  </code>
+                </td>
+                <td class="calibre21">匹配第<code class="calibre27">
+                    <i class="calibre6">nn</i>
+                  </code>个捕获组字符串，其中<code class="calibre27">
+                    <i class="calibre6">nn</i>
+                  </code>是01~99。比如，<code class="calibre27">$01</code>是匹配第一个捕获组的字符串，<code class="calibre27">$02</code>是匹配第二个捕获组的字符串，以此类推。如果没有捕获组，则值为空字符串</td>
+              </tr>
+            </table>
+
+            <p class="calibre1">使用这些特殊的序列，可以在替换文本中使用之前匹配的内容，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+result = text.replace(/(.at)/g, "word ($1)");
+console.log(result);  // word (cat), word (bat), word (sat), word (fat)</code></pre>
+            <p class="calibre1">这里，每个以<code class="calibre11">"at"</code>结尾的词都会被替换成<code class="calibre11">"word"</code>后跟一对小括号，其中包含捕获组匹配的内容<code class="calibre11">$1</code>。</p>
+            <p class="calibre1">
+              <code class="calibre11">replace()</code>的第二个参数可以是一个函数。在只有一个匹配项时，这个函数会收到3个参数：与整个模式匹配的字符串、匹配项在字符串中的开始位置，以及整个字符串。在有多个捕获组的情况下，每个匹配捕获组的字符串也会作为参数传给这个函数，但最后两个参数还是与整个模式匹配的开始位置和原始字符串。这个函数应该返回一个字符串，表示应该把匹配项替换成什么。使用函数作为第二个参数可以更细致地控制替换过程，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function htmlescape(text) {
+  return text.replace(/[&lt;&gt;"&amp;]/g, function(match, pos, originaltext) {
+    switch(match) {
+      case "&lt;":
+        return "&amp;lt;";
+      case "&gt;":
+        return "&amp;gt;";
+      case "&amp;":
+        return "&amp;amp;";
+      case "\"":
+        return "&amp;quot;";
+    }
+  });
+}
+
+console.log(htmlescape("&lt;p class=\"greeting\"&gt;hello world!&lt;/p&gt;"));
+// "&amp;lt;p class=&amp;quot;greeting&amp;quot;&amp;gt;hello world!&lt;/p&gt;"</code></pre>
+            <p class="calibre1">这里，函数<code class="calibre11">htmlEscape()</code>用于将一段HTML中的4个字符替换成对应的实体：小于号、大于号、和号，还有双引号（都必须经过转义）。实现这个任务最简单的办法就是用一个正则表达式查找这些字符，然后定义一个函数，根据匹配的每个字符分别返回特定的HTML实体。</p>
+            <p class="calibre1">最后一个与模式匹配相关的字符串方法是<code class="calibre11">split()</code>。这个方法会根据传入的分隔符将字符串拆分成数组。作为分隔符的参数可以是字符串，也可以是<code class="calibre11">RegExp</code>对象。（字符串分隔符不会被这个方法当成正则表达式。）还可以传入第二个参数，即数组大小，确保返回的数组不会超过指定大小。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let colortext = "red,blue,green,yellow";
+let colors1 = colortext.split(",");       // ["red", "blue", "green", "yellow"]
+let colors2 = colortext.split(",", 2);    // ["red", "blue"]
+let colors3 = colortext.split(/[^,]+/);   // ["", ",", ",", ",", ""]</code></pre>
+            <p class="calibre1">在这里，字符串<code class="calibre11">colorText</code>是一个逗号分隔的颜色名称符串。调用<code class="calibre11">split(",")</code>会得到包含这些颜色名的数组，基于逗号进行拆分。要把数组元素限制为2个，传入第二个参数2即可。最后，使用正则表达式可以得到一个包含逗号的数组。注意在最后一次调用<code class="calibre11">split()</code>时，返回的数组前后包含两个空字符串。这是因为正则表达式指定的分隔符出现在了字符串开头（<code class="calibre11">"red"</code>）和末尾（<code class="calibre11">"yellow"</code>）。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="12" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">localeCompare()</code>方法</strong>
+            </p>
+            <p class="calibre1">最后一个方法是<code class="calibre11">localeCompare()</code>，这个方法比较两个字符串，返回如下3个值中的一个。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">如果按照字母表顺序，字符串应该排在字符串参数前头，则返回负值。（通常是<code class="calibre11">-1</code>，具体还要看与实际值相关的实现。）</li>
+              <li class="di_1ji_wu_xu_lie_biao">如果字符串与字符串参数相等，则返回<code class="calibre11">0</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">如果按照字母表顺序，字符串应该排在字符串参数后头，则返回正值。（通常是<code class="calibre11">1</code>，具体还要看与实际值相关的实现。）</li>
+            </ul>
+            <p class="calibre1">下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let stringvalue = "yellow";
+console.log(stringvalue.localecompare("brick"));  // 1
+console.log(stringvalue.localecompare("yellow")); // 0
+console.log(stringvalue.localecompare("zoo"));    // -1</code></pre>
+            <p class="calibre1">在这里，字符串<code class="calibre11">"yellow"</code>与3个不同的值进行了比较：<code class="calibre11">"brick"</code>、<code class="calibre11">"yellow"</code>和<code class="calibre11">"zoo"</code>。<code class="calibre11">"brick"</code>按字母表顺序应该排在<code class="calibre11">"yellow"</code>前头，因此<code class="calibre11">localeCompare()</code>返回1。<code class="calibre11">"yellow"</code>等于<code class="calibre11">"yellow"</code>，因此<code class="calibre11">"localeCompare()"</code>返回<code class="calibre11">0</code>。最后，<code class="calibre11">"zoo"</code>在<code class="calibre11">"yellow"</code>后面，因此<code class="calibre11">localeCompare()</code>返回<code class="calibre11">-1</code>。强调一下，因为返回的具体值可能因具体实现而异，所以最好像下面的示例中一样使用<code class="calibre11">localeCompare()</code>：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function determineorder(value) {
+  let result = stringvalue.localecompare(value);
+  if (result &lt; 0) {
+    console.log(`the string 'yellow' comes before the string '${value}'.`);
+  } else if (result &gt; 0) {
+    console.log(`the string 'yellow' comes after the string '${value}'.`);
+  } else {
+    console.log(`the string 'yellow' is equal to the string '${value}'.`);
+  }
+}
+
+determineorder("brick");
+determineorder("yellow");
+determineorder("zoo");</code></pre>
+            <p class="calibre1">这样一来，就可以保证在所有实现中都能正确判断字符串的顺序了。</p>
+            <p class="calibre1">
+              <code class="calibre11">localeCompare()</code>的独特之处在于，实现所在的地区（国家和语言）决定了这个方法如何比较字符串。在美国，英语是ECMAScript实现的标准语言，<code class="calibre11">localeCompare()</code>区分大小写，大写字母排在小写字母前面。但其他地区未必是这种情况。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="13" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">HTML方法</strong>
+            </p>
+            <p class="calibre1">早期的浏览器开发商认为使用JavaScript动态生成HTML标签是一个需求。因此，早期浏览器扩展了规范，增加了辅助生成HTML标签的方法。下表总结了这些HTML方法。不过，这些方法基本上已经没有人使用了，因为结果通常不是语义化的标记。</p>
+            <table class="table" width="90%" border="1">
+              <tr class="calibre18">
+                <th class="calibre19">方法</th>
+                <th class="calibre19">输出</th>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">anchor(<i class="calibre6">name</i>)</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;a name="<i class="calibre6">name</i>"&gt;<i class="calibre6">string</i>&lt;/a&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">big()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;big&gt;<i class="calibre6">string</i>&lt;/big&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">bold()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;b&gt;<i class="calibre6">string</i>&lt;/b&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">fixed()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;tt&gt;<i class="calibre6">string</i>&lt;/tt&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">fontcolor(<i class="calibre6">color</i>)</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;font color="<i class="calibre6">color</i>"&gt;<i class="calibre6">string</i>&lt;/font&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">fontsize(<i class="calibre6">size</i>)</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;font size="<i class="calibre6">size</i>"&gt;<i class="calibre6">string</i>&lt;/font&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">italics()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;i&gt;<i class="calibre6">string</i>&lt;/i&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">link(url)</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;a href="<i class="calibre6">url</i>"&gt;<i class="calibre6">string</i>&lt;/a&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">small()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;small&gt;<i class="calibre6">string</i>&lt;/small&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">strike()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;strike&gt;<i class="calibre6">string</i>&lt;/strike&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre20">
+                <td class="calibre21">
+                  <code class="calibre27">sub()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;sub&gt;<i class="calibre6">string</i>&lt;/sub&gt;</code>
+                </td>
+              </tr>
+              <tr class="calibre18">
+                <td class="calibre21">
+                  <code class="calibre27">sup()</code>
+                </td>
+                <td class="calibre21">
+                  <code class="calibre27">&lt;sup&gt;<i class="calibre6">string</i>&lt;/sup&gt;</code>
+                </td>
+              </tr>
+            </table>
+
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0040.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0042.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

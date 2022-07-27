@@ -1,0 +1,270 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0072.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0074.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_228" class="calibre9">10.3 理解参数</h2>
+        <p class="calibre1">ECMAScript函数的参数跟大多数其他语言不同。ECMAScript函数既不关心传入的参数个数，也不关心这些参数的数据类型。定义函数时要接收两个参数，并不意味着调用时就传两个参数。你可以传一个、三个，甚至一个也不传，解释器都不会报错。</p>
+        <p class="calibre1">之所以会这样，主要是因为ECMAScript函数的参数在内部表现为一个数组。函数被调用时总会接收一个数组，但函数并不关心这个数组中包含什么。如果数组中什么也没有，那没问题；如果数组的元素超出了要求，那也没问题。事实上，在使用<code class="calibre11">function</code>关键字定义（非箭头）函数时，可以在函数内部访问<code class="calibre11">arguments</code>对象，从中取得传进来的每个参数值。</p>
+        <p class="calibre1">
+          <code class="calibre11">arguments</code>对象是一个类数组对象（但不是<code class="calibre11">Array</code>的实例），因此可以使用中括号语法访问其中的元素（第一个参数是<code class="calibre11">arguments[0]</code>，第二个参数是<code class="calibre11">arguments[1]</code>）。而要确定传进来多少个参数，可以访问<code class="calibre11">arguments.length</code>属性。</p>
+        <p class="calibre1">在下面的例子中，<code class="calibre11">sayHi()</code>函数的第一个参数叫<code class="calibre11">name</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function sayhi(name, message) {
+  console.log("hello " + name + ", " + message);
+}</code></pre>
+        <p class="calibre1">可以通过<code class="calibre11">arguments[0]</code>取得相同的参数值。因此，把函数重写成不声明参数也可以：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function sayhi() {
+  console.log("hello " + arguments[0] + ", " + arguments[1]);
+}</code></pre>
+        <p class="calibre1">在重写后的代码中，没有命名参数。<code class="calibre11">name</code>和<code class="calibre11">message</code>参数都不见了，但函数照样可以调用。这就表明，ECMAScript函数的参数只是为了方便才写出来的，并不是必须写出来的。与其他语言不同，在ECMAScript中的命名参数不会创建让之后的调用必须匹配的函数签名。这是因为根本不存在验证命名参数的机制。</p>
+        <p class="calibre1">也可以通过<code class="calibre11">arguments</code>对象的<code class="calibre11">length</code>属性检查传入的参数个数。下面的例子展示了在每调用一个函数时，都会打印出传入的参数个数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function howmanyargs() {
+  console.log(arguments.length);
+}
+
+howmanyargs("string", 45);  // 2
+howmanyargs();              // 0
+howmanyargs(12);            // 1</code></pre>
+        <p class="calibre1">这个例子分别打印出2、0和1（按顺序）。既然如此，那么开发者可以想传多少参数就传多少参数。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function doadd() {
+  if (arguments.length === 1) {
+    console.log(arguments[0] + 10);
+  } else if (arguments.length === 2) {
+    console.log(arguments[0] + arguments[1]);
+  }
+}
+
+doadd(10);      // 20
+doadd(30, 20);  // 50</code></pre>
+        <p class="calibre1">这个函数<code class="calibre11">doAdd()</code>在只传一个参数时会加10，在传两个参数时会将它们相加，然后返回。因此<code class="calibre11">doAdd(10)</code>返回20，而<code class="calibre11">doAdd(30,20)</code>返回50。虽然不像真正的函数重载那么明确，但这已经足以弥补ECMAScript在这方面的缺失了。</p>
+        <p class="calibre1">还有一个必须理解的重要方面，那就是<code class="calibre11">arguments</code>对象可以跟命名参数一起使用，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function doadd(num1, num2) {
+  if (arguments.length === 1) {
+    console.log(num1 + 10);
+  } else if (arguments.length === 2) {
+    console.log(arguments[0] + num2);
+  }
+}</code></pre>
+        <p class="calibre1">在这个<code class="calibre11">doAdd()</code>函数中，同时使用了两个命名参数和<code class="calibre11">arguments</code>对象。命名参数<code class="calibre11">num1</code>保存着与<code class="calibre11">arugments[0]</code>一样的值，因此使用谁都无所谓。（同样，<code class="calibre11">num2</code>也保存着跟<code class="calibre11">arguments[1]</code>一样的值。）</p>
+        <p class="calibre1">
+          <code class="calibre11">arguments</code>对象的另一个有意思的地方就是，它的值始终会与对应的命名参数同步。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function doadd(num1, num2) {
+  arguments[1] = 10;
+  console.log(arguments[0] + num2);
+}</code></pre>
+        <p class="calibre1">这个<code class="calibre11">doAdd()</code>函数把第二个参数的值重写为10。因为<code class="calibre11">arguments</code>对象的值会自动同步到对应的命名参数，所以修改<code class="calibre11">arguments[1]</code>也会修改<code class="calibre11">num2</code>的值，因此两者的值都是10。但这并不意味着它们都访问同一个内存地址，它们在内存中还是分开的，只不过会保持同步而已。另外还要记住一点：如果只传了一个参数，然后把<code class="calibre11">arguments[1]</code>设置为某个值，那么这个值并不会反映到第二个命名参数。这是因为<code class="calibre11">arguments</code>对象的长度是根据传入的参数个数，而非定义函数时给出的命名参数个数确定的。</p>
+        <p class="calibre1">对于命名参数而言，如果调用函数时没有传这个参数，那么它的值就是<code class="calibre11">undefined</code>。这就类似于定义了变量而没有初始化。比如，如果只给<code class="calibre11">doAdd()</code>传了一个参数，那么<code class="calibre11">num2</code>的值就是<code class="calibre11">undefined</code>。</p>
+        <p class="calibre1">严格模式下，<code class="calibre11">arguments</code>会有一些变化。首先，像前面那样给<code class="calibre11">arguments[1]</code>赋值不会再影响<code class="calibre11">num2</code>的值。就算把<code class="calibre11">arguments[1]</code>设置为10，<code class="calibre11">num2</code>的值仍然还是传入的值。其次，在函数中尝试重写<code class="calibre11">arguments</code>对象会导致语法错误。（代码也不会执行。）</p>
+        <h3 id="nav_point_229" class="calibre15">箭头函数中的参数</h3>
+        <p class="calibre1">如果函数是使用箭头语法定义的，那么传给函数的参数将不能使用<code class="calibre11">arguments</code>关键字访问，而只能通过定义的命名参数访问。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function foo() {
+  console.log(arguments[0]);
+}
+foo(5); // 5
+
+let bar = () =&gt; {
+  console.log(arguments[0]);
+};
+bar(5);  // referenceerror: arguments is not defined</code></pre>
+        <p class="calibre1">虽然箭头函数中没有<code class="calibre11">arguments</code>对象，但可以在包装函数中把它提供给箭头函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function foo() {
+  let bar = () =&gt; {
+    console.log(arguments[0]); // 5
+  };
+  bar();
+}
+
+foo(5);</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            ECMAScript中的所有参数都按值传递的。不可能按引用传递参数。如果把对象作为参数传递，那么传递的值就是这个对象的引用。</p>
+        </blockquote>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0072.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0074.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

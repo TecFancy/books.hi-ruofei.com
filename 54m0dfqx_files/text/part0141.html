@@ -1,0 +1,729 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0140.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0142.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_444" class="calibre9">19.5 富文本编辑</h2>
+        <p class="calibre1">在网页上编写富文本内容是Web应用开发中很常见的需求。富文本编辑也就是所谓的“所见即所得”（WYSIWYG，What You See Is What You Get）编辑。虽然没有规范定义，但源自IE的一套事实标准已经被Opera、Safari、Chrome和Firefox所支持。基本的技术就是在空白HTML文件中嵌入一个<code class="calibre11">iframe</code>。通过<code class="calibre11">designMode</code>属性，可以将这个空白文档变成可以编辑的，实际编辑的则是<code class="calibre11">&lt;body&gt;</code>元素的HTML。<code class="calibre11">designMode</code>属性有两个可能的值：<code class="calibre11">"off"</code>（默认值）和<code class="calibre11">"on"</code>。设置为<code class="calibre11">"on"</code>时，整个文档都会变成可以编辑的（显示插入光标），从而可以像使用文字处理程序一样编辑文本，通过键盘将文本标记为粗体、斜体，等等。</p>
+        <p class="calibre1">作为<code class="calibre11">iframe</code>源的是一个非常简单的空白HTML页面。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;blank page for rich text editing&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">这个页面会像其他任何页面一样加载到<code class="calibre11">iframe</code>里。为了可以编辑，必须将文档的<code class="calibre11">designMode</code>属性设置为<code class="calibre11">"on"</code>。不过，只有在文档完全加载之后才可以设置。在这个包含页面内，需要使用<code class="calibre11">onload</code>事件处理程序在适当时机设置<code class="calibre11">designMode</code>，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;iframe name="richedit" style="height: 100px; width: 100px"&gt;&lt;/iframe&gt;
+
+&lt;script&gt;
+  window.addeventlistener("load", () =&gt; {
+    frames["richedit"].document.designmode = "on";
+  });
+&lt;/script&gt;</code></pre>
+        <p class="calibre1">以上代码加载之后，可以在页面上看到一个类似文本框的区域。这个框的样式具有网页默认样式，不过可以通过CSS调整。</p>
+        <h3 id="nav_point_445" class="calibre15">19.5.1 使用<code class="calibre26">contenteditable</code>
+        </h3>
+        <p class="calibre1">还有一种处理富文本的方式，也是IE最早实现的，即指定<code class="calibre11">contenteditable</code>属性。可以给页面中的任何元素指定<code class="calibre11">contenteditable</code>属性，然后该元素会立即被用户编辑。这种方式更受欢迎，因为不需要额外的<code class="calibre11">iframe</code>、空页面和JavaScript，只给元素添加一个<code class="calibre11">contenteditable</code>属性即可，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div class="editable" id="richedit" contenteditable&gt;&lt;/div&gt;</code></pre>
+        <p class="calibre1">元素中包含的任何文本都会自动被编辑，元素本身类似于<code class="calibre11">&lt;textarea&gt;</code>元素。通过设置<code class="calibre11">contentEditable</code>属性，也可以随时切换元素的可编辑状态：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("richedit");
+richedit.contenteditable = "true";</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">contentEditable</code>属性有3个可能的值：<code class="calibre11">"true"</code>表示开启，<code class="calibre11">"false"</code>表示关闭，<code class="calibre11">"inherit"</code>表示继承父元素的设置（因为在<code class="calibre11">contenteditable</code>元素内部会创建和删除元素）。IE、Firefox、Chrome、Safari和Opera及所有主流移动浏览器都支持<code class="calibre11">contentEditable</code>属性。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">contenteditable</code>是一个非常多才多艺的属性。比如，访问伪<code class="calibre11">URL data:text/html, &lt;html contenteditable&gt;</code>可以把浏览器窗口转换为一个记事本。这是因为这样会临时创建DOM树并将整个文档变成可编辑区域。</p>
+        </blockquote>
+        <h3 id="nav_point_446" class="calibre15">19.5.2 与富文本交互</h3>
+        <p class="calibre1">与富文本编辑器交互的主要方法是使用<code class="calibre11">document.execCommand()</code>。这个方法在文档上执行既定的命令，可以实现大多数格式化任务。<code class="calibre11">document.execCommand()</code>可以接收3个参数：要执行的命令、表示浏览器是否为命令提供用户界面的布尔值和执行命令必需的值（如果不需要则为<code class="calibre11">null</code>）。为跨浏览器兼容，第二个参数应该始终为<code class="calibre11">false</code>，因为Firefox会在其为<code class="calibre11">true</code>时抛出错误。</p>
+        <p class="calibre1">不同浏览器支持的命令也不一样。下表列出了最常用的命令。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">命令</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">值（第三个参数）</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">说明</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">backcolor</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">颜色字符串</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置文档背景颜色</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">bold</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">切换选中文本的粗体样式</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">copy</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本复制到剪贴板</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">createlink</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">URL字符串</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将当前选中文本转换为指向给定URL的链接</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">cut</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本剪切到剪贴板</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">delete</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">删除当前选中的文本</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">fontname</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">字体名</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本改为使用指定字体</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">fontsize</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">1~7</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本改为指定字体大小</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">forecolor</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">颜色字符串</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本改为指定颜色</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">formatblock</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">HTML标签，如<code class="calibre27">&lt;h1&gt;</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">将选中文本包含在指定的HTML标签中</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">indent</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">缩进文本</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">inserthorizontalrule</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置插入<code class="calibre27">&lt;hr&gt;</code>元素</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">insertimage</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">图片URL</p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置插入图片</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">insertorderedlist</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置插入<code class="calibre27">&lt;ol&gt;</code>元素</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">insertparagraph</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置插入<code class="calibre27">&lt;p&gt;</code>元素</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">insertunorderedlist</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置插入<code class="calibre27">&lt;ul&gt;</code>元素</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">italic</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">切换选中文本的斜体样式</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">justifycenter</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置居中文本块</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">justifyleft</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在光标位置左对齐文本块</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">outdent</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">减少缩进</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">paste</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">在选中文本上粘贴剪贴板内容</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">removeformat</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">移除包含光标所在位置块的HTML标签。这是<code class="calibre27">formatblock</code>的反操作</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">selectall</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">选中文档中所有文本</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">underline</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">切换选中文本的下划线样式</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">unlink</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">null</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">移除文本链接。这是<code class="calibre27">createlink</code>的反操作</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">剪贴板相关的命令与浏览器关系密切。虽然这些命令并不都可以通过<code class="calibre11">document.execCommand()</code>使用，但相应的键盘快捷键都是可以用的。</p>
+        <p class="calibre1">这些命令可以用于修改内嵌窗格（iframe）中富文本区域的外观，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在内嵌窗格中切换粗体文本样式
+frames["richedit"].document.execcommand("bold", false, null);
+
+// 在内嵌窗格中切换斜体文本样式
+frames["richedit"].document.execcommand("italic", false, null);
+
+// 在内嵌窗格中创建指向www.wrox.com的链接
+frames["richedit"].document.execcommand("createlink", false,
+                                        "http://www.wrox.com");
+
+// 在内嵌窗格中为内容添加&lt;h1&gt;标签
+frames["richedit"].document.execcommand("formatblock", false, "&lt;h1&gt;");</code></pre>
+        <p class="calibre1">同样的方法也可以用于页面中添加了<code class="calibre11">contenteditable</code>属性的元素，只不过要使用当前窗口而不是内嵌窗格中的<code class="calibre11">document</code>对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 切换粗体文本样式
+document.execcommand("bold", false, null);
+
+// 切换斜体文本样式
+document.execcommand("italic", false, null);
+
+// 创建指向www.wrox.com的链接
+document.execcommand("createlink", false, "http://www.wrox.com");
+
+// 为内容添加&lt;h1&gt;标签
+document.execcommand("formatblock", false, "&lt;h1&gt;");</code></pre>
+        <p class="calibre1">注意，即使命令是所有浏览器都支持的，命令生成的HTML通常差别也很大。例如，为选中文本应用<code class="calibre11">bold</code>命令在IE和Opera中会使用<code class="calibre11">&lt;strong&gt;</code>标签，在Safari和Chrome中会使用<code class="calibre11">&lt;b&gt;</code>标签，而在Firefox中会使用<code class="calibre11">&lt;span&gt;</code>标签。在富文本编辑中，不能依赖浏览器生成的HTML，因为命令实现和格式转换都是通过<code class="calibre11">innerHTML</code>完成的。</p>
+        <p class="calibre1">还有与命令相关的其他一些方法。第一个方法是<code class="calibre11">queryCommandEnabled()</code>，此方法用于确定对当前选中文本或光标所在位置是否可以执行相关命令。它只接收一个参数，即要检查的命令名。如果可编辑区可以执行该命令就返回<code class="calibre11">true</code>，否则返回<code class="calibre11">false</code>。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = frames["richedit"].document.querycommandenabled("bold");</code></pre>
+        <p class="calibre1">以上代码在当前选区可以执行<code class="calibre11">"bold"</code>命令时返回<code class="calibre11">true</code>。不过要注意，<code class="calibre11">queryCommandEnabled()</code>返回<code class="calibre11">true</code>并不代表允许执行相关命令，只代表当前选区适合执行相关命令。在Firefox中，<code class="calibre11">queryCommandEnabled("cut")</code>即使默认不允许剪切也会返回<code class="calibre11">true</code>。</p>
+        <p class="calibre1">另一个方法<code class="calibre11">queryCommandState()</code>用于确定相关命令是否应用到了当前文本选区。例如，要确定当前选区的文本是否为粗体，可以这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let isbold = frames["richedit"].document.querycommandstate("bold");</code></pre>
+        <p class="calibre1">如果之前给文本选区应用过<code class="calibre11">"bold"</code>命令，则以上代码返回<code class="calibre11">true</code>。全功能富文本编辑器可以利用这个方法更新粗体、斜体等按钮。</p>
+        <p class="calibre1">最后一个方法是<code class="calibre11">queryCommandValue()</code>，此方法可以返回执行命令时使用的值（即前面示例的<code class="calibre11">execCommand()</code>中的第三个参数）。如果对一段选中文本应用了值为7的<code class="calibre11">"fontsize"</code>命令，则如下代码会返回7：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fontsize = frames["richedit"].document.querycommandvalue("fontsize");</code></pre>
+        <p class="calibre1">这个方法可用于确定如何将命令应用于文本选区，从而进一步决定是否需要执行下一个命令。</p>
+        <h3 id="nav_point_447" class="calibre15">19.5.3 富文件选择</h3>
+        <p class="calibre1">在内嵌窗格中使用<code class="calibre11">getSelection()</code>方法，可以获得富文本编辑器的选区。这个方法暴露在<code class="calibre11">document</code>和<code class="calibre11">window</code>对象上，返回表示当前选中文本的<code class="calibre11">Selection</code>对象。每个<code class="calibre11">Selection</code>对象都拥有以下属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">anchorNode</code>：选区开始的节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">anchorOffset</code>：在<code class="calibre11">anchorNode</code>中，从开头到选区开始跳过的字符数。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">focusNode</code>：选区结束的节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">focusOffset</code>：<code class="calibre11">focusNode</code>中包含在选区内的字符数。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">isCollapsed</code>：布尔值，表示选区起点和终点是否在同一个地方。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">rangeCount</code>：选区中包含的DOM范围数量。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">Selection</code>的属性并没有包含很多有用的信息。好在它的以下方法提供了更多信息，并允许操作选区。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">addRange(<i class="calibre6">range</i>)</code>：把给定的DOM范围添加到选区。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">collapse(<i class="calibre6">node, offset</i>)</code>：将选区折叠到给定节点中给定的文本偏移处。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">collapseToEnd()</code>：将选区折叠到终点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">collapseToStart()</code>：将选区折叠到起点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">containsNode(<i class="calibre6">node</i>)</code>：确定给定节点是否包含在选区中。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">deleteFromDocument()</code>：从文档中删除选区文本。与执行<code class="calibre11">execCommand("delete", false, null)</code>命令结果相同。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">extend(<i class="calibre6">node, offset</i>)</code>：通过将<code class="calibre11">focusNode</code>和<code class="calibre11">focusOffset</code>移动到指定值来扩展选区。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">getRangeAt(<i class="calibre6">index</i>)</code>：返回选区中指定索引处的DOM范围。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">removeAllRanges()</code>：从选区中移除所有DOM范围。这实际上会移除选区，因为选区中至少要包含一个范围。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">removeRange(<i class="calibre6">range</i>)</code>：从选区中移除指定的DOM范围。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">selectAllChildren(<i class="calibre6">node</i>)</code>：清除选区并选择给定节点的所有子节点。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toString()</code>：返回选区中的文本内容。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">Selection</code>对象的这个方法极其强大，充分利用了DOM范围来管理选区。操纵DOM范围可以实现比<code class="calibre11">execCommand()</code>更细粒度的控制，因为可以直接对选中文本的DOM内容进行操作。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let selection = frames["richedit"].getselection();
+
+// 取得选中的文本
+let selectedtext = selection.tostring();
+
+// 取得表示选区的范围
+let range = selection.getrangeat(0);
+
+// 高亮选中的文本
+let span = frames["richedit"].document.createelement("span");
+span.style.backgroundcolor = "yellow";
+range.surroundcontents(span);</code></pre>
+        <p class="calibre1">以上代码会在富文本编辑器中给选中文本添加黄色高亮背景。实现方式是在默认选区使用DOM范围，用<code class="calibre11">surroundContents()</code>方法给选中文本添加背景为黄色的<code class="calibre11">&lt;span&gt;</code>标签。</p>
+        <p class="calibre1">
+          <code class="calibre11">getSelection()</code>方法在HTML5中进行了标准化，IE9以及Firefox、Safari、Chrome和Opera的所有现代版本中都实现了这个方法。</p>
+        <p class="calibre1">IE8及更早版本不支持DOM范围，不过它们允许通过专有的<code class="calibre11">selection</code>对象操作选中的文本。如本章前面所讨论的，这个<code class="calibre11">selection</code>对象是<code class="calibre11">document</code>的属性。要取得富文本编辑器中选中的文本，必须先创建一个文本范围，然后再访问其<code class="calibre11">text</code>属性：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let range = frames["richedit"].document.selection.createrange();
+let selectedtext = range.text;</code></pre>
+        <p class="calibre1">使用IE文本范围执行HTML操作不像使用DOM范围那么可靠，不过也是可以做到的。要实现与使用DOM范围一样的高亮效果，可以组合使用<code class="calibre11">htmlText</code>属性和<code class="calibre11">pasteHTML()</code>方法：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let range = frames["richedit"].document.selection.createrange();
+range.pastehtml(
+    '&lt;span style="background-color:yellow"&gt;${range.htmltext}&lt;/span&gt;');</code></pre>
+        <p class="calibre1">以上代码使用<code class="calibre11">htmlText</code>取得了当前选区的HTML，然后用一个<code class="calibre11">&lt;span&gt;</code>标签将其包围起来并通过<code class="calibre11">pasteHTML()</code>再把它插入选区中。</p>
+        <h3 id="nav_point_448" class="calibre15">19.5.4 通过表单提交富文本</h3>
+        <p class="calibre1">因为富文本编辑是在内嵌窗格中或通过为元素指定<code class="calibre11">contenteditable</code>属性实现的，而不是在表单控件中实现，所以富文本编辑器技术上与表单没有关系。这意味着要把富文本编辑的结果提交给服务器，必须手工提取HTML并自己提交。通常的解决方案是在表单中添加一个隐藏字段，使用内嵌窗格或<code class="calibre11">contenteditable</code>元素的HTML更新它的值。在表单提交之前，从内嵌窗格或<code class="calibre11">contenteditable</code>元素中提取出HTML并插入隐藏字段中。例如，以下代码在使用内嵌窗格实现富文本编辑时，可以用在表单的<code class="calibre11">onsubmit</code>事件处理程序中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">form.addeventlistener("submit", (event) =&gt; {
+  let target = event.target;
+
+  target.elements["comments"].value =
+      frames["richedit"].document.body.innerhtml;
+});</code></pre>
+        <p class="calibre1">这里，代码使用文档主体的<code class="calibre11">innerHTML</code>属性取得了内嵌窗格的HTML，然后将其插入名为<code class="calibre11">"comments"</code>的表单字段中。这样做可以确保在提交表单之前给表单字段赋值。如果使用<code class="calibre11">submit()</code>方法手工提交表单，那么要注意在提交前先执行上述操作。对于<code class="calibre11">contenteditable</code>元素，执行这一操作的代码是类似的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">form.addeventlistener("submit", (event) =&gt; {
+  let target = event.target;
+
+  target.elements["comments"].value =
+      document.getelementbyid("richedit").innerhtml;
+});</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0140.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0142.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

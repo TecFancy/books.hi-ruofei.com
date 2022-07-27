@@ -1,0 +1,615 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0039.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0041.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_98" class="calibre9">5.2 RegExp</h2>
+        <p class="calibre1">ECMAScript通过<code class="calibre11">RegExp</code>类型支持正则表达式。正则表达式使用类似Perl的简洁语法来创建：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let expression = /pattern/flags;</code></pre>
+        <p class="calibre1">这个正则表达式的<code class="calibre11">pattern</code>（模式）可以是任何简单或复杂的正则表达式，包括字符类、限定符、分组、向前查找和反向引用。每个正则表达式可以带零个或多个<code class="calibre11">flags</code>（标记），用于控制正则表达式的行为。下面给出了表示匹配模式的标记。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">g</code>：全局模式，表示查找字符串的全部内容，而不是找到第一个匹配的内容就结束。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">i</code>：不区分大小写，表示在查找匹配时忽略<code class="calibre11">pattern</code>和字符串的大小写。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">m</code>：多行模式，表示查找到一行文本末尾时会继续查找。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">y</code>：粘附模式，表示只查找从<code class="calibre11">lastIndex</code>开始及之后的字符串。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">u</code>：Unicode模式，启用Unicode匹配。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">s</code>：<code class="calibre11">dotAll</code>模式，表示元字符<code class="calibre11">.</code>匹配任何字符（包括<code class="calibre11">\n</code>或<code class="calibre11">\r</code>）。</li>
+        </ul>
+        <p class="calibre1">使用不同模式和标记可以创建出各种正则表达式，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 匹配字符串中的所有"at"
+let pattern1 = /at/g;
+
+// 匹配第一个"bat"或"cat"，忽略大小写
+let pattern2 = /[bc]at/i;
+
+// 匹配所有以"at"结尾的三字符组合，忽略大小写
+let pattern3 = /.at/gi;</code></pre>
+        <p class="calibre1">与其他语言中的正则表达式类似，所有<strong class="calibre2">元字符</strong>在模式中也必须转义，包括：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">( [ { \ ^ $ | ) ] } ? * + .</code></pre>
+        <p class="calibre1">元字符在正则表达式中都有一种或多种特殊功能，所以要匹配上面这些字符本身，就必须使用反斜杠来转义。下面是几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 匹配第一个"bat"或"cat"，忽略大小写
+let pattern1 = /[bc]at/i;
+
+// 匹配第一个"[bc]at"，忽略大小写
+let pattern2 = /\[bc\]at/i;
+
+// 匹配所有以"at"结尾的三字符组合，忽略大小写
+let pattern3 = /.at/gi;
+
+// 匹配所有".at"，忽略大小写
+let pattern4 = /\.at/gi;</code></pre>
+        <p class="calibre1">这里的<code class="calibre11">pattern1</code>匹配<code class="calibre11">"bat"</code>或<code class="calibre11">"cat"</code>，不区分大小写。要直接匹配<code class="calibre11">"[bc]at"</code>，左右中括号都必须像<code class="calibre11">pattern2</code>中那样使用反斜杠转义。在<code class="calibre11">pattern3</code>中，点号表示<code class="calibre11">"at"</code>前面的任意字符都可以匹配。如果想匹配<code class="calibre11">".at"</code>，那么要像<code class="calibre11">pattern4</code>中那样对点号进行转义。</p>
+        <p class="calibre1">前面例子中的正则表达式都是使用字面量形式定义的。正则表达式也可以使用<code class="calibre11">RegExp</code>构造函数来创建，它接收两个参数：模式字符串和（可选的）标记字符串。任何使用字面量定义的正则表达式也可以通过构造函数来创建，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 匹配第一个"bat"或"cat"，忽略大小写
+let pattern1 = /[bc]at/i;
+
+// 跟pattern1一样，只不过是用构造函数创建的
+let pattern2 = new regexp("[bc]at", "i");</code></pre>
+        <p class="calibre1">这里的<code class="calibre11">pattern1</code>和<code class="calibre11">pattern2</code>是等效的正则表达式。注意，<code class="calibre11">RegExp</code>构造函数的两个参数都是字符串。因为<code class="calibre11">RegExp</code>的模式参数是字符串，所以在某些情况下需要二次转义。所有元字符都必须二次转义，包括转义字符序列，如<code class="calibre11">\n</code>（<code class="calibre11">\</code>转义后的字符串是<code class="calibre11">\\</code>，在正则表达式字符串中则要写成<code class="calibre11">\\\\</code>）。下表展示了几个正则表达式的字面量形式，以及使用<code class="calibre11">RegExp</code>构造函数创建时对应的模式字符串。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">字面量模式</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">对应的字符串</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">/\[bc\]at/</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"\\[bc\\]at"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">/\.at/</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"\\.at"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">/name\/age/</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"name\\/age"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">/\d.\d{1,2}/</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"\\d.\\d{1,2}"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">/\w\\hello\\123/</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"\\w\\\\hello\\\\123"</code>
+                </p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">此外，使用<code class="calibre11">RegExp</code>也可以基于已有的正则表达式实例，并可选择性地修改它们的标记：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const re1 = /cat/g;
+console.log(re1);  // "/cat/g"
+
+const re2 = new regexp(re1);
+console.log(re2);  // "/cat/g"
+
+const re3 = new regexp(re1, "i");
+console.log(re3);  // "/cat/i"</code></pre>
+        <h3 id="nav_point_99" class="calibre15">5.2.1
+          <code class="calibre26">RegExp</code>实例属性</h3>
+        <p class="calibre1">每个<code class="calibre11">RegExp</code>实例都有下列属性，提供有关模式的各方面信息。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">global</code>：布尔值，表示是否设置了<code class="calibre11">g</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">ignoreCase</code>：布尔值，表示是否设置了<code class="calibre11">i</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">unicode</code>：布尔值，表示是否设置了<code class="calibre11">u</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">sticky</code>：布尔值，表示是否设置了<code class="calibre11">y</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">lastIndex</code>：整数，表示在源字符串中下一次搜索的开始位置，始终从0开始。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">multiline</code>：布尔值，表示是否设置了<code class="calibre11">m</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">dotAll</code>：布尔值，表示是否设置了<code class="calibre11">s</code>标记。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">source</code>：正则表达式的字面量字符串（不是传给构造函数的模式字符串），没有开头和结尾的斜杠。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">flags</code>：正则表达式的标记字符串。始终以字面量而非传入构造函数的字符串模式形式返回（没有前后斜杠）。</li>
+        </ul>
+        <p class="calibre1">通过这些属性可以全面了解正则表达式的信息，不过实际开发中用得并不多，因为模式声明中包含这些信息。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let pattern1 = /\[bc\]at/i;
+
+console.log(pattern1.global);      // false
+console.log(pattern1.ignorecase);  // true
+console.log(pattern1.multiline);   // false
+console.log(pattern1.lastindex);   // 0
+console.log(pattern1.source);      // "\[bc\]at"
+console.log(pattern1.flags);       // "i"
+
+let pattern2 = new regexp("\\[bc\\]at", "i");
+
+console.log(pattern2.global);      // false
+console.log(pattern2.ignorecase);  // true
+console.log(pattern2.multiline);   // false
+console.log(pattern2.lastindex);   // 0
+console.log(pattern2.source);      // "\[bc\]at"
+console.log(pattern2.flags);       // "i"</code></pre>
+        <p class="calibre1">注意，虽然第一个模式是通过字面量创建的，第二个模式是通过<code class="calibre11">RegExp</code>构造函数创建的，但两个模式的<code class="calibre11">source</code>和<code class="calibre11">flags</code>属性是相同的。<code class="calibre11">source</code>和<code class="calibre11">flags</code>属性返回的是规范化之后可以在字面量中使用的形式。</p>
+        <h3 id="nav_point_100" class="calibre15">5.2.2
+          <code class="calibre26">RegExp</code>实例方法</h3>
+        <p class="calibre1">
+          <code class="calibre11">RegExp</code>实例的主要方法是<code class="calibre11">exec()</code>，主要用于配合捕获组使用。这个方法只接收一个参数，即要应用模式的字符串。如果找到了匹配项，则返回包含第一个匹配信息的数组；如果没找到匹配项，则返回<code class="calibre11">null</code>。返回的数组虽然是<code class="calibre11">Array</code>的实例，但包含两个额外的属性：<code class="calibre11">index</code>和<code class="calibre11">input</code>。<code class="calibre11">index</code>是字符串中匹配模式的起始位置，<code class="calibre11">input</code>是要查找的字符串。这个数组的第一个元素是匹配整个模式的字符串，其他元素是与表达式中的捕获组匹配的字符串。如果模式中没有捕获组，则数组只包含一个元素。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "mom and dad and baby";
+let pattern = /mom( and dad( and baby)?)?/gi;
+
+let matches = pattern.exec(text);
+console.log(matches.index);   // 0
+console.log(matches.input);   // "mom and dad and baby"
+console.log(matches[0]);      // "mom and dad and baby"
+console.log(matches[1]);      // " and dad and baby"
+console.log(matches[2]);      // " and baby"</code></pre>
+        <p class="calibre1">在这个例子中，模式包含两个捕获组：最内部的匹配项<code class="calibre11">" and baby"</code>，以及外部的匹配项<code class="calibre11">" and dad"</code>或<code class="calibre11">" and dad and baby"</code>。调用<code class="calibre11">exec()</code>后找到了一个匹配项。因为整个字符串匹配模式，所以<code class="calibre11">matchs</code>数组的<code class="calibre11">index</code>属性就是0。数组的第一个元素是匹配的整个字符串，第二个元素是匹配第一个捕获组的字符串，第三个元素是匹配第二个捕获组的字符串。</p>
+        <p class="calibre1">如果模式设置了全局标记，则每次调用<code class="calibre11">exec()</code>方法会返回一个匹配的信息。如果没有设置全局标记，则无论对同一个字符串调用多少次<code class="calibre11">exec()</code>，也只会返回第一个匹配的信息。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let pattern = /.at/;
+
+let matches = pattern.exec(text);
+console.log(matches.index);      // 0
+console.log(matches[0]);         // cat
+console.log(pattern.lastindex);  // 0
+
+matches = pattern.exec(text);
+console.log(matches.index);      // 0
+console.log(matches[0]);         // cat
+console.log(pattern.lastindex);  // 0</code></pre>
+        <p class="calibre1">上面例子中的模式没有设置全局标记，因此调用<code class="calibre11">exec()</code>只返回第一个匹配项（<code class="calibre11">"cat"</code>）。<code class="calibre11">lastIndex</code>在非全局模式下始终不变。</p>
+        <p class="calibre1">如果在这个模式上设置了<code class="calibre11">g</code>标记，则每次调用<code class="calibre11">exec()</code>都会在字符串中向前搜索下一个匹配项，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let pattern = /.at/g;
+let matches = pattern.exec(text);
+console.log(matches.index);      // 0
+console.log(matches[0]);         // cat
+console.log(pattern.lastindex);  // 3
+
+matches = pattern.exec(text);
+console.log(matches.index);      // 5
+console.log(matches[0]);         // bat
+console.log(pattern.lastindex);  // 8
+
+matches = pattern.exec(text);
+console.log(matches.index);      // 10
+console.log(matches[0]);         // sat
+console.log(pattern.lastindex);  // 13</code></pre>
+        <p class="calibre1">这次模式设置了全局标记，因此每次调用<code class="calibre11">exec()</code>都会返回字符串中的下一个匹配项，直到搜索到字符串末尾。注意模式的<code class="calibre11">lastIndex</code>属性每次都会变化。在全局匹配模式下，每次调用<code class="calibre11">exec()</code>都会更新<code class="calibre11">lastIndex</code>值，以反映上次匹配的最后一个字符的索引。</p>
+        <p class="calibre1">如果模式设置了粘附标记<code class="calibre11">y</code>，则每次调用<code class="calibre11">exec()</code>就只会在<code class="calibre11">lastIndex</code>的位置上寻找匹配项。粘附标记覆盖全局标记。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "cat, bat, sat, fat";
+let pattern = /.at/y;
+
+let matches = pattern.exec(text);
+console.log(matches.index);       // 0
+console.log(matches[0]);          // cat
+console.log(pattern.lastindex);   // 3
+
+// 以索引3对应的字符开头找不到匹配项，因此exec()返回null
+// exec()没找到匹配项，于是将lastindex设置为0
+matches = pattern.exec(text);
+console.log(matches);             // null
+console.log(pattern.lastindex);   // 0
+
+// 向前设置lastindex可以让粘附的模式通过exec()找到下一个匹配项：
+pattern.lastindex = 5;
+matches = pattern.exec(text);
+console.log(matches.index);       // 5
+console.log(matches[0]);          // bat
+console.log(pattern.lastindex);   // 8</code></pre>
+        <p class="calibre1">正则表达式的另一个方法是<code class="calibre11">test()</code>，接收一个字符串参数。如果输入的文本与模式匹配，则参数返回<code class="calibre11">true</code>，否则返回<code class="calibre11">false</code>。这个方法适用于只想测试模式是否匹配，而不需要实际匹配内容的情况。<code class="calibre11">test()</code>经常用在<code class="calibre11">if</code>语句中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "000-00-0000";
+let pattern = /\d{3}-\d{2}-\d{4}/;
+
+if (pattern.test(text)) {
+  console.log("the pattern was matched.");
+}</code></pre>
+        <p class="calibre1">在这个例子中，正则表达式用于测试特定的数值序列。如果输入的文本与模式匹配，则显示匹配成功的消息。这个用法常用于验证用户输入，此时我们只在乎输入是否有效，不关心为什么无效。</p>
+        <p class="calibre1">无论正则表达式是怎么创建的，继承的方法<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>都返回正则表达式的字面量表示。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let pattern = new regexp("\\[bc\\]at", "gi");
+console.log(pattern.tostring());       // /\[bc\]at/gi
+console.log(pattern.tolocalestring()); // /\[bc\]at/gi</code></pre>
+        <p class="calibre1">这里的模式是通过<code class="calibre11">RegExp</code>构造函数创建的，但<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>返回的都是其字面量的形式。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            正则表达式的<code class="calibre11">valueOf()</code>方法返回正则表达式本身。</p>
+        </blockquote>
+        <h3 id="nav_point_101" class="calibre15">5.2.3
+          <code class="calibre26">RegExp</code>构造函数属性</h3>
+        <p class="calibre1">
+          <code class="calibre11">RegExp</code>构造函数本身也有几个属性。（在其他语言中，这种属性被称为静态属性。）这些属性适用于作用域中的所有正则表达式，而且会根据最后执行的正则表达式操作而变化。这些属性还有一个特点，就是可以通过两种不同的方式访问它们。换句话说，每个属性都有一个全名和一个简写。下表列出了<code class="calibre11">RegExp</code>构造函数的属性。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">全名</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">简写</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">说明</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">input</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">$_</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">最后搜索的字符串（非标准特性）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">lastMatch</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">$&amp;</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">最后匹配的文本</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">lastParen</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">$+</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">最后匹配的捕获组（非标准特性）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">leftContext</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">$`</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">input</code>字符串中出现在<code class="calibre27">lastMatch</code>前面的文本</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">rightContext</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">$'</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">input</code>字符串中出现在<code class="calibre27">lastMatch</code>后面的文本</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="calibre1">通过这些属性可以提取出与<code class="calibre11">exec()</code>和<code class="calibre11">test()</code>执行的操作相关的信息。来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "this has been a short summer";
+let pattern = /(.)hort/g;
+
+if (pattern.test(text)) {
+  console.log(regexp.input);        // this has been a short summer
+  console.log(regexp.leftcontext);  // this has been a
+  console.log(regexp.rightcontext); // summer
+  console.log(regexp.lastmatch);    // short
+  console.log(regexp.lastparen);    // s
+}</code></pre>
+        <p class="calibre1">以上代码创建了一个模式，用于搜索任何后跟<code class="calibre11">"hort"</code>的字符，并把第一个字符放在了捕获组中。不同属性包含的内容如下。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">input</code>属性中包含原始的字符串。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">leftConext</code>属性包含原始字符串中<code class="calibre11">"short"</code>之前的内容，<code class="calibre11">rightContext</code>属性包含<code class="calibre11">"short"</code>之后的内容。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">lastMatch</code>属性包含匹配整个正则表达式的上一个字符串，即<code class="calibre11">"short"</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">lastParen</code>属性包含捕获组的上一次匹配，即<code class="calibre11">"s"</code>。</li>
+        </ul>
+        <p class="calibre1">这些属性名也可以替换成简写形式，只不过要使用中括号语法来访问，如下面的例子所示，因为大多数简写形式都不是合法的ECMAScript标识符：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "this has been a short summer";
+let pattern = /(.)hort/g;
+
+/*
+ * 注意：opera 不支持简写属性名
+ * ie 不支持多行匹配
+ */
+if (pattern.test(text)) {
+  console.log(regexp.$_);      // this has been a short summer
+  console.log(regexp["$`"]);   // this has been a
+  console.log(regexp["$'"]);   // summer
+  console.log(regexp["$&amp;"]);   // short
+  console.log(regexp["$+"]);   // s
+}</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">RegExp</code>还有其他几个构造函数属性，可以存储最多9个捕获组的匹配项。这些属性通过<code class="calibre11">RegExp.$1~RegExp.$9</code>来访问，分别包含第1~9个捕获组的匹配项。在调用<code class="calibre11">exec()</code>或<code class="calibre11">test()</code>时，这些属性就会被填充，然后就可以像下面这样使用它们：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let text = "this has been a short summer";
+let pattern = /(..)or(.)/g;
+
+if (pattern.test(text)) {
+  console.log(regexp.$1);  // sh
+  console.log(regexp.$2);  // t
+}</code></pre>
+        <p class="calibre1">在这个例子中，模式包含两个捕获组。调用<code class="calibre11">test()</code>搜索字符串之后，因为找到了匹配项所以返回<code class="calibre11">true</code>，而且可以打印出通过<code class="calibre11">RegExp</code>构造函数的<code class="calibre11">$1</code>和<code class="calibre11">$2</code>属性取得的两个捕获组匹配的内容。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">RegExp</code>构造函数的所有属性都没有任何Web标准出处，因此不要在生产环境中使用它们。</p>
+        </blockquote>
+        <h3 id="nav_point_102" class="calibre15">5.2.4 模式局限</h3>
+        <p class="calibre1">虽然ECMAScript对正则表达式的支持有了长足的进步，但仍然缺少Perl语言中的一些高级特性。下列特性目前还没有得到ECMAScript的支持（想要了解更多信息，可以参考Regular-Expressions.info网站）：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">\A</code>和<code class="calibre11">\Z</code>锚（分别匹配字符串的开始和末尾）</li>
+          <li class="di_1ji_wu_xu_lie_biao">联合及交叉类</li>
+          <li class="di_1ji_wu_xu_lie_biao">原子组</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">x</code>（忽略空格）匹配模式</li>
+          <li class="di_1ji_wu_xu_lie_biao">条件式匹配</li>
+          <li class="di_1ji_wu_xu_lie_biao">正则表达式注释</li>
+        </ul>
+        <p class="calibre1">虽然还有这些局限，但ECMAScript的正则表达式已经非常强大，可以用于大多数模式匹配任务。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0039.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0041.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

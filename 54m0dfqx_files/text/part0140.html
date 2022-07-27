@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0139.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0141.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_443" class="calibre9">19.4 表单序列化</h2>
+        <p class="calibre1">随着Ajax（第21章会进一步讨论）的崭露头角，<strong class="calibre2">表单序列化</strong>（form serialization）已经成为一个常见需求。表单在JavaScript中可以使用表单字段的<code class="calibre11">type</code>属性连同其<code class="calibre11">name</code>属性和<code class="calibre11">value</code>属性来进行序列化。在写代码之前，我们需要理解浏览器如何确定在提交表单时要把什么发送到服务器。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">字段名和值是URL编码的并以和号（<code class="calibre11">&amp;</code>）分隔。</li>
+          <li class="di_1ji_wu_xu_lie_biao">禁用字段不会发送。</li>
+          <li class="di_1ji_wu_xu_lie_biao">复选框或单选按钮只在被选中时才发送。</li>
+          <li class="di_1ji_wu_xu_lie_biao">类型为<code class="calibre11">"reset"</code>或<code class="calibre11">"button"</code>的按钮不会发送。</li>
+          <li class="di_1ji_wu_xu_lie_biao">多选字段的每个选中项都有一个值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">通过点击提交按钮提交表单时，会发送该提交按钮；否则，不会发送提交按钮。类型为<code class="calibre11">"image"</code>的<code class="calibre11">&lt;input&gt;</code>元素视同提交按钮。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;select&gt;</code>元素的值是被选中<code class="calibre11">&lt;option&gt;</code>元素的<code class="calibre11">value</code>属性。如果<code class="calibre11">&lt;option&gt;</code>元素没有<code class="calibre11">value</code>属性，则该值是它的文本。</li>
+        </ul>
+        <p class="calibre1">表单序列化通常不包含任何按钮，因为序列化得到的字符串很可能以其他方式提交。除此之外其他规则都应该遵循。最终完成表单序列化的代码如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function serialize(form) {
+  let parts = [];
+  let optvalue;
+
+  for (let field of form.elements) {
+    switch(field.type) {
+      case "select-one":
+      case "select-multiple":
+        if (field.name.length) {
+        for (let option of field.options) {
+            if (option.selected) {
+              if (option.hasattribute){
+                optvalue = (option.hasattribute("value") ?
+                            option.value : option.text);
+              } else {
+                optvalue = (option.attributes["value"].specified ?
+                            option.value : option.text);
+              }
+              parts.push(encodeuricomponent(field.name)} + "=" +
+                         encodeuricomponent(optvalue));
+            }
+          }
+        }
+        break;
+      case undefined:     // 字段集
+      case "file":        // 文件输入
+      case "submit":      // 提交按钮
+      case "reset":       // 重置按钮
+      case "button":      // 自定义按钮
+        break;
+      case "radio":       // 单选按钮
+      case "checkbox":    // 复选框
+        if (!field.checked) {
+          break;
+        }
+      default:
+        // 不包含没有名字的表单字段
+        if (field.name.length) {
+          parts.push('${encodeuricomponent(field.name)}=' +
+                     '${encodeuricomponent(field.value)}');
+        }
+  }
+  return parts.join("&amp;");
+}</code></pre>
+        <p class="calibre1">这个<code class="calibre11">serialize()</code>函数一开始定义了一个名为<code class="calibre11">parts</code>的数组，用于保存要创建字符串的各个部分。接下来通过<code class="calibre11">for</code>循环迭代每个表单字段，将字段保存在<code class="calibre11">field</code>变量中。获得一个字段的引用后，再通过<code class="calibre11">switch</code>语句检测其<code class="calibre11">type</code>属性。最麻烦的是序列化<code class="calibre11">&lt;select&gt;</code>元素，包括单选和多选两种模式。在遍历选择框的每个选项时，只要有选项被选中，就将其添加到结果字符串。单选控件只会有一个选项被选中，多选控件则可能有零或多个选项被选中。同样的代码适用于两种选择类型，因为浏览器会限制可选项的数量。找到选中项时，需要确定使用哪个值。如果不存在<code class="calibre11">value</code>属性，则应该以选项文本代替，不过<code class="calibre11">value</code>属性为空字符串是完全有效的。为此需要使用DOM合规的浏览器支持的<code class="calibre11">hasAttribute()</code>方法，而在IE8及更早版本中要使用值的<code class="calibre11">specified</code>属性。</p>
+        <p class="calibre1">表单中如果有<code class="calibre11">&lt;fieldset&gt;</code>元素，它就会出现在元素集合中，但应该没有<code class="calibre11">type</code>属性。因此，如果<code class="calibre11">type</code>属性是<code class="calibre11">undefined</code>，则不必纳入序列化。各种类型的按钮以及文件输入字段也是如此。（文件输入字段在提交表单时包含文件的内容，但这些字段通常无法转换，因而也要排除在序列化之外。）对于单选按钮和复选框，会检测其<code class="calibre11">checked</code>属性。如果值为<code class="calibre11">false</code>就退出<code class="calibre11">switch</code>语句；如果值为<code class="calibre11">true</code>，则继续执行<code class="calibre11">default</code>分支，将字段的名和值编码后添加到<code class="calibre11">parts</code>数组。注意，所有没有名字的表单字段都不会包含在序列化结果中以模拟浏览器的表单提交行为。这个函数的最后一步是使用<code class="calibre11">join()</code>通过和号把所有字段的名值对拼接起来。</p>
+        <p class="calibre1">
+          <code class="calibre11">serialize()</code>函数返回的结果是查询字符串格式。如果想要返回其他格式，修改起来也很简单。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0139.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0141.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

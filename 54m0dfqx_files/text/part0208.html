@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0207.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0209.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_695" class="calibre9">A.4 正则表达式相关特性</h2>
+        <p class="calibre1">ECMAScript 2018为正则表达式增加了一些特性。</p>
+        <h3 id="nav_point_696" class="calibre15">A.4.1
+          <code class="calibre26">dotAll</code>标志</h3>
+        <p class="calibre1">正则表达式中用于匹配任意字符的点（<code class="calibre11">.</code>）不匹配换行符，比如<code class="calibre11">\n</code>和<code class="calibre11">\r</code>或非BMP字符，如表情符号。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = `
+foo
+bar
+`;
+
+const re = /foo.bar/;
+
+console.log(re.test(text)); // false</code></pre>
+        <p class="calibre1">为此，规范新增了<code class="calibre11">s</code>标志（意思是单行，singleline），从而解决了这个问题：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = `
+foo
+bar
+`;
+
+const re = /foo.bar/s;
+
+console.log(re.test(text)); // true</code></pre>
+        <h3 id="nav_point_697" class="calibre15">A.4.2 向后查找断言</h3>
+        <p class="calibre1">正则表达式支持肯定式向前查找断言和否定式向前查找断言，可以匹配后跟指定字符串的表达式：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = 'foobar';
+
+// 肯定式向前查找
+// 断言后跟某个值，但不捕获该值
+const repositivematch = /foo(?=bar)/;
+const repositivenomatch = /foo(?=baz)/;
+
+console.log(repositivematch.exec(text));
+// ["foo"]
+
+console.log(repositivenomatch.exec(text));
+// null
+
+// 否定式向前查找
+// 断言后面不是某个值，但不捕获该值
+const renegativenomatch = /foo(?!bar)/;
+const renegativematch = /foo(?!baz)/;
+
+console.log(renegativenomatch.exec(text));
+// null
+
+console.log(renegativematch.exec(text));
+// ["foo"]</code></pre>
+        <p class="calibre1">规范相应地增加了与这些断言对应的肯定式向后查找和否定式向后查找。向后查找与向前查找的工作原理类似，只是会检测要捕获内容之前的内容。</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = 'foobar';
+
+// 肯定式向后查找
+// 断言前面是某个值，但不捕获该值
+const repositivematch = /(?&lt;=foo)bar/;
+const repositivenomatch = /(?&lt;=baz)bar/;
+
+console.log(repositivematch.exec(text));
+// ["bar"]
+
+console.log(repositivenomatch.exec(text));
+// null
+
+// 否定式向后查找
+// 断言前面不是某个值，但不捕获该值
+const renegativenomatch = /(?&lt;!foo)bar/;
+const renegativematch = /(?&lt;!baz)bar/;
+
+console.log(renegativenomatch.exec(text));
+// null
+
+console.log(renegativematch.exec(text));
+// ["bar"]</code></pre>
+        <h3 id="nav_point_698" class="calibre15">A.4.3 命名捕获组</h3>
+        <p class="calibre1">多个捕获组通常是按索引来取值的，但索引没有上下文，反映不出它们包含的是什么内容：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = '2018-03-14';
+
+const re = /(\d+)-(\d+)-(\d+)/;
+
+console.log(re.exec(text));
+// ["2018-03-14", "2018", "03", "14"]</code></pre>
+        <p class="calibre1">为此，规范支持将捕获组与有效JavaScript标识符关联，这样就可以通过标识符获取捕获组的内容：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const text = '2018-03-14';
+
+const re = /(?&lt;year&gt;\d+)-(?&lt;month&gt;\d+)-(?&lt;day&gt;\d+)/;
+
+console.log(re.exec(text).groups);
+// { year: "2018", month: "03", day: "14" }</code></pre>
+        <h3 id="nav_point_699" class="calibre15">A.4.4 Unicode属性转义</h3>
+        <p class="calibre1">Unicode标准为每个字符都定义了属性。字符属性，涉及字符名称、类别、空格指示和字符内部定义的脚本或语言等。通过使用Unicode属性转义可以在正则表达式中使用这些属性。</p>
+        <p class="calibre1">有些属性是二进制，意味可以独立使用。比如<code class="calibre11">Uppercase</code>和<code class="calibre11">White_Space</code>。有些属性是键/值对，即一个属性对应一个属性值。比如<code class="calibre11">Script_Extensions=Greek</code>。</p>
+        <p class="calibre1">Unicode属性列表及属性值列表参见Unicode网站。</p>
+        <p class="calibre1">Unicode属性转义在正则表达式中可使用<code class="calibre11">\p</code>表示匹配，使用<code class="calibre11">\P</code>表示不匹配：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const pi = string.fromcharcode(0x03c0);
+const linereturn = `
+`;
+
+const rewhitespace = /\p{white_space}/u;
+const regreek = /\p{script_extensions=greek}/u;
+const renotwhitespace = /\p{white_space}/u;
+const renotgreek = /\p{script_extensions=greek}/u;
+
+console.log(rewhitespace.test(pi));             // false
+console.log(rewhitespace.test(linereturn));     // true
+console.log(renotwhitespace.test(pi));          // true
+console.log(renotwhitespace.test(linereturn));  // false
+
+console.log(regreek.test(pi));                  // true
+console.log(regreek.test(linereturn));          // false
+console.log(renotgreek.test(pi));               // false
+console.log(renotgreek.test(linereturn));       // true</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0207.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0209.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

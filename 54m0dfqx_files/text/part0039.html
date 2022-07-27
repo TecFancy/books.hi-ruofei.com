@@ -1,0 +1,647 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0038.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0040.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_94" class="calibre9">5.1 Date</h2>
+        <p class="calibre1">ECMAScript的<code class="calibre11">Date</code>类型参考了Java早期版本中的<code class="calibre11">java.util.Date</code>。为此，<code class="calibre11">Date</code>类型将日期保存为自协调世界时（UTC，Universal Time Coordinated）时间1970年1月1日午夜（零时）至今所经过的毫秒数。使用这种存储格式，<code class="calibre11">Date</code>类型可以精确表示1970年1月1日之前及之后285 616年的日期。</p>
+        <p class="calibre1">要创建日期对象，就使用<code class="calibre11">new</code>操作符来调用<code class="calibre11">Date</code>构造函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let now = new date();</code></pre>
+        <p class="calibre1">在不给<code class="calibre11">Date</code>构造函数传参数的情况下，创建的对象将保存当前日期和时间。要基于其他日期和时间创建日期对象，必须传入其毫秒表示（UNIX纪元1970年1月1日午夜之后的毫秒数）。ECMAScript为此提供了两个辅助方法：<code class="calibre11">Date.parse()</code>和<code class="calibre11">Date.UTC()</code>。</p>
+        <p class="calibre1">
+          <code class="calibre11">Date.parse()</code>方法接收一个表示日期的字符串参数，尝试将这个字符串转换为表示该日期的毫秒数。ECMA-262第5版定义了<code class="calibre11">Date.parse()</code>应该支持的日期格式，填充了第3版遗留的空白。所有实现都必须支持下列日期格式：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">“月/日/年”，如<code class="calibre11">"5/23/2019"</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">“月名 日, 年”，如<code class="calibre11">"May 23, 2019"</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">“周几 月名 日 年 时:分:秒 时区”，如<code class="calibre11">"Tue May 23 2019 00:00:00 GMT-0700"</code>；</li>
+          <li class="di_1ji_wu_xu_lie_biao">ISO 8601扩展格式“YYYY-MM-DDTHH:mm:ss.sssZ”，如<code class="calibre11">2019-05-23T00:00:00</code>（只适用于兼容ES5的实现）。</li>
+        </ul>
+        <p class="calibre1">比如，要创建一个表示“2019年5月23日”的日期对象，可以使用以下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let somedate = new date(date.parse("may 23, 2019"));</code></pre>
+        <p class="calibre1">如果传给<code class="calibre11">Date.parse()</code>的字符串并不表示日期，则该方法会返回<code class="calibre11">NaN</code>。如果直接把表示日期的字符串传给<code class="calibre11">Date</code>构造函数，那么<code class="calibre11">Date</code>会在后台调用<code class="calibre11">Date.parse()</code>。换句话说，下面这行代码跟前面那行代码是等价的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let somedate = new date("may 23, 2019");</code></pre>
+        <p class="calibre1">这两行代码得到的日期对象相同。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            不同的浏览器对<code class="calibre11">Date</code>类型的实现有很多问题。比如，很多浏览器会选择用当前日期替代越界的日期，因此有些浏览器会将<code class="calibre11">"January 32, 2019"</code>解释为<code class="calibre11">"February 1, 2019"</code>。Opera则会插入当前月的当前日，返回<code class="calibre11">"January 当前日, 2019"</code>。就是说，如果是在9月21日运行代码，会返回<code class="calibre11">"January 21, 2019"</code>。</p>
+        </blockquote>
+        <p class="calibre1">
+          <code class="calibre11">Date.UTC()</code>方法也返回日期的毫秒表示，但使用的是跟<code class="calibre11">Date.parse()</code>不同的信息来生成这个值。传给<code class="calibre11">Date.UTC()</code>的参数是年、零起点月数（1月是0，2月是1，以此类推）、日（1~31）、时（0~23）、分、秒和毫秒。这些参数中，只有前两个（年和月）是必需的。如果不提供日，那么默认为1日。其他参数的默认值都是0。下面是使用<code class="calibre11">Date.UTC()</code>的两个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// gmt时间2000年1月1日零点
+let y2k = new date(date.utc(2000, 0));
+
+// gmt时间2005年5月5日下午5点55分55秒
+let allfives = new date(date.utc(2005, 4, 5, 17, 55, 55));</code></pre>
+        <p class="calibre1">这个例子创建了两个日期 。第一个日期是2000年1月1日零点（GMT），<code class="calibre11">2000</code>代表年，<code class="calibre11">0</code>代表月（1月）。因为没有其他参数（日取<code class="calibre11">1</code>，其他取<code class="calibre11">0</code>），所以结果就是该月第1天零点。第二个日期表示2005年5月5日下午5点55分55秒（GMT）。虽然日期里面涉及的都是5，但月数必须用<code class="calibre11">4</code>，因为月数是零起点的。小时也必须是17，因为这里采用的是24小时制，即取值范围是0~23。其他参数就都很直观了。</p>
+        <p class="calibre1">与<code class="calibre11">Date.parse()</code>一样，<code class="calibre11">Date.UTC()</code>也会被<code class="calibre11">Date</code>构造函数隐式调用，但有一个区别：这种情况下创建的是本地日期，不是GMT日期。不过<code class="calibre11">Date</code>构造函数跟<code class="calibre11">Date.UTC()</code>接收的参数是一样的。因此，如果第一个参数是数值，则构造函数假设它是日期中的年，第二个参数就是月，以此类推。前面的例子也可以这样来写：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 本地时间2000年1月1日零点
+let y2k = new date(2000, 0);
+
+// 本地时间2005年5月5日下午5点55分55秒
+let allfives = new date(2005, 4, 5, 17, 55, 55);</code></pre>
+        <p class="calibre1">以上代码创建了与前面例子中相同的两个日期，但这次的两个日期是（由于系统设置决定的）本地时区的日期。</p>
+        <p class="calibre1">ECMAScript还提供了<code class="calibre11">Date.now()</code>方法，返回表示方法执行时日期和时间的毫秒数。这个方法可以方便地用在代码分析中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 起始时间
+let 首页 = date.now();
+
+// 调用函数
+dosomething();
+
+// 结束时间
+let stop = date.now(),
+result = stop - 首页;</code></pre>
+        <h3 id="nav_point_95" class="calibre15">5.1.1 继承的方法</h3>
+        <p class="calibre1">与其他类型一样，<code class="calibre11">Date</code>类型重写了<code class="calibre11">toLocaleString()</code>、<code class="calibre11">toString()</code>和<code class="calibre11">valueOf()</code>方法。但与其他类型不同，重写后这些方法的返回值不一样。<code class="calibre11">Date</code>类型的<code class="calibre11">toLocaleString()</code>方法返回与浏览器运行的本地环境一致的日期和时间。这通常意味着格式中包含针对时间的AM（上午）或PM（下午），但不包含时区信息（具体格式可能因浏览器而不同）。<code class="calibre11">toString()</code>方法通常返回带时区信息的日期和时间，而时间也是以24小时制（0~23）表示的。下面给出了<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>返回的2019年2月1日零点的示例（地区为<code class="calibre11">"en-US"</code>的PST，即Pacific Standard Time，太平洋标准时间）：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">tolocalestring() - 2/1/2019 12:00:00 am
+
+tostring() - thu feb 1 2019 00:00:00 gmt-0800 (pacific standard time)</code></pre>
+        <p class="calibre1">现代浏览器在这两个方法的输出上已经趋于一致。在比较老的浏览器上，每个方法返回的结果可能在每个浏览器上都是不同的。这些差异意味着<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>可能只对调试有用，不能用于显示。</p>
+        <p class="calibre1">
+          <code class="calibre11">Date</code>类型的<code class="calibre11">valueOf()</code>方法根本就不返回字符串，这个方法被重写后返回的是日期的毫秒表示。因此，操作符（如小于号和大于号）可以直接使用它返回的值。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let date1 = new date(2019, 0, 1);    // 2019年1月1日
+let date2 = new date(2019, 1, 1);    // 2019年2月1日
+
+console.log(date1 &lt; date2); // true
+console.log(date1 &gt; date2); // false</code></pre>
+        <p class="calibre1">日期2019年1月1日在2019年2月1日之前，所以说前者小于后者没问题。因为2019年1月1日的毫秒表示小于2019年2月1日的毫秒表示，所以用小于号比较这两个日期时会返回<code class="calibre11">true</code>。这也是确保日期先后的一个简单方式。</p>
+        <h3 id="nav_point_96" class="calibre15">5.1.2 日期格式化方法</h3>
+        <p class="calibre1">
+          <code class="calibre11">Date</code>类型有几个专门用于格式化日期的方法，它们都会返回字符串：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toDateString()</code>显示日期中的周几、月、日、年（格式特定于实现）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toTimeString()</code>显示日期中的时、分、秒和时区（格式特定于实现）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toLocaleDateString()</code>显示日期中的周几、月、日、年（格式特定于实现和地区）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toLocaleTimeString()</code>显示日期中的时、分、秒（格式特定于实现和地区）；</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">toUTCString()</code>显示完整的UTC日期（格式特定于实现）。</li>
+        </ul>
+        <p class="calibre1">这些方法的输出与<code class="calibre11">toLocaleString()</code>和<code class="calibre11">toString()</code>一样，会因浏览器而异。因此不能用于在用户界面上一致地显示日期。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            还有一个方法叫<code class="calibre11">toGMTString()</code>，这个方法跟<code class="calibre11">toUTCString()</code>是一样的，目的是为了向后兼容。不过，规范建议新代码使用<code class="calibre11">toUTCString()</code>。</p>
+        </blockquote>
+        <h3 id="nav_point_97" class="calibre15">5.1.3 日期/时间组件方法</h3>
+        <p class="calibre1">
+          <code class="calibre11">Date</code>类型剩下的方法（见下表）直接涉及取得或设置日期值的特定部分。注意表中“UTC日期”，指的是没有时区偏移（将日期转换为GMT）时的日期。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">方法</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">说明</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getTime()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期的毫秒表示；与<code class="calibre27">valueOf()</code>相同</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setTime(<i class="calibre6">milliseconds</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期的毫秒表示，从而修改整个日期</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getFullYear()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回4位数年（即2019而不是19）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCFullYear()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期的4位数年</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setFullYear(<i class="calibre6">year</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期的年（<code class="calibre27">
+                    <i class="calibre6">year</i>
+                  </code>必须是4位数）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCFullYear(<i class="calibre6">year</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期的年（<code class="calibre27">
+                    <i class="calibre6">year</i>
+                  </code>必须是4位数）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getMonth()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期的月（0表示1月，11表示12月）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCMonth()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期的月（0表示1月，11表示12月）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setMonth(<i class="calibre6">month</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期的月（<code class="calibre27">
+                    <i class="calibre6">month</i>
+                  </code>为大于0的数值，大于11加年）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCMonth(<i class="calibre6">month</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期的月（<code class="calibre27">
+                    <i class="calibre6">month</i>
+                  </code>为大于0的数值，大于11加年）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getDate()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中的日（1~31）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCDate()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中的日（1~31）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setDate(<i class="calibre6">date</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期中的日（如果<code class="calibre27">
+                    <i class="calibre6">date</i>
+                  </code>大于该月天数，则加月）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCDate(<i class="calibre6">date</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期中的日（如果<code class="calibre27">
+                    <i class="calibre6">date</i>
+                  </code>大于该月天数，则加月）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getDay()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中表示周几的数值（0表示周日，6表示周六）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCDay()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中表示周几的数值（0表示周日，6表示周六）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getHours()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中的时（0~23）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCHours()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中的时（0~23）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setHours(<i class="calibre6">hours</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期中的时（如果<code class="calibre27">
+                    <i class="calibre6">hours</i>
+                  </code>大于23，则加日）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCHours(<i class="calibre6">hours</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期中的时（如果<code class="calibre27">
+                    <i class="calibre6">hours</i>
+                  </code>大于23，则加日）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getMinutes()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中的分（0~59）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCMinutes()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中的分（0~59）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setMinutes(<i class="calibre6">minutes</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期中的分（如果<code class="calibre27">
+                    <i class="calibre6">minutes</i>
+                  </code>大于59，则加时）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCMinutes(<i class="calibre6">minutes</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期中的分（如果<code class="calibre27">
+                    <i class="calibre6">minutes</i>
+                  </code>大于59，则加时）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getSeconds()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中的秒（0~59）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCSeconds()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中的秒（0~59）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setSeconds(<i class="calibre6">seconds</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期中的秒（如果<code class="calibre27">
+                    <i class="calibre6">seconds</i>
+                  </code>大于59，则加分）</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCSeconds(<i class="calibre6">seconds</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期中的秒（如果<code class="calibre27">
+                    <i class="calibre6">seconds</i>
+                  </code>大于59，则加分）</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getMilliseconds()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回日期中的毫秒</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getUTCMilliseconds()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回UTC日期中的毫秒</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setMilliseconds(<i class="calibre6">milliseconds</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置日期中的毫秒</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">setUTCMilliseconds(<i class="calibre6">milliseconds</i>)</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">设置UTC日期中的毫秒</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">getTimezoneOffset()</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">返回以分钟计的UTC与本地时区的偏移量（如美国EST即“东部标准时间”返回300，进入夏令时的地区可能有所差异）</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0038.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0040.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0183.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0185.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_589" class="calibre9">25.2 Web Storage</h2>
+        <p class="calibre1">Web Storage最早是网页超文本应用技术工作组（WHATWG，Web Hypertext Application Technical Working Group）在Web Applications 1.0规范中提出的。这个规范中的草案最终成为了HTML5的一部分，后来又独立成为自己的规范。Web Storage的目的是解决通过客户端存储不需要频繁发送回服务器的数据时使用cookie的问题。</p>
+        <p class="calibre1">Web Storage规范最新的版本是第2版，这一版规范主要有两个目标：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">提供在cookie之外的存储会话数据的途径；</li>
+          <li class="di_1ji_wu_xu_lie_biao">提供跨会话持久化存储大量数据的机制。</li>
+        </ul>
+        <p class="calibre1">Web Storage的第2版定义了两个对象：<code class="calibre11">localStorage</code>和<code class="calibre11">sessionStorage</code>。<code class="calibre11">localStorage</code>是永久存储机制，<code class="calibre11">sessionStorage</code>是跨会话的存储机制。这两种浏览器存储API提供了在浏览器中不受页面刷新影响而存储数据的两种方式。2009年之后所有主要供应商发布的浏览器版本在window对象上支持<code class="calibre11">localStorage</code>和<code class="calibre11">sessionStorage</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            Web Storage第1版曾使用过<code class="calibre11">globalStorage</code>，不过目前<code class="calibre11">globalStorage</code>已废弃。</p>
+        </blockquote>
+        <h3 id="nav_point_590" class="calibre15">25.2.1
+          <code class="calibre26">Storage</code>类型</h3>
+        <p class="calibre1">
+          <code class="calibre11">Storage</code>类型用于保存名/值对数据，直至存储空间上限（由浏览器决定）。<code class="calibre11">Storage</code>的实例与其他对象一样，但增加了以下方法。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">clear()</code>：删除所有值；不在Firefox中实现。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">getItem(<i class="calibre6">name</i>)</code>：取得给定<code class="calibre11">
+              <i class="calibre6">name</i>
+            </code>的值。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">key(<i class="calibre6">index</i>)</code>：取得给定数值位置的名称。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">removeItem(<i class="calibre6">name</i>)</code>：删除给定<code class="calibre11">
+              <i class="calibre6">name</i>
+            </code>的名/值对。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">setItem(<i class="calibre6">name</i>,
+              <i class="calibre6">value</i>)</code>：设置给定<code class="calibre11">
+              <i class="calibre6">name</i>
+            </code>的值。</li>
+        </ul>
+        <p class="calibre1">
+          <code class="calibre11">getItem()</code>、<code class="calibre11">removeItem()</code>和<code class="calibre11">setItem()</code>方法可以直接或间接通过<code class="calibre11">Storage</code>对象调用。因为每个数据项都作为属性存储在该对象上，所以可以使用点或方括号操作符访问这些属性，通过同样的操作来设置值，也可以使用<code class="calibre11">delete</code>操作符删除属性。即便如此，通常还是建议使用方法而非属性来执行这些操作，以免意外重写某个已存在的对象成员。</p>
+        <p class="calibre1">通过<code class="calibre11">length</code>属性可以确定<code class="calibre11">Storage</code>对象中保存了多少名/值对。我们无法确定对象中所有数据占用的空间大小，尽管IE8提供了<code class="calibre11">remainingSpace</code>属性，用于确定还有多少存储空间（以字节计）可用。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            <code class="calibre11">Storage</code>类型只能存储字符串。非字符串数据在存储之前会自动转换为字符串。注意，这种转换不能在获取数据时撤销。</p>
+        </blockquote>
+        <h3 id="nav_point_591" class="calibre15">25.2.2
+          <code class="calibre26">sessionStorage</code>对象</h3>
+        <p class="calibre1">
+          <code class="calibre11">sessionStorage</code>对象只存储会话数据，这意味着数据只会存储到浏览器关闭。这跟浏览器关闭时会消失的会话cookie类似。存储在<code class="calibre11">sessionStorage</code>中的数据不受页面刷新影响，可以在浏览器崩溃并重启后恢复。（取决于浏览器，Firefox和WebKit支持，IE不支持。）</p>
+        <p class="calibre1">因为<code class="calibre11">sessionStorage</code>对象与服务器会话紧密相关，所以在运行本地文件时不能使用。存储在<code class="calibre11">sessionStorage</code>对象中的数据只能由最初存储数据的页面使用，在多页应用程序中的用处有限。</p>
+        <p class="calibre1">因为<code class="calibre11">sessionStorage</code>对象是<code class="calibre11">Storage</code>的实例，所以可以通过使用<code class="calibre11">setItem()</code>方法或直接给属性赋值给它添加数据。下面是使用这两种方式的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用方法存储数据
+sessionstorage.setitem("name", "nicholas");
+
+// 使用属性存储数据
+sessionstorage.book = "professional javascript";</code></pre>
+        <p class="calibre1">所有现代浏览器在实现存储写入时都使用了同步阻塞方式，因此数据会被立即提交到存储。具体API的实现可能不会立即把数据写入磁盘（而是使用某种不同的物理存储），但这个区别在JavaScript层面是不可见的。通过Web Storage写入的任何数据都可以立即被读取。</p>
+        <p class="calibre1">老版IE以异步方式实现了数据写入，因此给数据赋值的时间和数据写入磁盘的时间可能存在延迟。对于少量数据，这里的差别可以忽略不计，但对于大量数据，就可以注意到IE中JavaScript恢复执行的速度比其他浏览器更快。这是因为实际写入磁盘的进程被转移了。在IE8中可以在数据赋值前调用<code class="calibre11">begin()</code>、之后调用<code class="calibre11">commit()</code>来强制将数据写入磁盘。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 仅适用于ie8
+sessionstorage.begin();
+sessionstorage.name = "nicholas";
+sessionstorage.book = "professional javascript";
+sessionstorage.commit();</code></pre>
+        <p class="calibre1">以上代码确保了<code class="calibre11">"name"</code>和<code class="calibre11">"book"</code>在<code class="calibre11">commit()</code>调用之后会立即写入磁盘。调用<code class="calibre11">begin()</code>是为了保证在代码执行期间不会有写入磁盘的操作。对于少量数据，这个过程不是必要的，但对于较大的数据量，如文档，则可以考虑使用这种事务性方法。</p>
+        <p class="calibre1">对存在于<code class="calibre11">sessionStorage</code>上的数据，可以使用<code class="calibre11">getItem()</code>或直接访问属性名来取得。下面是使用这两种方式的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用方法取得数据
+let name = sessionstorage.getitem("name");
+
+// 使用属性取得数据
+let book = sessionstorage.book;</code></pre>
+        <p class="calibre1">可以结合<code class="calibre11">sessionStorage</code>的<code class="calibre11">length</code>属性和<code class="calibre11">key()</code>方法遍历所有的值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let i = 0, len = sessionstorage.length; i &lt; len; i++){
+  let key = sessionstorage.key(i);
+  let value = sessionstorage.getitem(key);
+  alert(`${key}=`${value}`);
+}</code></pre>
+        <p class="calibre1">这里通过<code class="calibre11">key()</code>先取得给定位置中的数据名称，然后使用该名称通过<code class="calibre11">getItem()</code>取得值，可以依次访问<code class="calibre11">sessionStorage</code>中的名/值对。</p>
+        <p class="calibre1">也可以使用<code class="calibre11">for-in</code>循环迭代<code class="calibre11">sessionStorage</code>的值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let key in sessionstorage){
+  let value = sessionstorage.getitem(key);
+  alert(`${key}=${value}`);
+}</code></pre>
+        <p class="calibre1">每次循环，<code class="calibre11">key</code>都会被赋予<code class="calibre11">sessionStorage</code>中的一个名称；这里不会返回内置方法或<code class="calibre11">length</code>属性。</p>
+        <p class="calibre1">要从<code class="calibre11">sessionStorage</code>中删除数据，可以使用<code class="calibre11">delete</code>操作符直接删除对象属性，也可以使用<code class="calibre11">removeItem()</code>方法。下面是使用这两种方式的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用delete删除值
+delete sessionstorage.name;
+
+// 使用方法删除值
+sessionstorage.removeitem("book");</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">sessionStorage</code>对象应该主要用于存储只在会话期间有效的小块数据。如果需要跨会话持久存储数据，可以使用<code class="calibre11">globalStorage</code>或<code class="calibre11">localStorage</code>。</p>
+        <h3 id="nav_point_592" class="calibre15">25.2.3
+          <code class="calibre26">localStorage</code>对象</h3>
+        <p class="calibre1">在修订的HTML5规范里，<code class="calibre11">localStorage</code>对象取代了<code class="calibre11">globalStorage</code>，作为在客户端持久存储数据的机制。要访问同一个<code class="calibre11">localStorage</code>对象，页面必须来自同一个域（子域不可以）、在相同的端口上使用相同的协议。</p>
+        <p class="calibre1">因为<code class="calibre11">localStorage</code>是<code class="calibre11">Storage</code>的实例，所以可以像使用<code class="calibre11">sessionStorage</code>一样使用<code class="calibre11">localStorage</code>。比如下面这几个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 使用方法存储数据
+localstorage.setitem("name", "nicholas");
+
+// 使用属性存储数据
+localstorage.book = "professional javascript";
+
+// 使用方法取得数据
+let name = localstorage.getitem("name");
+
+// 使用属性取得数据
+let book = localstorage.book;</code></pre>
+        <p class="calibre1">两种存储方法的区别在于，存储在<code class="calibre11">localStorage</code>中的数据会保留到通过JavaScript删除或者用户清除浏览器缓存。<code class="calibre11">localStorage</code>数据不受页面刷新影响，也不会因关闭窗口、标签页或重新启动浏览器而丢失。</p>
+        <h3 id="nav_point_593" class="calibre15">25.2.4 存储事件</h3>
+        <p class="calibre1">每当<code class="calibre11">Storage</code>对象发生变化时，都会在文档上触发<code class="calibre11">storage</code>事件。使用属性或<code class="calibre11">setItem()</code>设置值、使用<code class="calibre11">delete</code>或<code class="calibre11">removeItem()</code>删除值，以及每次调用<code class="calibre11">clear()</code>时都会触发这个事件。这个事件的事件对象有如下4个属性。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">domain</code>：存储变化对应的域。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">key</code>：被设置或删除的键。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">newValue</code>：键被设置的新值，若键被删除则为<code class="calibre11">null</code>。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">oldValue</code>：键变化之前的值。</li>
+        </ul>
+        <p class="calibre1">可以使用如下代码监听<code class="calibre11">storage</code>事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.addeventlistener("storage",
+    (event) =&gt; alert('storage changed for ${event.domain}'));</code></pre>
+        <p class="calibre1">对于<code class="calibre11">sessionStorage</code>和<code class="calibre11">localStorage</code>上的任何更改都会触发<code class="calibre11">storage</code>事件，但<code class="calibre11">storage</code>事件不会区分这两者。</p>
+        <h3 id="nav_point_594" class="calibre15">25.2.5 限制</h3>
+        <p class="calibre1">与其他客户端数据存储方案一样，Web Storage也有限制。具体的限制取决于特定的浏览器。一般来说，客户端数据的大小限制是按照每个源（协议、域和端口）来设置的，因此每个源有固定大小的数据存储空间。分析存储数据的页面的源可以加强这一限制。</p>
+        <p class="calibre1">不同浏览器给<code class="calibre11">localStorage</code>和<code class="calibre11">sessionStorage</code>设置了不同的空间限制，但大多数会限制为每个源5MB。关于每种媒介的新配额限制信息表，可以参考web.dev网站上的文章“Storage for the Web”。</p>
+        <p class="calibre1">要了解关于Web Storage限制的更多信息，可以参考dev-test.nemikor网站的“Web Storage Support Test”页面。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0183.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0185.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

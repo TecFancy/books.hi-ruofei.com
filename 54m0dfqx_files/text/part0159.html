@@ -1,0 +1,654 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0158.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0160.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_504" class="calibre9">21.2 错误处理</h2>
+        <p class="calibre1">错误处理在编程中的重要性毋庸置疑。所有主流Web应用程序都需要定义完善的错误处理协议，大多数优秀的应用程序有自己的错误处理策略，尽管主要逻辑是放在服务器端的。事实上，服务器端团队通常会花很多精力根据错误类型、频率和其他重要指标来定义规范的错误日志机制。最终实现通过简单的数据库查询或报告生成脚本就可以了解应用程序的运行状态。</p>
+        <p class="calibre1">错误处理在应用程序的浏览器端进展较慢，尽管其重要性一点也不低。这里有一个重要的事实：大多数上网的人没有技术背景，甚至连什么是浏览器都不十分清楚，而且有的人不知道自己使用的是什么浏览器。如前所述，当网页中的JavaScript脚本发生错误时，不同浏览器的处理方式不同。不过浏览器处理JavaScript报告错误的默认方式对用户并不友好。最好的情况是用户自己不知道发生了什么，然后再重试；最坏的情况是用户感觉特别厌烦，于是永远不回来了。有一个良好的错误处理策略可以让用户知道到底发生了什么。为此，必须理解各种捕获和处理JavaScript错误的方式。</p>
+        <h3 id="nav_point_505" class="calibre15">21.2.1
+          <code class="calibre26">try</code>/<code class="calibre26">catch</code>语句</h3>
+        <p class="calibre1">ECMA-262第3版新增了<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句，作为在JavaScript中处理异常的一种方式。基本的语法如下所示，跟Java中的<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句一样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  // 可能出错的代码
+} catch (error) {
+  // 出错时要做什么
+}</code></pre>
+        <p class="calibre1">任何可能出错的代码都应该放到<code class="calibre11">try</code>块中，而处理错误的代码则放在<code class="calibre11">catch</code>块中，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  window.somenonexistentfunction();
+} catch (error){
+  console.log("an error happened!");
+}</code></pre>
+        <p class="calibre1">如果<code class="calibre11">try</code>块中有代码发生错误，代码会立即退出执行，并跳到<code class="calibre11">catch</code>块中。<code class="calibre11">catch</code>块此时接收到一个对象，该对象包含发生错误的相关信息。与其他语言不同，即使在<code class="calibre11">catch</code>块中不使用错误对象，也必须为它定义名称。错误对象中暴露的实际信息因浏览器而异，但至少包含保存错误消息的<code class="calibre11">message</code>属性。ECMA-262也指定了定义错误类型的<code class="calibre11">name</code>属性，目前所有浏览器中都有这个属性。因此，可以像下面的代码这样在必要时显示错误消息：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  window.somenonexistentfunction();
+} catch (error){
+  console.log(error.message);
+}</code></pre>
+        <p class="calibre1">这个例子使用<code class="calibre11">message</code>属性向用户显示错误消息。<code class="calibre11">message</code>属性是唯一一个在IE、Firefox、Safari、Chrome和Opera中都有的属性，尽管每个浏览器添加了其他属性。IE添加了<code class="calibre11">description</code>属性（其值始终等于<code class="calibre11">message</code>）和<code class="calibre11">number</code>属性（它包含内部错误号）。Firefox添加了<code class="calibre11">fileName</code>、<code class="calibre11">lineNumber</code>和<code class="calibre11">stack</code>（包含栈跟踪信息）属性。Safari添加了<code class="calibre11">line</code>（行号）、<code class="calibre11">sourceId</code>（内部错误号）和<code class="calibre11">sourceURL</code>属性。同样，为保证跨浏览器兼容，最好只依赖<code class="calibre11">message</code>属性。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">finally</code>子句</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">try</code>/<code class="calibre11">catch</code>语句中可选的<code class="calibre11">finally</code>子句始终运行。如果<code class="calibre11">try</code>块中的代码运行完，则接着执行<code class="calibre11">finally</code>块中的代码。如果出错并执行<code class="calibre11">catch</code>块中的代码，则<code class="calibre11">finally</code>块中的代码仍执行。<code class="calibre11">try</code>或<code class="calibre11">catch</code>块无法阻止<code class="calibre11">finally</code>块执行，包括<code class="calibre11">return</code>语句。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function testfinally(){
+  try {
+    return 2;
+  } catch (error){
+    return 1;
+  } finally {
+    return 0;
+  }
+}</code></pre>
+            <p class="calibre1">这个函数在<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句的各个部分都只放了一个<code class="calibre11">return</code>语句。看起来该函数应该返回2，因为它在<code class="calibre11">try</code>块中，不会导致错误。但是，<code class="calibre11">finally</code>块的存在导致<code class="calibre11">try</code>块中的<code class="calibre11">return</code>语句被忽略。因此，无论什么情况下调用该函数都会返回0。如果去掉<code class="calibre11">finally</code>子句，该函数会返回2。如果写出<code class="calibre11">finally</code>子句，<code class="calibre11">catch</code>块就成了可选的（它们两者中只有一个是必需的）。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                只要代码中包含了<code class="calibre11">finally</code>子句，<code class="calibre11">try</code>块或<code class="calibre11">catch</code>块中的<code class="calibre11">return</code>语句就会被忽略，理解这一点很重要。在使用<code class="calibre11">finally</code>时一定要仔细确认代码的行为。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">错误类型</strong>
+            </p>
+            <p class="calibre1">代码执行过程中会发生各种类型的错误。每种类型都会对应一个错误发生时抛出的错误对象。ECMA-262定义了以下8种错误类型：</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">Error</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">InternalError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">EvalError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">RangeError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ReferenceError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">SyntaxError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">TypeError</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">URIError</code>
+              </li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">Error</code>是基类型，其他错误类型继承该类型。因此，所有错误类型都共享相同的属性（所有错误对象上的方法都是这个默认类型定义的方法）。浏览器很少会抛出<code class="calibre11">Error</code>类型的错误，该类型主要用于开发者抛出自定义错误。</p>
+            <p class="calibre1">
+              <code class="calibre11">InternalError</code>类型的错误会在底层JavaScript引擎抛出异常时由浏览器抛出。例如，递归过多导致了栈溢出。这个类型并不是代码中通常要处理的错误，如果真发生了这种错误，很可能代码哪里弄错了或者有危险了。</p>
+            <p class="calibre1">
+              <code class="calibre11">EvalError</code>类型的错误会在使用<code class="calibre11">eval()</code>函数发生异常时抛出。ECMA-262规定，“如果<code class="calibre11">eval</code>属性没有被直接调用（即没有将其名称作为一个<code class="calibre11">Identifier</code>，也就是<code class="calibre11">CallExpression</code>中的<code class="calibre11">MemberExpression</code>），或者如果<code class="calibre11">eval</code>属性被赋值”，就会抛出该错误。基本上，只要不把<code class="calibre11">eval()</code>当成函数调用就会报告该错误：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">new eval(); // 抛出evalerror
+eval = foo; // 抛出evalerror</code></pre>
+            <p class="calibre1">实践中，浏览器不会总抛出<code class="calibre11">EvalError</code>。Firefox和IE在上面第一种情况下抛出<code class="calibre11">TypeError</code>，在第二种情况下抛出<code class="calibre11">EvalError</code>。为此，再加上代码中不大可能这样使用<code class="calibre11">eval()</code>，因此几乎遇不到这种错误。</p>
+            <p class="calibre1">
+              <code class="calibre11">RangeError</code>错误会在数值越界时抛出。例如，定义数组时如果设置了并不支持的长度，如<code class="calibre11">-20</code>或<code class="calibre11">Number.MAX_VALUE</code>，就会报告该错误：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let items1 = new array(-20);              // 抛出rangeerror
+let items2 = new array(number.max_value); // 抛出rangeerror</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">RangeError</code>在JavaScript中发生得不多。</p>
+            <p class="calibre1">
+              <code class="calibre11">ReferenceError</code>会在找不到对象时发生。（这就是著名的<code class="calibre11">"object expected"</code>浏览器错误的原因。）这种错误经常是由访问不存在的变量而导致的，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let obj = x; // 在x没有声明时会抛出referenceerror</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">SyntaxError</code>经常在给<code class="calibre11">eval()</code>传入的字符串包含JavaScript语法错误时发生，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">eval("a ++ b"); // 抛出syntaxerror</code></pre>
+            <p class="calibre1">在<code class="calibre11">eval()</code>外部，很少会用到<code class="calibre11">SyntaxError</code>。这是因为JavaScript代码中的语法错误会导致代码无法执行。</p>
+            <p class="calibre1">
+              <code class="calibre11">TypeError</code>在JavaScript中很常见，主要发生在变量不是预期类型，或者访问不存在的方法时。很多原因可能导致这种错误，尤其是在使用类型特定的操作而变量类型不对时。下面是几个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let o = new 10;                           // 抛出typeerror
+console.log("name" in true);              // 抛出typeerror
+function.prototype.tostring.call("name"); // 抛出typeerror</code></pre>
+            <p class="calibre1">在给函数传参数之前没有验证其类型的情况下，类型错误频繁发生。</p>
+            <p class="calibre1">最后一种错误类型是<code class="calibre11">URIError</code>，只会在使用<code class="calibre11">encodeURI()</code>或<code class="calibre11">decodeURI()</code>但传入了格式错误的URI时发生。这个错误恐怕是JavaScript中难得一见的错误了，因为上面这两个函数非常稳健。</p>
+            <p class="calibre1">不同的错误类型可用于为异常提供更多信息，以便实现适当的错误处理逻辑。在<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句的<code class="calibre11">catch</code>块中，可以使用<code class="calibre11">instanceof</code>操作符确定错误的类型，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">try {
+  somefunction();
+} catch (error){
+  if (error instanceof typeerror){
+    // 处理类型错误
+  } else if (error instanceof referenceerror){
+    // 处理引用错误
+  } else {
+    // 处理所有其他类型的错误
+  }
+}</code></pre>
+            <p class="calibre1">检查错误类型是以跨浏览器方式确定适当操作过程的最简单方法，因为<code class="calibre11">message</code>属性中包含的错误消息因浏览器而异。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">try</code>/<code class="calibre11">catch</code>的用法</strong>
+            </p>
+            <p class="calibre1">当<code class="calibre11">try</code>/<code class="calibre11">catch</code>中发生错误时，浏览器会认为错误被处理了，因此就不会再使用本章前面提到的机制报告错误。如果应用程序的用户不懂技术，那么他们即使看到错误也看不懂，这是一个理想的结果。使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>可以针对特定错误类型实现自定义的错误处理。</p>
+            <p class="calibre1">
+              <code class="calibre11">try</code>/<code class="calibre11">catch</code>语句最好用在自己无法控制的错误上。例如，假设你的代码中使用了一个大型JavaScript库的某个函数，而该函数可能会有意或由于出错而抛出错误。因为不能修改这个库的代码，所以为防止这个函数报告错误，就有必要通过<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句把该函数调用包装起来，对可能的错误进行处理。</p>
+            <p class="calibre1">如果你明确知道自己的代码会发生某种错误，那么就不适合使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句。例如，如果给函数传入字符串而不是数值时就会失败，就应该检查该函数的参数类型并采取相应的操作。这种情况下，没有必要使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_506" class="calibre15">21.2.2 抛出错误</h3>
+        <p class="calibre1">与<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句对应的一个机制是<code class="calibre11">throw</code>操作符，用于在任何时候抛出自定义错误。<code class="calibre11">throw</code>操作符必须有一个值，但值的类型不限。下面这些代码都是有效的：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw 12345;
+throw "hello world!";
+throw true;
+throw { name: "javascript" };</code></pre>
+        <p class="calibre1">使用<code class="calibre11">throw</code>操作符时，代码立即停止执行，除非<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句捕获了抛出的值。</p>
+        <p class="calibre1">可以通过内置的错误类型来模拟浏览器错误。每种错误类型的构造函数都只接收一个参数，就是错误消息。下面看一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw new error("something bad happened.");</code></pre>
+        <p class="calibre1">以上代码使用一个自定义的错误消息生成了一个通用错误。浏览器会像处理自己生成的错误一样来处理这个自定义错误。换句话说，浏览器会像通常一样报告这个错误，最终显示这个自定义错误。当然，使用特定的错误类型也是一样的，如以下代码所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">throw new syntaxerror("i don't like your syntax.");
+throw new internalerror("i can't do that, dave.");
+throw new typeerror("what type of variable do you take me for?");
+throw new rangeerror("sorry, you just don't have the range.");
+throw new evalerror("that doesn't evaluate.");
+throw new urierror("uri, is that you?");
+throw new referenceerror("you didn't cite your references properly.");</code></pre>
+        <p class="calibre1">自定义错误常用的错误类型是<code class="calibre11">Error</code>、<code class="calibre11">RangeError</code>、<code class="calibre11">ReferenceError</code>和<code class="calibre11">TypeError</code>。</p>
+        <p class="calibre1">此外，通过继承<code class="calibre11">Error</code>（第6章介绍过继承）也可以创建自定义的错误类型。创建自定义错误类型时，需要提供<code class="calibre11">name</code>属性和<code class="calibre11">message</code>属性，比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class customerror extends error {
+  constructor(message) {
+    super(message);
+    this.name = "customerror";
+    this.message = message;
+  }
+}
+
+throw new customerror("my message");</code></pre>
+        <p class="calibre1">继承<code class="calibre11">Error</code>的自定义错误类型会被浏览器当成其他内置错误类型。自定义错误类型有助于在捕获错误时更准确地区分错误。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">何时抛出错误</strong>
+            </p>
+            <p class="calibre1">抛出自定义错误是解释函数为什么失败的有效方式。在出现已知函数无法正确执行的情况时就应该抛出错误。换句话说，浏览器会在给定条件下执行该函数时抛出错误。例如，下面的函数会在参数不是数组时抛出错误：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function process(values){
+  values.sort();
+
+  for (let value of values){
+    if (value &gt; 100){
+      return value;
+    }
+  }
+
+  return -1;
+}</code></pre>
+            <p class="calibre1">如果给这个函数传入字符串，调用<code class="calibre11">sort()</code>函数就会失败。每种浏览器对此都会给出一个模棱两可的错误消息，如下所示。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">IE</strong>：属性或方法不存在。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">Firefox</strong>：<code class="calibre11">values.sort()</code>不是函数。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">Safari</strong>：值<code class="calibre11">undefined</code>（对表达式<code class="calibre11">values.sort</code>求值的结果）不是一个对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">Chrome</strong>：对象名没有方法<code class="calibre11">'sort'</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <strong class="calibre2">Opera</strong>：类型不匹配（通常是在需要对象时使用了非对象值）。</li>
+            </ul>
+            <p class="calibre1">虽然Firefox、Chrome和Safari至少给出了导致错误的相关代码，但并没有哪个错误消息特别明确地指出发生了什么，或者怎么修复。对于上面的一个函数来说，通过这样的错误消息调试还是很容易的。但是，如果是一个复杂的Web应用程序，有几千行JavaScript代码，想要找到错误的原因就会很难。</p>
+            <p class="calibre1">这时候，使用适当的信息创建自定义错误可以有效提高代码的可维护性。比如下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function process(values){
+  if (!(values instanceof array)){
+    throw new error("process(): argument must be an array.");
+  }
+
+  values.sort();
+
+  for (let value of values){
+    if (value &gt; 100){
+      return value;
+    }
+  }
+
+  return -1;
+}</code></pre>
+            <p class="calibre1">在这个重写后的函数中，如果<code class="calibre11">values</code>参数不是数组就会抛出错误。错误消息包含函数名以及对错误原因非常清晰的描述。即使在复杂的应用程序中出现这个错误，也可以很容易理解问题所在。</p>
+            <p class="calibre1">实际编写JavaScript代码时，应该仔细评估每个函数，以及可能导致它们失败的情形。良好的错误处理协议可以保证只会发生你自己抛出的错误。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">抛出错误与<code class="calibre11">try</code>/<code class="calibre11">catch</code>
+              </strong>
+            </p>
+            <p class="calibre1">一个常见的问题是何时抛出错误，何时使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>捕获错误。一般来说，错误要在应用程序架构的底层抛出，在这个层面上，人们对正在进行的流程知之甚少，因此无法真正地处理错误。如果你在编写一个可能用于很多应用程序的JavaScript库，或者一个会在应用程序的很多地方用到的实用函数，那么应该认真考虑抛出带有详细信息的错误。然后捕获和处理错误交给应用程序就行了。</p>
+            <p class="calibre1">至于抛出错误与捕获错误的区别，可以这样想：应该只在确切知道接下来该做什么的时候捕获错误。捕获错误的目的是阻止浏览器以其默认方式响应；抛出错误的目的是为错误提供有关其发生原因的说明。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_507" class="calibre15">21.2.3
+          <code class="calibre26">error</code>事件</h3>
+        <p class="calibre1">任何没有被<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句处理的错误都会在<code class="calibre11">window</code>对象上触发<code class="calibre11">error</code>事件。该事件是浏览器早期支持的事件，为保持向后兼容，很多浏览器保持了其格式不变。在<code class="calibre11">onerror</code>事件处理程序中，任何浏览器都不会传入<code class="calibre11">event</code>对象。相反，会传入3个参数：错误消息、发生错误的URL和行号。大多数情况下，只有错误消息有用，因为URL就是当前文档的地址，而行号可能指嵌入JavaScript或外部文件中的代码。另外，<code class="calibre11">onerror</code>事件处理程序需要使用DOM Level 0技术来指定，因为它不遵循DOM Level 2 Events标准格式：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.onerror = (message, url, line) =&gt; {
+  console.log(message);
+};</code></pre>
+        <p class="calibre1">在任何错误发生时，无论是否是浏览器生成的，都会触发<code class="calibre11">error</code>事件并执行这个事件处理程序。然后，浏览器的默认行为就会生效，像往常一样显示这条错误消息。可以返回<code class="calibre11">false</code>来阻止浏览器默认报告错误的行为，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.onerror = (message, url, line) =&gt; {
+  console.log(message);
+  return false;
+};</code></pre>
+        <p class="calibre1">通过返回<code class="calibre11">false</code>，这个函数实际上就变成了整个文档的<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句，可以捕获所有未处理的运行时错误。这个事件处理程序应该是处理浏览器报告错误的最后一道防线。理想情况下，最好永远不要用到。适当使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句意味着不会有错误到达浏览器这个层次，因此也就不会触发<code class="calibre11">error</code>事件。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            浏览器在使用这个事件处理错误时存在明显差异。在IE中发生<code class="calibre11">error</code>事件时，正常代码会继续执行，所有变量和数据会保持，且可以在<code class="calibre11">onerror</code>事件处理程序中访问。然而在Firefox中，正常代码会执行会终止，错误发生之前的所有变量和数据会被销毁，导致很难真正分析处理错误。</p>
+        </blockquote>
+        <p class="calibre1">图片也支持<code class="calibre11">error</code>事件。任何时候，如果图片<code class="calibre11">src</code>属性中的URL没有返回可识别的图片格式，就会触发<code class="calibre11">error</code>事件。这个事件遵循DOM格式，返回一个以图片为目标的<code class="calibre11">event</code>对象。下面是个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const image = new image();
+
+image.addeventlistener("load", (event) =&gt; {
+  console.log("image loaded!");
+});
+image.addeventlistener("error", (event) =&gt; {
+  console.log("image not loaded!");
+});
+
+image.src = "doesnotexist.gif"; // 不存在，资源会加载失败</code></pre>
+        <p class="calibre1">在这个例子中，图片加载失败后会显示一个<code class="calibre11">alert</code>警告框。这里的关键在于，当<code class="calibre11">error</code>事件发生时，图片下载过程已结束，不会再恢复。</p>
+        <h3 id="nav_point_508" class="calibre15">21.2.4 错误处理策略</h3>
+        <p class="calibre1">过去，Web应用程序的错误处理策略基本上是在服务器上落地。错误处理策略涉及很多错误和错误处理考量，包括日志记录和监控系统。这些主要是为了分析模式，以期找到问题的根源并了解有多少用户会受错误影响。</p>
+        <p class="calibre1">在Web应用程序的JavaScipt层面落地错误处理策略同样重要。因为任何JavaScript错误都可能导致网页无法使用，所以理解这些错误会在什么情况下发生以及为什么会发生非常重要。绝大多数Web应用程序的用户不懂技术，在碰到页面出问题时通常会迷惑。为解决问题，他们可能会尝试刷新页面，也可能会直接放弃。作为开发者，应该非常清楚自己的代码在什么情况下会失败，以及失败会导致什么结果。另外，还要有一个系统跟踪这些问题。</p>
+        <h3 id="nav_point_509" class="calibre15">21.2.5 识别错误</h3>
+        <p class="calibre1">错误处理非常重要的部分是首先识别错误可能会在代码中的什么地方发生。因为JavaScript是松散类型的，不会验证函数参数，所以很多错误只有在代码真正运行起来时才会出现。通常，需要注意3类错误：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">类型转换错误</li>
+          <li class="di_1ji_wu_xu_lie_biao">数据类型错误</li>
+          <li class="di_1ji_wu_xu_lie_biao">通信错误</li>
+        </ul>
+        <p class="calibre1">上面这几种错误会在特定情况下，在没有对值进行充分检测时发生。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">静态代码分析器</strong>
+            </p>
+            <p class="calibre1">不得不说的是，通过在代码构建流程中添加静态代码分析或代码检查器（linter），可以预先发现非常多的错误。这样的代码分析工具有很多，详见GitHub Gist网站All Gists页面。常用的静态分析工具是JSHint、JSLint、Google Closure和TypeScript。</p>
+            <p class="calibre1">静态代码分析器要求使用类型、函数签名及其他指令来注解JavaScript，以此描述程序如何在基本可执行代码之外运行。分析器会比较注解和JavaScript代码的各个部分，对在实际运行时可能出现的潜在不兼容问题给出提醒。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                随着代码数量的增长，代码分析器会变得越来越重要，尤其是协作开发者也在增加的情况下。所有主流技术公司都有着庞大的JavaScript库，并会在构建流程中使用稳健的静态分析工具。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">类型转换错误</strong>
+            </p>
+            <p class="calibre1">
+              <strong class="calibre2">类型转换错误</strong>的主要原因是使用了会自动改变某个值的数据类型的操作符或语言构造。使用等于（<code class="calibre11">==</code>）或不等于（<code class="calibre11">!=</code>）操作符，以及在<code class="calibre11">if</code>、<code class="calibre11">for</code>或<code class="calibre11">while</code>等流控制语句中使用非布尔值，经常会导致类型转换错误。</p>
+            <p class="calibre1">第3章曾讨论过，相等和不相等操作符会自动把执行比较的两个不同类型的值转换为相同类型。在非动态语言中，符号之间是直接比较的，因此很多开发者在JavaScript中也会以相同方式来错误地比较值。大多数情况下，最好使用严格相等（<code class="calibre11">===</code>）和严格不相等（<code class="calibre11">!==</code>）操作符来避免类型转换。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(5 == "5");   // true
+console.log(5 === "5");  // false
+console.log(1 == true);  // true
+console.log(1 === true); // false</code></pre>
+            <p class="calibre1">这个例子分别使用了相等和严格相等操作符比较了数值<code class="calibre11">5</code>和字符串<code class="calibre11">"5"</code>。相等操作符会把字符串<code class="calibre11">"5"</code>转换为数值<code class="calibre11">5</code>，然后再进行比较，结果是<code class="calibre11">true</code>。严格相等操作符发现两个值的数据类型不同，因而直接返回<code class="calibre11">false</code>。同样，对于<code class="calibre11">1</code>和<code class="calibre11">true</code>的比较也类似。相等操作符认为它们相等，但严格相等操作符认为它们不相等。使用严格相等和严格不相等操作符可以避免比较过程的类型转换错误，强烈推荐用它们代替相等和不相等操作符。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                代码风格指南通常会指出什么时候应使用<code class="calibre11">===</code>，什么时候应使用<code class="calibre11">==</code>。有些风格指南认同只要始终使用<code class="calibre11">===</code>，类型转换就不再是个问题。另一些则认为除了可能发生字符串/布尔值转换的情形，在其他时候使用<code class="calibre11">===</code>均是用力过猛的表现。</p>
+            </blockquote>
+            <p class="calibre1">类型转换错误也会发生在流控制语句中。比如，<code class="calibre11">if</code>语句会自动把条件表达式转换为布尔值，然后再决定下一步的走向。在实践中，<code class="calibre11">if</code>语句是问题比较多的。来看下面的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function concat(str1, str2, str3) {
+  let result = str1 + str2;
+  if (str3) { // 不要！
+    result += str3;
+  }
+  return result;
+}</code></pre>
+            <p class="calibre1">这个函数的用意是把两个或三个字符串拼接起来并返回结果。第三个字符串是可选的，因此必须检测它是否存在。如第3章所说，命名变量如果没有被赋值就会自动被赋予<code class="calibre11">undefined</code>值。而在默认转换中，<code class="calibre11">undefined</code>会被转换为布尔值<code class="calibre11">false</code>。因此这个函数的用意是在提供了第三个参数的情况下，才会在拼接时带上它。问题在于并非只有<code class="calibre11">undefined</code>会转换为<code class="calibre11">false</code>，字符串也不是唯一可转换为<code class="calibre11">true</code>的值。假如第三个参数是数值<code class="calibre11">0</code>，<code class="calibre11">if</code>条件判断就会失败，而数值<code class="calibre11">1</code>则会导致满足条件。</p>
+            <p class="calibre1">在流控制语句中使用非布尔值作为条件是很常见的错误来源。为避免这类错误，需要始终坚持使用布尔值作为条件。这通常可以借助某种比较来实现。例如，可以把前面的函数改写为如下形式：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function concat(str1, str2, str3){
+  let result = str1 + str2;
+  if (typeof str3 === "string") { // 恰当的比较
+    result += str3;
+  }
+  return result;
+}</code></pre>
+            <p class="calibre1">在这个重写的版本中，<code class="calibre11">if</code>语句的条件会基于比较操作返回布尔值。这个函数相对更安全，受错误值影响的可能性也更小。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">数据类型错误</strong>
+            </p>
+            <p class="calibre1">因为JavaScript是松散类型的，所以变量和函数参数都不能保证会使用正确的数据类型。开发者需要自己检查数据类型，确保不会发生错误。数据类型错误常发生在将意外值传给函数的时候。</p>
+            <p class="calibre1">在前面的例子中，代码检查了第三个参数的数据类型，以确保它是字符串，但根本没有检查另外两个参数。如果函数必须返回一个字符串，那么只传入两个数值，忽略第三个参数就会破坏约定。下面的函数也存在类似问题：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不安全的函数，任何非字符串值都会导致错误
+function getquerystring(url) {
+   const pos = url.indexof("?");
+   if (pos &gt; -1){
+     return url.substring(pos +1);
+   }
+   return "";
+}</code></pre>
+            <p class="calibre1">这个函数的用途是返回给定URL的查询字符串。为此，它先用<code class="calibre11">indexOf()</code>在字符串中寻找问号，如果找到则使用<code class="calibre11">substring()</code>方法返回问号后面的所有内容。这两个方法都是只有字符串才有的，因此传入其他类型的值就会导致错误。下面的简单类型检查可以保证函数少出错：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function getquerystring(url) {
+  if (typeof url === "string") { // 通过类型检查保证安全
+    let pos = url.indexof("?");
+    if (pos &gt; -1) {
+      return url.substring(pos +1);
+    }
+  }
+  return "";
+}</code></pre>
+            <p class="calibre1">在这个重写的版本中，第一步检查了传入的值确实是字符串。这样可以保证函数永远不会因为非字符串值而出错。</p>
+            <p class="calibre1">如上一节所述，因为存在类型转换，所以应该避免在流控制语句中使用非布尔值作为条件。另外这也是可能导致类型错误的一个做法。来看下面的函数：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不安全的函数，非数组值可能导致错误
+function reversesort(values) {
+  if (values) { // 不要！
+    values.sort();
+    values.reverse();
+  }
+}</code></pre>
+            <p class="calibre1">
+              <code class="calibre11">reverseSort()</code>函数可以使用数组的<code class="calibre11">sort()</code>和<code class="calibre11">reverse()</code>方法，将数组反向排序。由于<code class="calibre11">if</code>语句中的控制条件，任何非数组值都会被转换为<code class="calibre11">true</code>，从而导致错误。另一个常见的错误是将参数与<code class="calibre11">null</code>比较，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 还是不安全的函数，非数组值可能导致错误
+function reversesort(values) {
+  if (values != null){ // 不要！
+    values.sort();
+    values.reverse();
+  }
+}</code></pre>
+            <p class="calibre1">用参数值与<code class="calibre11">null</code>比较只会保证不是两个值：<code class="calibre11">null</code>和<code class="calibre11">undefined</code>（对于使用相等和不相等操作符而言是等价的）。与<code class="calibre11">null</code>比较不足以保证适当的值，因此不要使用这种方式。出于同样的原因，也不推荐与<code class="calibre11">undefined</code>比较。</p>
+            <p class="calibre1">另一个错误的做法是在检测特性时只检查使用的特性。下面是一个例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 仍是不安全的函数，非数组值可能导致错误
+function reversesort(values) {
+  if (typeof values.sort === "function") { // 不要！
+    values.sort();
+    values.reverse();
+  }
+}</code></pre>
+            <p class="calibre1">在这个例子中，代码检查了参数上是否存在<code class="calibre11">sort()</code>方法。假如传入的参数确实有一个<code class="calibre11">sort()</code>方法，但参数本身不是数组，那么在执行<code class="calibre11">reverse()</code>时也会报告错误。如果知道预期的确切类型，那么最好使用<code class="calibre11">instanceof</code>来确定值的正确类型，如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 安全，非数组值被忽略
+function reversesort(values) {
+  if (values instanceof array) { // 修复
+    values.sort();
+    values.reverse();
+  }
+}</code></pre>
+            <p class="calibre1">最后一个<code class="calibre11">reverseSort()</code>是安全的，它测试了<code class="calibre11">values</code>参数是不是<code class="calibre11">Array</code>的实例。这样，函数可以保证忽略非数组参数。</p>
+            <p class="calibre1">一般来说，原始类型的值应该使用<code class="calibre11">typeof</code>检测，而对象值应该使用<code class="calibre11">instanceof</code>检测。根据函数的用法，不一定要检查每个参数的数据类型，但对外的任何API都应该做类型检查以保证正确执行。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">通信错误</strong>
+            </p>
+            <p class="calibre1">随着Ajax编程的出现，Web应用程序在运行期间动态加载数据和功能成为常见的情形。JavaScript和服务器之间的通信也会出现错误。</p>
+            <p class="calibre1">第一种错误是URL格式或发送数据的格式不正确。通常，在把数据发送到服务器之前没有用<code class="calibre11">encodeURIComponent()</code>编码，会导致这种错误。例如，下面的URL格式就不正确：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http://www.yourdomain.com/?redir=http://www.someotherdomain.com?a=b&amp;c=d</code></pre>
+            <p class="calibre1">这个URL可以通过用<code class="calibre11">encodeURIComponent()</code>编码<code class="calibre11">"redir="</code>后面的内容来修复，得到的结果如下所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">http://www.example.com/?redir=http%3a%2f%2fwww.someotherdomain.com%3fa%3db%26c%3dd</code></pre>
+            <p class="calibre1">对于查询字符串，应该都要通过<code class="calibre11">encodeURIComponent()</code>编码。为此，可以专门定义一个处理查询字符串的函数，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function addquerystringarg(url, name, value) {
+  if (url.indexof("?") == -1){
+    url += "?";
+  } else {
+    url += "&amp;";
+  }
+
+  url += '${encodeuricomponent(name)=${encodeuricomponent(value)}';
+  return url;
+}</code></pre>
+            <p class="calibre1">这个函数接收三个参数：要添加查询字符串的URL、参数名和参数值。如果URL不包含问号，则要给它加上一个；否则就要使用和号（<code class="calibre11">&amp;</code>），以便拼接更多参数和值，因为这意味着前面已有其他查询参数了。查询字符串的名和值在被编码之后会被添加到URL中。可以像下面这样使用这个函数：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const url = "http://www.somedomain.com";
+const newurl = addquerystringarg(url, "redir",
+                                 "http://www.someotherdomain.com?a=b&amp;c=d");
+console.log(newurl);</code></pre>
+            <p class="calibre1">使用这个函数而不是手动构建URL可以保证编码合适，以避免相关错误发生。</p>
+            <p class="calibre1">在服务器响应非预期值时也会发生通信错误。在动态加载脚本或样式时，请求的资源有可能不可用。有些浏览器在没有返回预期资源时会静默失败，而其他浏览器则会报告错误。不过，在动态加载资源的情况下出错，是不太好做错误处理的。有时候，使用Ajax通信可能会提供关于错误条件的更多信息。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_510" class="calibre15">21.2.6 区分重大与非重大错误</h3>
+        <p class="calibre1">任何错误处理策略中一个非常重要的方面就是确定某个错误是否为重大错误。具有以下一个或多个特性的错误属于非重大错误：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">不会影响用户的主要任务；</li>
+          <li class="di_1ji_wu_xu_lie_biao">只会影响页面中某个部分；</li>
+          <li class="di_1ji_wu_xu_lie_biao">可以恢复；</li>
+          <li class="di_1ji_wu_xu_lie_biao">重复操作可能成功。</li>
+        </ul>
+        <p class="calibre1">本质上，不需要担心非重大错误。例如，Gmail有一个功能，可以让用户在其界面上发送环聊（Hangouts）消息。如果在某个条件下，环聊功能不工作了，就不能算重大错误，因为这不是应用程序的主要功能。Gmail主要用于阅读和撰写电子邮件，只要用户可以做到这一点，就没有理由中断用户体验。对于非重大错误，无须明确给用户发送消息。可以将受影响的页面区域替换成一条消息，表示该功能暂时不能使用，但不需要中断用户体验。</p>
+        <p class="calibre1">另一方面，重大错误具备如下特性：</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">应用程序绝对无法继续运行；</li>
+          <li class="di_1ji_wu_xu_lie_biao">错误严重影响了用户的主要目标；</li>
+          <li class="di_1ji_wu_xu_lie_biao">会导致其他错误发生。</li>
+        </ul>
+        <p class="calibre1">理解JavaScript中何时会发生重大错误极其重要，因为这样才能采取应对措施。当重大错误发生时，应该立即发送消息让用户知晓自己不能再继续使用应用程序了。如果必须刷新页面才能恢复应用程序，那就应该明确告知用户，并提供一个自动刷新页面的按钮。</p>
+        <p class="calibre1">代码中则不要区分什么是或什么不是重大错误。非重大错误和重大错误的区别主要体现在对用户的影响上。好的代码设计意味着应用程序某个部分的错误不会影响其他部分，实际上根本不应该相关。例如，在个性化的主页上，比如Gmail，可能包含多个相互独立的功能模块。如果每个模块都通过JavaScript调用来初始化，那就可能会在代码中看到以下逻辑：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let mod of mods){
+    mod.init(); // 可能的重大错误
+}</code></pre>
+        <p class="calibre1">表面上看，这段代码没什么问题，就是依次调用每个模块的<code class="calibre11">init()</code>方法。问题在于，这里只要有一个模块的<code class="calibre11">init()</code>方法出错，数组中其后的所有模块都不会被初始化。如果错误发生在第一个模块上，页面上就没有模块会被初始化了。逻辑上，这样写代码是不合适的，因为每个模块相互独立，各自功能没有相关性。由此可能导致重大错误的原因是代码的结构。好在可以简单地重写以上代码，让每个模块的错误变成非重大错误：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let mod of mods){
+  try {
+    mod.init();
+  } catch (ex){
+    // 在这里处理错误
+  }
+}</code></pre>
+        <p class="calibre1">通过在<code class="calibre11">for</code>循环中加入<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句，模块初始化过程中的任何错误都不会影响其他模块初始化。如果代码中有错误发生，则可以单独处理，并不会影响用户体验。</p>
+        <h3 id="nav_point_511" class="calibre15">21.2.7 把错误记录到服务器中</h3>
+        <p class="calibre1">Web应用程序开发中的一个常见做法是建立中心化的错误日志存储和跟踪系统。数据库和服务器错误正常写到日志中并按照常用API加以分类。对复杂的Web应用程序而言，最好也把JavaScript错误发送回服务器记录下来。这样做可以把错误记录到与服务器相同的系统，只要把它们归类到前端错误即可。使用相同的系统可以进行相同的分析，而不用考虑错误来源。</p>
+        <p class="calibre1">要建立JavaScript错误日志系统，首先需要在服务器上有页面或入口可以处理错误数据。该页面只要从查询字符串中取得错误数据，然后把它们保存到错误日志中即可。比如，该页面可以使用如下代码：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function logerror(sev, msg) {
+  let img = new image(),
+      encodedsev = encodeuricomponent(sev),
+      encodedmsg = encodeuricomponent(msg);
+  img.src = 'log.php?sev=${encodedsev}&amp;msg=${encodedmsg}';
+}</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">logError()</code>函数接收两个参数：严重程度和错误消息。严重程度可以是数值或字符串，具体取决于使用的日志系统。这里使用<code class="calibre11">Image</code>对象发送请求主要是从灵活性方面考虑的。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">所有浏览器都支持<code class="calibre11">Image</code>对象，即使不支持<code class="calibre11">XMLHttpRequest</code>对象也一样。</li>
+          <li class="di_1ji_wu_xu_lie_biao">不受跨域规则限制。通常，接收错误消息的应该是多个服务器中的一个，而<code class="calibre11">XMLHttpRequest</code>此时就比较麻烦。</li>
+          <li class="di_1ji_wu_xu_lie_biao">记录错误的过程很少出错。大多数Ajax通信借助JavaScript库的包装来处理。如果这个库本身出错，而你又要利用它记录错误，那么显然错误消息永远不会发给服务器。</li>
+        </ul>
+        <p class="calibre1">只要是使用<code class="calibre11">try</code>/<code class="calibre11">catch</code>语句的地方，都可以把相关错误记录下来。下面是一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let mod of mods){
+  try {
+    mod.init();
+  } catch (ex){
+    logerror("nonfatal", 'module init failed: ${ex.message}');
+  }
+}</code></pre>
+        <p class="calibre1">在这个例子中，模块初始化失败就会调用<code class="calibre11">logError()</code>函数。第一个参数是表示错误严重程度的<code class="calibre11">"nonfatal"</code>，第二个参数在上下文信息后面追加了JavaScript错误消息。记录到服务器的错误消息应该包含尽量多的上下文信息，以便找出错误的确切原因。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0158.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0160.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

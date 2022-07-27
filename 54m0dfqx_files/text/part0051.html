@@ -1,0 +1,300 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0050.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0052.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_146" class="calibre9">6.7
+          <code class="calibre26">WeakSet</code>
+        </h2>
+        <p class="calibre1">ECMAScript 6新增的“弱集合”（<code class="calibre11">WeakSet</code>）是一种新的集合类型，为这门语言带来了集合数据结构。<code class="calibre11">WeakSet</code>是<code class="calibre11">Set</code>的“兄弟”类型，其API也是<code class="calibre11">Set</code>的子集。<code class="calibre11">WeakSet</code>中的“weak”（弱），描述的是JavaScript垃圾回收程序对待“弱集合”中值的方式。</p>
+        <h3 id="nav_point_147" class="calibre15">6.7.1 基本API</h3>
+        <p class="calibre1">可以使用<code class="calibre11">new</code>关键字实例化一个空的<code class="calibre11">WeakSet</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const ws = new weakset();</code></pre>
+        <p class="calibre1">弱集合中的值只能是<code class="calibre11">Object</code>或者继承自<code class="calibre11">Object</code>的类型，尝试使用非对象设置值会抛出<code class="calibre11">TypeError</code>。</p>
+        <p class="calibre1">如果想在初始化时填充弱集合，则构造函数可以接收一个可迭代对象，其中需要包含有效的值。可迭代对象中的每个值都会按照迭代顺序插入到新实例中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const val1 = {id: 1},
+      val2 = {id: 2},
+      val3 = {id: 3};
+// 使用数组初始化弱集合
+const ws1 = new weakset([val1, val2, val3]);
+
+alert(ws1.has(val1)); // true
+alert(ws1.has(val2)); // true
+alert(ws1.has(val3)); // true
+
+// 初始化是全有或全无的操作
+// 只要有一个值无效就会抛出错误，导致整个初始化失败
+const ws2 = new weakset([val1, "badval", val3]);
+// typeerror: invalid value used in weakset
+typeof ws2;
+// referenceerror: ws2 is not defined
+
+// 原始值可以先包装成对象再用作值
+const stringval = new string("val1");
+const ws3 = new weakset([stringval]);
+alert(ws3.has(stringval)); // true</code></pre>
+        <p class="calibre1">初始化之后可以使用<code class="calibre11">add()</code>再添加新值，可以使用<code class="calibre11">has()</code>查询，还可以使用<code class="calibre11">delete()</code>删除：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const ws = new weakset();
+
+const val1 = {id: 1},
+      val2 = {id: 2};
+
+alert(ws.has(val1)); // false
+
+ws.add(val1)
+  .add(val2);
+
+alert(ws.has(val1)); // true
+alert(ws.has(val2)); // true
+
+ws.delete(val1);     // 只删除这一个值
+
+alert(ws.has(val1)); // false
+alert(ws.has(val2)); // true</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">add()</code>方法返回弱集合实例，因此可以把多个操作连缀起来，包括初始化声明：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const val1 = {id: 1},
+      val2 = {id: 2},
+      val3 = {id: 3};
+
+const ws = new weakset().add(val1);
+
+ws.add(val2)
+  .add(val3);
+
+alert(ws.has(val1)); // true
+alert(ws.has(val2)); // true
+alert(ws.has(val3)); // true</code></pre>
+        <h3 id="nav_point_148" class="calibre15">6.7.2 弱值</h3>
+        <p class="calibre1">
+          <code class="calibre11">WeakSet</code>中“weak”表示弱集合的值是“弱弱地拿着”的。意思就是，这些值不属于正式的引用，不会阻止垃圾回收。</p>
+        <p class="calibre1">来看下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const ws = new weakset();
+
+ws.add({});</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">add()</code>方法初始化了一个新对象，并将它用作一个值。因为没有指向这个对象的其他引用，所以当这行代码执行完成后，这个对象值就会被当作垃圾回收。然后，这个值就从弱集合中消失了，使其成为一个空集合。</p>
+        <p class="calibre1">再看一个稍微不同的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const ws = new weakset();
+
+const container = {
+  val: {}
+};
+
+ws.add(container.val);
+
+function removereference() {
+  container.val = null;
+}</code></pre>
+        <p class="calibre1">这一次，<code class="calibre11">container</code>对象维护着一个对弱集合值的引用，因此这个对象值不会成为垃圾回收的目标。不过，如果调用了<code class="calibre11">removeReference()</code>，就会摧毁值对象的最后一个引用，垃圾回收程序就可以把这个值清理掉。</p>
+        <h3 id="nav_point_149" class="calibre15">6.7.3 不可迭代值</h3>
+        <p class="calibre1">因为<code class="calibre11">WeakSet</code>中的值任何时候都可能被销毁，所以没必要提供迭代其值的能力。当然，也用不着像<code class="calibre11">clear()</code>这样一次性销毁所有值的方法。<code class="calibre11">WeakSet</code>
+          确实没有这个方法。因为不可能迭代，所以也不可能在不知道对象引用的情况下从弱集合中取得值。即便代码可以访问<code class="calibre11">WeakSet</code>实例，也没办法看到其中的内容。</p>
+        <p class="calibre1">
+          <code class="calibre11">WeakSet</code>之所以限制只能用对象作为值，是为了保证只有通过值对象的引用才能取得值。如果允许原始值，那就没办法区分初始化时使用的字符串字面量和初始化之后使用的一个相等的字符串了。</p>
+        <h3 id="nav_point_150" class="calibre15">6.7.4 使用弱集合</h3>
+        <p class="calibre1">相比于<code class="calibre11">WeakMap</code>实例，<code class="calibre11">WeakSet</code>实例的用处没有那么大。不过，弱集合在给对象打标签时还是有价值的。</p>
+        <p class="calibre1">来看下面的例子，这里使用了一个普通<code class="calibre11">Set</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const disabledelements = new set();
+
+const loginbutton = document.queryselector('#login');
+
+// 通过加入对应集合，给这个节点打上“禁用”标签
+disabledelements.add(loginbutton);</code></pre>
+        <p class="calibre1">这样，通过查询元素在不在<code class="calibre11">disabledElements</code>中，就可以知道它是不是被禁用了。不过，假如元素从DOM树中被删除了，它的引用却仍然保存在<code class="calibre11">Set</code>中，因此垃圾回收程序也不能回收它。</p>
+        <p class="calibre1">为了让垃圾回收程序回收元素的内存，可以在这里使用<code class="calibre11">WeakSet</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const disabledelements = new weakset();
+
+const loginbutton = document.queryselector('#login');
+
+// 通过加入对应集合，给这个节点打上“禁用”标签
+disabledelements.add(loginbutton);</code></pre>
+        <p class="calibre1">这样，只要<code class="calibre11">WeakSet</code>中任何元素从DOM树中被删除，垃圾回收程序就可以忽略其存在，而立即释放其内存（假设没有其他地方引用这个对象）。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0050.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0052.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

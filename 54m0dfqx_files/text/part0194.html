@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0193.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0195.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_634" class="calibre9">27.1 工作者线程简介</h2>
+        <p class="calibre1">JavaScript环境实际上是运行在托管操作系统中的虚拟环境。在浏览器中每打开一个页面，就会分配一个它自己的环境。这样，每个页面都有自己的内存、事件循环、DOM，等等。每个页面就相当于一个沙盒，不会干扰其他页面。对于浏览器来说，同时管理多个环境是非常简单的，因为所有这些环境都是<strong class="calibre2">并行</strong>执行的。</p>
+        <p class="calibre1">使用<strong class="calibre2">工作者线程</strong>，浏览器可以在原始页面环境之外再分配一个完全独立的二级子环境。这个子环境不能与依赖单线程交互的API（如DOM）互操作，但可以与父环境并行执行代码。</p>
+        <h3 id="nav_point_635" class="calibre15">27.1.1 工作者线程与线程</h3>
+        <p class="calibre1">作为介绍，通常需要将工作者线程与执行线程进行比较。在许多方面，这是一个恰当的比较，因为工作者线程和线程确实有很多共同之处。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">工作者线程是以实际线程实现的</strong>。例如，Blink浏览器引擎实现工作者线程的<code class="calibre11">WorkerThread</code>就对应着底层的线程。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">工作者线程并行执行</strong>。虽然页面和工作者线程都是单线程JavaScript环境，每个环境中的指令则可以并行执行。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">工作者线程可以共享某些内存</strong>。工作者线程能够使用<code class="calibre11">SharedArrayBuffer</code>在多个环境间共享内容。虽然线程会使用锁实现并发控制，但JavaScript使用<code class="calibre11">Atomics</code>接口实现并发控制。</li>
+        </ul>
+        <p class="calibre1">工作者线程与线程有很多类似之处，但也有重要的区别。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">工作者线程不共享全部内存</strong>。在传统线程模型中，多线程有能力读写共享内存空间。除了<code class="calibre11">SharedArrayBuffer</code>外，从工作者线程进出的数据需要复制或转移。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">工作者线程不一定在同一个进程里</strong>。通常，一个进程可以在内部产生多个线程。根据浏览器引擎的实现，工作者线程可能与页面属于同一进程，也可能不属于。例如，Chrome的Blink引擎对共享工作者线程和服务工作者线程使用独立的进程。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <strong class="calibre2">创建工作者线程的开销更大</strong>。工作者线程有自己独立的事件循环、全局对象、事件处理程序和其他JavaScript环境必需的特性。创建这些结构的代价不容忽视</li>
+        </ul>
+        <p class="calibre1">无论形式还是功能，工作者线程都不是用于替代线程的。HTML Web工作者线程规范是这样说的：</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">工作者线程相对比较重，不建议大量使用。例如，对一张400万像素的图片，为每个像素都启动一个工作者线程是不合适的。通常，工作者线程应该是长期运行的，启动成本比较高，每个实例占用的内存也比较大。</p>
+        </blockquote>
+        <h3 id="nav_point_636" class="calibre15">27.1.2 工作者线程的类型</h3>
+        <p class="calibre1">Web工作者线程规范中定义了三种主要的工作者线程：<strong class="calibre2">专用工作者线程</strong>、<strong class="calibre2">共享工作者线程</strong>和<strong class="calibre2">服务工作者线程</strong>。现代浏览器都支持这些工作者线程。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            Web工作者线程规范参见HTML Standard网站。</p>
+        </blockquote>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">专用工作者线程</strong>
+            </p>
+            <p class="calibre1">专用工作者线程，通常简称为工作者线程、Web Worker或Worker，是一种实用的工具，可以让脚本单独创建一个JavaScript线程，以执行委托的任务。专用工作者线程，顾名思义，只能被创建它的页面使用。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">共享工作者线程</strong>
+            </p>
+            <p class="calibre1">共享工作者线程与专用工作者线程非常相似。主要区别是共享工作者线程可以被多个不同的上下文使用，包括不同的页面。任何与创建共享工作者线程的脚本同源的脚本，都可以向共享工作者线程发送消息或从中接收消息。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">服务工作者线程</strong>
+            </p>
+            <p class="calibre1">服务工作者线程与专用工作者线程和共享工作者线程截然不同。它的主要用途是拦截、重定向和修改页面发出的请求，充当网络请求的仲裁者的角色。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                还有其他一些工作者线程规范，比如ChromeWorker或Web Audio API，但它们并未得到广泛支持，或者定位于小众应用程序，因此本书没有包含与之相关的内容。</p>
+            </blockquote>
+          </li>
+        </ol>
+        <h3 id="nav_point_637" class="calibre15">27.1.3
+          <code class="calibre26">WorkerGlobalScope</code>
+        </h3>
+        <p class="calibre1">在网页上，<code class="calibre11">window</code>对象可以向运行在其中的脚本暴露各种全局变量。在工作者线程内部，没有<code class="calibre11">window</code>的概念。这里的全局对象是<code class="calibre11">WorkerGlobalScope</code>的实例，通过<code class="calibre11">self</code>关键字暴露出来。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">WorkerGlobalScope</code>属性和方法</strong>
+            </p>
+            <p class="calibre1">
+              <code class="calibre11">self</code>上可用的属性是<code class="calibre11">window</code>对象上属性的严格子集。其中有些属性会返回特定于工作者线程的版本。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">navigator</code>：返回与工作者线程关联的<code class="calibre11">WorkerNavigator</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">self</code>：返回<code class="calibre11">WorkerGlobalScope</code>对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">location</code>：返回与工作者线程关联的<code class="calibre11">WorkerLocation</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">performance</code>：返回（只包含特定属性和方法的）<code class="calibre11">Performance</code>对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">console</code>：返回与工作者线程关联的<code class="calibre11">Console</code>对象；对API没有限制。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">caches</code>：返回与工作者线程关联的<code class="calibre11">CacheStorage</code>对象；对API没有限制。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">indexedDB</code>：返回<code class="calibre11">IDBFactory</code>对象。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">isSecureContext</code>：返回布尔值，表示工作者线程上下文是否安全。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">origin</code>：返回<code class="calibre11">WorkerGlobalScope</code>的源。</li>
+            </ul>
+            <p class="calibre1">类似地，<code class="calibre11">self</code>对象上暴露的一些方法也是<code class="calibre11">window</code>上方法的子集。这些<code class="calibre11">self</code>上的方法也与<code class="calibre11">window</code>上对应的方法操作一样。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">atob()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">btoa()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">clearInterval()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">clearTimeout()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">createImageBitmap()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">fetch()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">setInterval()</code>
+              </li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">setTimeout()</code>
+              </li>
+            </ul>
+            <p class="calibre1">
+              <code class="calibre11">WorkerGlobalScope</code>还增加了新的全局方法<code class="calibre11">importScripts()</code>，只在工作者线程内可用。本章稍后会介绍该方法。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">
+                <code class="calibre11">WorkerGlobalScope</code>的子类</strong>
+            </p>
+            <p class="calibre1">实际上并不是所有地方都实现了<code class="calibre11">WorkerGlobalScope</code>。每种类型的工作者线程都使用了自己特定的全局对象，这继承自<code class="calibre11">WorkerGlobalScope</code>。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">专用工作者线程使用<code class="calibre11">DedicatedWorkerGlobalScope</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">共享工作者线程使用<code class="calibre11">SharedWorkerGlobalScope</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">服务工作者线程使用<code class="calibre11">ServiceWorkerGlobalScope</code>。</li>
+            </ul>
+            <p class="calibre1">本章稍后会在这些全局对象对应的小节中讨论其差异。</p>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0193.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0195.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

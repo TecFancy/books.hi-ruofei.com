@@ -1,0 +1,446 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0127.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0129.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_399" class="calibre9">17.6 模拟事件</h2>
+        <p class="calibre1">事件就是为了表示网页中某个有意义的时刻。通常，事件都是由用户交互或浏览器功能触发。事实上，可能很少有人知道可以通过JavaScript在任何时候触发任意事件，而这些事件会被当成浏览器创建的事件。这意味着同样会有事件冒泡，因而也会触发相应的事件处理程序。这种能力在测试Web应用时特别有用。DOM3规范指明了模拟特定类型事件的方式。IE8及更早版本也有自己模拟事件的方式。</p>
+        <h3 id="nav_point_400" class="calibre15">17.6.1 DOM事件模拟</h3>
+        <p class="calibre1">任何时候，都可以使用<code class="calibre11">document.createEvent()</code>方法创建一个<code class="calibre11">event</code>对象。这个方法接收一个参数，此参数是一个表示要创建事件类型的字符串。在DOM2中，所有这些字符串都是英文复数形式，但在DOM3中，又把它们改成了英文单数形式。可用的字符串值是以下值之一。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"UIEvents"</code>（DOM3中是<code class="calibre11">"UIEvent"</code>）：通用用户界面事件（鼠标事件和键盘事件都继承自这个事件）。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"MouseEvents"</code>（DOM3中是<code class="calibre11">"MouseEvent"</code>）：通用鼠标事件。</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">"HTMLEvents"</code>（DOM3中没有）：通用HTML事件（HTML事件已经分散到了其他事件大类中）。</li>
+        </ul>
+        <p class="calibre1">注意，键盘事件不是在DOM2 Events中规定的，而是后来在DOM3 Events中增加的。</p>
+        <p class="calibre1">创建<code class="calibre11">event</code>对象之后，需要使用事件相关的信息来初始化。每种类型的<code class="calibre11">event</code>对象都有特定的方法，可以使用相应数据来完成初始化。方法的名字并不相同，这取决于调用<code class="calibre11">createEvent()</code>时传入的参数。</p>
+        <p class="calibre1">事件模拟的最后一步是触发事件。为此要使用<code class="calibre11">dispatchEvent()</code>方法，这个方法存在于所有支持事件的DOM节点之上。<code class="calibre11">dispatchEvent()</code>方法接收一个参数，即表示要触发事件的<code class="calibre11">event</code>对象。调用<code class="calibre11">dispatchEvent()</code>方法之后，事件就“转正”了，接着便冒泡并触发事件处理程序执行。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">模拟鼠标事件</strong>
+            </p>
+            <p class="calibre1">模拟鼠标事件需要先创建一个新的鼠标<code class="calibre11">event</code>对象，然后再使用必要的信息对其进行初始化。要创建鼠标<code class="calibre11">event</code>对象，可以调用<code class="calibre11">createEvent()</code>方法并传入<code class="calibre11">"MouseEvents"</code>参数。这样就会返回一个<code class="calibre11">event</code>对象，这个对象有一个<code class="calibre11">initMouseEvent()</code>方法，用于为新对象指定鼠标的特定信息。<code class="calibre11">initMouseEvent()</code>方法接收15个参数，分别对应鼠标事件会暴露的属性。这些参数列举如下。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>（字符串）：要触发的事件类型，如<code class="calibre11">"click"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">bubbles</code>（布尔值）：表示事件是否冒泡。为精确模拟鼠标事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cancelable</code>（布尔值）：表示事件是否可以取消。为精确模拟鼠标事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">view</code>（AbstractView）：与事件关联的视图。基本上始终是<code class="calibre11">document.defaultView</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">detail</code>（整数）：关于事件的额外信息。只被事件处理程序使用，通常为0。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">screenX</code>（整数）：事件相对于屏幕的<img src="../images/00080.gif" alt="x" class="calibre12"/>坐标。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">screenY</code>（整数）：事件相对于屏幕的<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">clientX</code>（整数）：事件相对于视口的<img src="../images/00080.gif" alt="x" class="calibre12"/>坐标。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">clientY</code>（整数）：事件相对于视口的<img src="../images/00073.gif" alt="y" class="calibre12"/>坐标。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ctrlkey</code>（布尔值）：表示是否按下了Ctrl键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">altkey</code>（布尔值）：表示是否按下了Alt键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">shiftkey</code>（布尔值）：表示是否按下了Shift键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">metakey</code>（布尔值）：表示是否按下了Meta键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">button</code>（整数）：表示按下了哪个按钮。默认为0。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">relatedTarget</code>（对象）：与事件相关的对象。只在模拟<code class="calibre11">mouseover</code>和<code class="calibre11">mouseout</code>时使用。</li>
+            </ul>
+            <p class="calibre1">显然，<code class="calibre11">initMouseEvent()</code>方法的这些参数与鼠标事件的<code class="calibre11">event</code>对象属性是一一对应的。前4个参数是正确模拟事件唯一重要的几个参数，这是因为它们是浏览器要用的，其他参数则是事件处理程序要用的。<code class="calibre11">event</code>对象的<code class="calibre11">target</code>属性会自动设置为调用<code class="calibre11">dispatchEvent()</code>方法时传入的节点。下面来看一个使用默认值模拟单击事件的例子：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let btn = document.getelementbyid("mybtn");
+
+// 创建event对象
+let event = document.createevent("mouseevents");
+
+// 初始化event对象
+event.initmouseevent("click", true, true, document.defaultview,
+                     0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+// 触发事件
+btn.dispatchevent(event);</code></pre>
+            <p class="calibre1">所有鼠标事件，包括<code class="calibre11">dblclick</code>都可以像这样在DOM合规的浏览器中模拟出来。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">模拟键盘事件</strong>
+            </p>
+            <p class="calibre1">如前所述，DOM2 Events中没有定义键盘事件，因此模拟键盘事件并不直观。键盘事件曾在DOM2 Events的草案中提到过，但最终成为推荐标准前又被删掉了。要注意的是，DOM3 Events中定义的键盘事件与DOM2 Events草案最初定义的键盘事件差别很大。</p>
+            <p class="calibre1">在DOM3中创建键盘事件的方式是给<code class="calibre11">createEvent()</code>方法传入参数<code class="calibre11">"KeyboardEvent"</code>。这样会返回一个<code class="calibre11">event</code>对象，这个对象有一个<code class="calibre11">initKeyboardEvent()</code>方法。这个方法接收以下参数。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>（字符串）：要触发的事件类型，如<code class="calibre11">"keydown"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">bubbles</code>（布尔值）：表示事件是否冒泡。为精确模拟键盘事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cancelable</code>（布尔值）：表示事件是否可以取消。为精确模拟键盘事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">view</code>（AbstractView）：与事件关联的视图。基本上始终是<code class="calibre11">document.defaultView</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">key</code>（字符串）：按下按键的字符串代码。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">location</code>（整数）：按下按键的位置。0表示默认键，1表示左边，2表示右边，3表示数字键盘，4表示移动设备（虚拟键盘），5表示游戏手柄。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">modifiers</code>（字符串）：空格分隔的修饰键列表，如<code class="calibre11">"Shift"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">repeat</code>（整数）：连续按了这个键多少次。</li>
+            </ul>
+            <p class="calibre1">注意，DOM3 Events废弃了<code class="calibre11">keypress</code>事件，因此只能通过上述方式模拟<code class="calibre11">keydown</code>和<code class="calibre11">keyup</code>事件：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let textbox = document.getelementbyid("mytextbox"),
+    event;
+
+// 按照dom3的方式创建event对象
+if (document.implementation.hasfeature("keyboardevents", "3.0")) {
+   event = document.createevent("keyboardevent");
+
+   // 初始化event对象
+   event.initkeyboardevent("keydown", true, true, document.defaultview, "a",
+                           0, "shift", 0);
+
+}
+// 触发事件
+textbox.dispatchevent(event);</code></pre>
+            <p class="calibre1">这个例子模拟了同时按住Shift键和键盘上A键的<code class="calibre11">keydown</code>事件。在使用<code class="calibre11">document.create Event("KeyboardEvent")</code>之前，最好检测一下浏览器对DOM3键盘事件的支持情况，其他浏览器会返回非标准的<code class="calibre11">KeyboardEvent</code>对象。</p>
+            <p class="calibre1">Firefox允许给<code class="calibre11">createEvent()</code>传入<code class="calibre11">"KeyEvents"</code>来创建键盘事件。这时候返回的<code class="calibre11">event</code>对象包含的方法叫<code class="calibre11">initKeyEvent()</code>，此方法接收以下10个参数。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>（字符串）：要触发的事件类型，如<code class="calibre11">"keydown"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">bubbles</code>（布尔值）：表示事件是否冒泡。为精确模拟键盘事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cancelable</code>（布尔值）：表示事件是否可以取消。为精确模拟键盘事件，应该设置为<code class="calibre11">true</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">view</code>（AbstractView）：与事件关联的视图，基本上始终是<code class="calibre11">document.defaultView</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">ctrlkey</code>（布尔值）：表示是否按下了Ctrl键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">altkey</code>（布尔值）：表示是否按下了Alt键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">shiftkey</code>（布尔值）：表示是否按下了Shift键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">metakey</code>（布尔值）：表示是否按下了Meta键。默认为<code class="calibre11">false</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">keyCode</code>（整数）：表示按下或释放键的键码。在<code class="calibre11">keydown</code>和<code class="calibre11">keyup</code>中使用。默认为0。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">charCode</code>（整数）：表示按下键对应字符的ASCII编码。在<code class="calibre11">keypress</code>中使用。默认为0。</li>
+            </ul>
+            <p class="calibre1">键盘事件也可以通过调用<code class="calibre11">dispatchEvent()</code>并传入<code class="calibre11">event</code>对象来触发，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 仅适用于firefox
+let textbox = document.getelementbyid("mytextbox");
+
+// 创建event对象
+let event = document.createevent("keyevents");
+
+// 初始化event对象
+event.initkeyevent("keydown", true, true, document.defaultview, false,
+                   false, true, false, 65, 65);
+
+// 触发事件
+textbox.dispatchevent(event);</code></pre>
+            <p class="calibre1">这个例子模拟了同时按住Shift键和键盘上A键的<code class="calibre11">keydown</code>事件。同样也可以像这样模拟<code class="calibre11">keyup</code>和<code class="calibre11">keypress</code>事件。</p>
+            <p class="calibre1">对于其他浏览器，需要创建一个通用的事件，并为其指定特定于键盘的信息，如下面的例子所示：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let textbox = document.getelementbyid("mytextbox");
+
+// 创建event对象
+let event = document.createevent("events");
+
+// 初始化event对象
+event.initevent(type, bubbles, cancelable);
+event.view = document.defaultview;
+event.altkey = false;
+event.ctrlkey = false;
+event.shiftkey = false;
+event.metakey = false;
+event.keycode = 65;
+event.charcode = 65;
+
+// 触发事件
+textbox.dispatchevent(event);</code></pre>
+            <p class="calibre1">以上代码创建了一个通用事件，然后使用<code class="calibre11">initEvent()</code>方法初始化，接着又为它指定了键盘事件信息。这里必须使用通用事件而不是用户界面事件，因为用户界面事件不允许直接给<code class="calibre11">event</code>对象添加属性（Safari例外）。像这样模拟一个事件虽然会触发键盘事件，但文本框中不会输入任何文本，因为它并不能准确模拟键盘事件。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">模拟其他事件</strong>
+            </p>
+            <p class="calibre1">鼠标事件和键盘事件是浏览器中最常见的模拟对象。不过，有时候可能也需要模拟HTML事件。模拟HTML事件要调用<code class="calibre11">createEvent()</code>方法并传入<code class="calibre11">"HTMLEvents"</code>，然后再使用返回对象的<code class="calibre11">initEvent()</code>方法来初始化：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let event = document.createevent("htmlevents");
+event.initevent("focus", true, false);
+target.dispatchevent(event);</code></pre>
+            <p class="calibre1">这个例子模拟了在给定目标上触发<code class="calibre11">focus</code>事件。其他HTML事件也可以像这样来模拟。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                HTML事件在浏览器中很少使用，因为它们用处有限。</p>
+            </blockquote>
+            <p class="calibre1"></p>
+          </li>
+          <li value="4" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">自定义DOM事件</strong>
+            </p>
+            <p class="calibre1">DOM3增加了<strong class="calibre2">自定义事件</strong>的类型。自定义事件不会触发原生DOM事件，但可以让开发者定义自己的事件。要创建自定义事件，需要调用<code class="calibre11">createEvent("CustomEvent")</code>。返回的对象包含<code class="calibre11">initCustomEvent()</code>方法，该方法接收以下4个参数。</p>
+            <ul class="calibre17">
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">type</code>（字符串）：要触发的事件类型，如<code class="calibre11">"myevent"</code>。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">bubbles</code>（布尔值）：表示事件是否冒泡。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">cancelable</code>（布尔值）：表示事件是否可以取消。</li>
+              <li class="di_1ji_wu_xu_lie_biao">
+                <code class="calibre11">detail</code>（对象）：任意值。作为<code class="calibre11">event</code>对象的<code class="calibre11">detail</code>属性。</li>
+            </ul>
+            <p class="calibre1">自定义事件可以像其他事件一样在DOM中派发，比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let div = document.getelementbyid("mydiv"),
+    event;
+
+div.addeventlistener("myevent", (event) =&gt; {
+  console.log("div: " + event.detail);
+});
+
+document.addeventlistener("myevent", (event) =&gt; {
+  console.log("document: " + event.detail);
+});
+
+if (document.implementation.hasfeature("customevents", "3.0")) {
+  event = document.createevent("customevent");
+  event.initcustomevent("myevent", true, false, "hello world!");
+  div.dispatchevent(event);
+}</code></pre>
+            <p class="calibre1">这个例子创建了一个名为<code class="calibre11">"myevent"</code>的冒泡事件。<code class="calibre11">event</code>对象的<code class="calibre11">detail</code>属性就是一个简单的字符串，<code class="calibre11">&lt;div&gt;</code>元素和<code class="calibre11">document</code>都为这个事件注册了事件处理程序。因为使用<code class="calibre11">initCustomEvent()</code>初始化时将事件指定为可以冒泡，所以浏览器会负责把事件冒泡到<code class="calibre11">document</code>。</p>
+          </li>
+        </ol>
+        <h3 id="nav_point_401" class="calibre15">17.6.2 IE事件模拟</h3>
+        <p class="calibre1">在IE8及更早版本中模拟事件的过程与DOM方式类似：创建<code class="calibre11">event</code>对象，指定相应信息，然后使用这个对象触发。当然，IE实现每一步的方式都不一样。</p>
+        <p class="calibre1">首先，要使用<code class="calibre11">document</code>对象的<code class="calibre11">createEventObject()</code>方法来创建<code class="calibre11">event</code>对象。与DOM不同，这个方法不接收参数，返回一个通用event对象。然后，可以手工给返回的对象指定希望该对象具备的所有属性。（没有初始化方法。）最后一步是在事件目标上调用<code class="calibre11">fireEvent()</code>方法，这个方法接收两个参数：事件处理程序的名字和<code class="calibre11">event</code>对象。调用<code class="calibre11">fireEvent()</code>时，<code class="calibre11">srcElement</code>和<code class="calibre11">type</code>属性会自动指派到<code class="calibre11">event</code>对象（其他所有属性必须手工指定）。这意味着IE支持的所有事件都可以通过相同的方式来模拟。例如，下面的代码在一个按钮上模拟了<code class="calibre11">click</code>事件：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var btn = document.getelementbyid("mybtn");
+
+// 创建event对象
+var event = document.createeventobject();
+
+/// 初始化event对象
+event.screenx = 100;
+event.screeny = 0;
+event.clientx = 0;
+event.clienty = 0;
+event.ctrlkey = false;
+event.altkey = false;
+event.shiftkey = false;
+event.button = 0;
+
+// 触发事件
+btn.fireevent("onclick", event);</code></pre>
+        <p class="calibre1">这个例子先创建<code class="calibre11">event</code>对象，然后用相关信息对其进行了初始化。注意，这里可以指定任何属性，包括IE8及更早版本不支持的属性。这些属性的值对于事件来说并不重要，因为只有事件处理程序才会使用它们。</p>
+        <p class="calibre1">同样的方式也可以用来模拟<code class="calibre11">keypress</code>事件，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">var textbox = document.getelementbyid("mytextbox");
+
+// 创建event对象
+var event = document.createeventobject();
+
+// 初始化event对象
+event.altkey = false;
+event.ctrlkey = false;
+event.shiftkey = false;
+event.keycode = 65;
+
+// 触发事件
+textbox.fireevent("onkeypress", event);</code></pre>
+        <p class="calibre1">由于鼠标事件、键盘事件或其他事件的<code class="calibre11">event</code>对象并没有区别，因此使用通用的<code class="calibre11">event</code>对象可以触发任何类型的事件。注意，与DOM方式模拟键盘事件一样，这里模拟的<code class="calibre11">keypress</code>虽然会触发，但文本框中也不会出现字符。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0127.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0129.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

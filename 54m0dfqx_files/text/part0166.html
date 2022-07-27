@@ -1,0 +1,246 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0165.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0167.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_537" class="calibre9">22.3 浏览器对XSLT的支持</h2>
+        <p class="calibre1">可扩展样式表语言转换（XSLT，Extensible Stylesheet Language Transformations）是与XML相伴的一种技术，可以利用XPath将一种文档表示转换为另一种文档表示。与XML和XPath不同，XSLT没有与之相关的正式API，正式的DOM中也没有涵盖它。因此浏览器都以自己的方式实现XSLT。率先在JavaScript中支持XSLT的是IE。</p>
+        <h3 id="nav_point_538" class="calibre15">22.3.1
+          <code class="calibre26">XSLTProcessor</code>类型</h3>
+        <p class="calibre1">Mozilla通过增加了一个新类型<code class="calibre11">XSLTProcessor</code>，在JavaScript中实现了对XSLT的支持。通过使用<code class="calibre11">XSLTProcessor</code>类型，开发者可以使用XSLT转换XML文档，其方式类似于在IE中使用XSL处理器。自从<code class="calibre11">XSLTProcessor</code>首次实现以来，所有浏览器都照抄了其实现，从而使<code class="calibre11">XSLTProcessor</code>成了通过JavaScript完成XSLT转换的事实标准。</p>
+        <p class="calibre1">与IE的实现一样，第一步是加载两个DOM文档：XML文档和XSLT文档。然后，使用<code class="calibre11">importStyleSheet()</code>方法创建一个新的<code class="calibre11">XSLTProcessor</code>，将XSLT指定给它，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let processor = new xsltprocessor()
+processor.importstylesheet(xsltdom);</code></pre>
+        <p class="calibre1">最后一步是执行转换，有两种方式。如果想返回完整的DOM文档，就调用<code class="calibre11">transformToDocument()</code>；如果想得到文档片段，则可以调用<code class="calibre11">transformToFragment()</code>。一般来说，使用<code class="calibre11">transformToFragment()</code>的唯一原因是想把结果添加到另一个DOM文档。</p>
+        <p class="calibre1">如果使用<code class="calibre11">transformToDocument()</code>，只要传给它XML DOM，就可以将结果当作另一个完全不同的DOM来使用。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = processor.transformtodocument(xmldom);
+console.log(serializexml(result));</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">transformToFragment()</code>方法接收两个参数：要转换的XML DOM和最终会拥有结果片段的文档。这可以确保新文本片段可以在目标文档中使用。比如，可以把<code class="calibre11">document</code>作为第二个参数，然后将创建的片段添加到其页面元素中。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fragment = processor.transformtofragment(xmldom, document);
+let div = document.getelementbyid("divresult");
+div.appendchild(fragment);</code></pre>
+        <p class="calibre1">这里，处理器创建了由<code class="calibre11">document</code>对象所有的片段。这样就可以将片段添加到当前页面的<code class="calibre11">&lt;div&gt;</code>元素中了。</p>
+        <p class="calibre1">如果XSLT样式表的输出格式是<code class="calibre11">"xml"</code>或<code class="calibre11">"html"</code>，则创建文档或文档片段理所当然。不过，如果输出格式是<code class="calibre11">"text"</code>，则通常意味着只想得到转换后的文本结果。然而，没有方法直接返回文本。在输出格式为<code class="calibre11">"text"</code>时调用<code class="calibre11">transformToDocument()</code>会返回完整的XML文档，但这个文档的内容会因浏览器而异。比如，Safari返回整个HTML文档，而Opera和Firefox则返回只包含一个元素的文档，其中输出就是该元素的文本。</p>
+        <p class="calibre1">解决方案是调用<code class="calibre11">transformToFragment()</code>，返回只有一个子节点、其中包含结果文本的文档片段。之后，可以再使用以下代码取得文本：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let fragment = processor.transformtofragment(xmldom, document);
+let text = fragment.firstchild.nodevalue;
+console.log(text);</code></pre>
+        <p class="calibre1">这种方式在所有支持的浏览器中都可以正确返回转换后的输出文本。</p>
+        <h3 id="nav_point_539" class="calibre15">22.3.2 使用参数</h3>
+        <p class="calibre1">
+          <code class="calibre11">XSLTProcessor</code>还允许使用<code class="calibre11">setParameter()</code>方法设置XSLT参数。该方法接收三个参数：命名空间URI、参数本地名称和要设置的值。通常，命名空间URI是<code class="calibre11">null</code>，本地名称就是参数名称。<code class="calibre11">setParameter()</code>方法必须在调用<code class="calibre11">transformToDocument()</code>或<code class="calibre11">transformToFragment()</code>之前调用。例子如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let processor = new xsltprocessor()
+processor.importstylesheet(xsltdom);
+processor.setparameter(null, "message", "hello world!");
+let result = processor.transformtodocument(xmldom);</code></pre>
+        <p class="calibre1">与参数相关的还有两个方法：<code class="calibre11">getParameter()</code>和<code class="calibre11">removeParameter()</code>。它们分别用于取得参数的当前值和移除参数的值。它们都以一个命名空间URI（同样，一般是<code class="calibre11">null</code>）和参数的本地名称为参数。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let processor = new xsltprocessor()
+processor.importstylesheet(xsltdom);
+processor.setparameter(null, "message", "hello world!");
+
+console.log(processor.getparameter(null, "message"));   // 输出"hello world!"
+processor.removeparameter(null, "message");
+
+let result = processor.transformtodocument(xmldom);</code></pre>
+        <p class="calibre1">这几个方法并不常用，只是为了操作方便。</p>
+        <h3 id="nav_point_540" class="calibre15">22.3.3 重置处理器</h3>
+        <p class="calibre1">每个<code class="calibre11">XSLTProcessor</code>实例都可以重用于多个转换，只是要使用不同的XSLT样式表。处理器的<code class="calibre11">reset()</code>方法可以删除所有参数和样式表。然后，可以使用<code class="calibre11">importStylesheet()</code>方法加载不同的XSLT样表，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let processor = new xsltprocessor()
+processor.importstylesheet(xsltdom);
+
+// 执行某些转换
+
+processor.reset();
+processor.importstylesheet(xsltdom2);
+
+// 再执行一些转换</code></pre>
+        <p class="calibre1">在使用多个样式表执行转换时，重用一个<code class="calibre11">XSLTProcessor</code>可以节省内存。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0165.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0167.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

@@ -1,0 +1,965 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0153.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0155.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_492" class="calibre9">20.11 Web组件</h2>
+        <p class="calibre1">这里所说的Web组件指的是一套用于增强DOM行为的工具，包括影子DOM、自定义元素和HTML模板。这一套浏览器API特别混乱。</p>
+        <ul class="calibre10">
+          <li class="di_1ji_wu_xu_lie_biao">并没有统一的“Web Components”规范：每个Web组件都在一个不同的规范中定义。</li>
+          <li class="di_1ji_wu_xu_lie_biao">有些Web组件如影子DOM和自定义元素，已经出现了向后不兼容的版本问题。</li>
+          <li class="di_1ji_wu_xu_lie_biao">浏览器实现极其不一致。</li>
+        </ul>
+        <p class="calibre1">由于存在这些问题，因此使用Web组件通常需要引入一个Web组件库，比如Polymer。这种库可以作为腻子脚本，模拟浏览器中缺失的Web组件。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            本章只介绍Web组件的最新版本。</p>
+        </blockquote>
+        <h3 id="nav_point_493" class="calibre15">20.11.1 HTML模板</h3>
+        <p class="calibre1">在Web组件之前，一直缺少基于HTML解析构建DOM子树，然后在需要时再把这个子树渲染出来的机制。一种间接方案是使用<code class="calibre11">innerHTML</code>把标记字符串转换为DOM元素，但这种方式存在严重的安全隐患。另一种间接方案是使用<code class="calibre11">document.createElement()</code>构建每个元素，然后逐个把它们添加到孤儿根节点（不是添加到DOM），但这样做特别麻烦，完全与标记无关。</p>
+        <p class="calibre1">相反，更好的方式是提前在页面中写出特殊标记，让浏览器自动将其解析为DOM子树，但跳过渲染。这正是HTML模板的核心思想，而<code class="calibre11">&lt;template&gt;</code>标签正是为这个目的而生的。下面是一个简单的HTML模板的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;template id="foo"&gt;
+  &lt;p&gt;i'm inside a template!&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+<ol class="calibre16">
+<li value="1" class="di_1ji_wu_xu_lie_biao"><p class="calibre1"><strong class="calibre2">使用<code class="calibre11">documentfragment</code></strong></p>
+<p class="calibre1">在浏览器中渲染时，上面例子中的文本不会被渲染到页面上。因为<code class="calibre11">&lt;template&gt;</code>的内容不属于活动文档，所以<code class="calibre11">document.queryselector()</code>等dom查询方法不会发现其中的<code class="calibre11">&lt;p&gt;</code>标签。这是因为<code class="calibre11">&lt;p&gt;</code>存在于一个包含在html模板中的<code class="calibre11">documentfragment</code>节点内。</p>
+<p class="calibre1">在浏览器中通过开发者工具检查网页内容时，可以看到<code class="calibre11">&lt;template&gt;</code>中的<code class="calibre11">documentfragment</code>：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;template id="foo"&gt;
+  #document-fragment
+    &lt;p&gt;i'm inside a template!&lt;/p&gt;
+&lt;/template&gt;</code></pre>
+        <p class="calibre1">通过<code class="calibre11">&lt;template&gt;</code>元素的<code class="calibre11">content</code>属性可以取得这个<code class="calibre11">DocumentFragment</code>的引用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(document.queryselector('#foo').content); // #document-fragment</code></pre>
+        <p class="calibre1">此时的<code class="calibre11">DocumentFragment</code>就像一个对应子树的最小化<code class="calibre11">document</code>对象。换句话说，<code class="calibre11">DocumentFragment</code>上的DOM匹配方法可以查询其子树中的节点：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const fragment = document.queryselector('#foo').content;
+
+console.log(document.queryselector('p')); // null
+console.log(fragment.queryselector('p')); // &lt;p&gt;...&lt;p&gt;</code></pre>
+        <p class="calibre1">
+          <code class="calibre11">DocumentFragment</code>也是批量向HTML中添加元素的高效工具。比如，我们想以最快的方式给某个HTML元素添加多个子元素。如果连续调用<code class="calibre11">document.appendChild()</code>，则不仅费事，还会导致多次布局重排。而使用<code class="calibre11">DocumentFragment</code>可以一次性添加所有子节点，最多只会有一次布局重排：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 开始状态：
+// &lt;div id="foo"&gt;&lt;/div&gt;
+//
+// 期待的最终状态：
+// &lt;div id="foo"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/div&gt;
+// 也可以使用document.createdocumentfragment()
+const fragment = new documentfragment();
+
+const foo = document.queryselector('#foo');
+
+// 为documentfragment添加子元素不会导致布局重排
+fragment.appendchild(document.createelement('p'));
+fragment.appendchild(document.createelement('p'));
+fragment.appendchild(document.createelement('p'));
+
+console.log(fragment.children.length); // 3
+
+foo.appendchild(fragment);
+
+console.log(fragment.children.length); // 0
+
+console.log(document.body.innerhtml);
+// &lt;div id="foo"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/div&gt;</code></pre>
+        <p class="calibre1"></p>
+      </li>
+      <li value="2" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">使用<code class="calibre11">&lt;template&gt;</code>标签</strong>
+        </p>
+        <p class="calibre1">注意，在前面的例子中，<code class="calibre11">DocumentFragment</code>的所有子节点都高效地转移到了<code class="calibre11">foo</code>元素上，转移之后<code class="calibre11">DocumentFragment</code>变空了。同样的过程也可以使用<code class="calibre11">&lt;template&gt;</code>标签重现：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const fooelement = document.queryselector('#foo');
+const bartemplate = document.queryselector('#bar');
+const barfragment = bartemplate.content;
+
+console.log(document.body.innerhtml);
+// &lt;div id="foo"&gt;
+// &lt;/div&gt;
+// &lt;template id="bar"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/template&gt;
+
+fooelement.appendchild(barfragment);
+
+console.log(document.body.innerhtml);
+// &lt;div id="foo"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/div&gt;
+// &lt;tempate id="bar"&gt;&lt;/template&gt;</code></pre>
+        <p class="calibre1">如果想要复制模板，可以使用<code class="calibre11">importNode()</code>方法克隆<code class="calibre11">DocumentFragment</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">const fooelement = document.queryselector('#foo');
+const bartemplate = document.queryselector('#bar');
+const barfragment = bartemplate.content;
+
+console.log(document.body.innerhtml);
+// &lt;div id="foo"&gt;
+// &lt;/div&gt;
+// &lt;template id="bar"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/template&gt;
+
+fooelement.appendchild(document.importnode(barfragment, true));
+
+console.log(document.body.innerhtml);
+// &lt;div id="foo"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/div&gt;
+// &lt;template id="bar"&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+//   &lt;p&gt;&lt;/p&gt;
+// &lt;/template&gt;</code></pre>
+        <p class="calibre1"></p>
+      </li>
+      <li value="3" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">模板脚本</strong>
+        </p>
+        <p class="calibre1">脚本执行可以推迟到将<code class="calibre11">DocumentFragment</code>的内容实际添加到DOM树。下面的例子演示了这个过程：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 页面html：
+//
+// &lt;div id="foo"&gt;&lt;/div&gt;
+// &lt;template id="bar"&gt;
+//   &lt;script&gt;console.log('template script executed');&lt;/script&gt;
+// &lt;/template&gt;
+
+const fooelement = document.queryselector('#foo');
+const bartemplate = document.queryselector('#bar');
+const barfragment = bartemplate.content;
+
+console.log('about to add template');
+fooelement.appendchild(barfragment);
+console.log('added template');
+
+// about to add template
+// template script executed
+// added template</code></pre>
+        <p class="calibre1">如果新添加的元素需要进行某些初始化，这种延迟执行是有用的。</p>
+      </li>
+    </ol>
+    <h3 id="nav_point_494" class="calibre15">20.11.2 影子DOM</h3>
+    <p class="calibre1">概念上讲，影子DOM（shadow DOM） Web组件相当直观，通过它可以将一个完整的DOM树作为节点添加到父DOM树。这样可以实现DOM封装，意味着CSS样式和CSS选择符可以限制在影子DOM子树而不是整个顶级DOM树中。</p>
+    <p class="calibre1">影子DOM与HTML模板很相似，因为它们都是类似<code class="calibre11">document</code>的结构，并允许与顶级DOM有一定程度的分离。不过，影子DOM与HTML模板还是有区别的，主要表现在影子DOM的内容会实际渲染到页面上，而HTML模板的内容不会。</p>
+    <ol class="calibre16">
+      <li value="1" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">理解影子DOM</strong>
+        </p>
+        <p class="calibre1">假设有以下HTML标记，其中包含多个类似的DOM子树：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div&gt;
+  &lt;p&gt;make me red!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;p&gt;make me blue!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  &lt;p&gt;make me green!&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+        <p class="calibre1">从其中的文本节点可以推断出，这3个DOM子树会分别渲染为不同的颜色。常规情况下，为了给每个子树应用唯一的样式，又不使用<code class="calibre11">style</code>属性，就需要给每个子树添加一个唯一的类名，然后通过相应的选择符为它们添加样式：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;div class="red-text"&gt;
+  &lt;p&gt;make me red!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="green-text"&gt;
+  &lt;p&gt;make me green!&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="blue-text"&gt;
+  &lt;p&gt;make me blue!&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;style&gt;
+.red-text {
+  color: red;
+}
+.green-text {
+  color: green;
+}
+.blue-text {
+  color: blue;
+}
+&lt;/style&gt;</code></pre>
+        <p class="calibre1">当然，这个方案也不是十分理想，因为这跟在全局命名空间中定义变量没有太大区别。尽管知道这些样式与其他地方无关，所有CSS样式还会应用到整个DOM。为此，就要保持CSS选择符足够特别，以防这些样式渗透到其他地方。但这也仅是一个折中的办法而已。理想情况下，应该能够把CSS限制在使用它们的DOM上：这正是影子DOM最初的使用场景。<br class="calibre4"/>
+        </p>
+      </li>
+      <li value="2" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">创建影子DOM</strong>
+        </p>
+        <p class="calibre1">考虑到安全及避免影子DOM冲突，并非所有元素都可以包含影子DOM。尝试给无效元素或者已经有了影子DOM的元素添加影子DOM会导致抛出错误。</p>
+        <p class="calibre1">以下是可以容纳影子DOM的元素。</p>
+        <ul class="calibre17">
+          <li class="di_1ji_wu_xu_lie_biao">任何以有效名称创建的自定义元素（参见HTML规范中相关的定义）</li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;article&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;aside&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;blockquote&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;body&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;div&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;footer&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h1&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h2&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h3&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h4&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h5&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;h6&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;header&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;main&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;nav&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;p&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;section&gt;</code>
+          </li>
+          <li class="di_1ji_wu_xu_lie_biao">
+            <code class="calibre11">&lt;span&gt;</code>
+          </li>
+        </ul>
+        <p class="calibre1">影子DOM是通过<code class="calibre11">attachShadow()</code>方法创建并添加给有效HTML元素的。容纳影子DOM的元素被称为<strong class="calibre2">影子宿主</strong>（shadow host）。影子DOM的根节点被称为<strong class="calibre2">影子根</strong>（shadow root）。</p>
+        <p class="calibre1">
+          <code class="calibre11">attachShadow()</code>方法需要一个<code class="calibre11">shadowRootInit</code>对象，返回影子DOM的实例。<code class="calibre11">shadowRootInit</code>对象必须包含一个<code class="calibre11">mode</code>属性，值为<code class="calibre11">"open"</code>或<code class="calibre11">"closed"</code>。对<code class="calibre11">"open"</code>影子DOM的引用可以通过<code class="calibre11">shadowRoot</code>属性在HTML元素上获得，而对<code class="calibre11">"closed"</code>影子DOM的引用无法这样获取。</p>
+        <p class="calibre1">下面的代码演示了不同<code class="calibre11">mode</code>的区别：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+  &lt;div id="foo"&gt;&lt;/div&gt;
+  &lt;div id="bar"&gt;&lt;/div&gt;
+`;
+
+const foo = document.queryselector('#foo');
+const bar = document.queryselector('#bar');
+
+const openshadowdom = foo.attachshadow({ mode: 'open' });
+const closedshadowdom = bar.attachshadow({ mode: 'closed' });
+
+console.log(openshadowdom);   // #shadow-root (open)
+console.log(closedshadowdom); // #shadow-root (closed)
+
+console.log(foo.shadowroot);  // #shadow-root (open)
+console.log(bar.shadowroot);  // null</code></pre>
+        <p class="calibre1">一般来说，需要创建保密（closed）影子DOM的场景很少。虽然这可以限制通过影子宿主访问影子DOM，但恶意代码有很多方法绕过这个限制，恢复对影子DOM的访问。简言之，<strong class="calibre2">不能</strong>为了安全而创建保密影子DOM。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            如果想保护独立的DOM树不受未信任代码影响，影子DOM并不适合这个需求。对<code class="calibre11">&lt;iframe&gt;</code>施加的跨源限制更可靠。</p>
+        </blockquote>
+        <p class="calibre1"></p>
+      </li>
+      <li value="3" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">使用影子DOM</strong>
+        </p>
+        <p class="calibre1">把影子DOM添加到元素之后，可以像使用常规DOM一样使用影子DOM。来看下面的例子，这里重新创建了前面红/绿/蓝子树的示例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let color of ['red', 'green', 'blue']) {
+  const div = document.createelement('div');
+  const shadowdom = div.attachshadow({ mode: 'open' });
+
+  document.body.appendchild(div);
+  shadowdom.innerhtml = `
+    &lt;p&gt;make me ${color}&lt;/p&gt;
+
+    &lt;style&gt;
+    p {
+      color: ${color};
+    }
+    &lt;/style&gt;
+  `;
+}</code></pre>
+        <p class="calibre1">虽然这里使用相同的选择符应用了3种不同的颜色，但每个选择符只会把样式应用到它们所在的影子DOM上。为此，3个<code class="calibre11">&lt;p&gt;</code>元素会出现3种不同的颜色。</p>
+        <p class="calibre1">可以这样验证这些元素分别位于它们自己的影子DOM中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let color of ['red', 'green', 'blue']) {
+  const div = document.createelement('div');
+  const shadowdom = div.attachshadow({ mode: 'open' });
+
+  document.body.appendchild(div);
+
+  shadowdom.innerhtml = `
+    &lt;p&gt;make me ${color}&lt;/p&gt;
+
+    &lt;style&gt;
+    p {
+      color: ${color};
+    }
+    &lt;/style&gt;
+  `;
+}
+
+function countp(node) {
+  console.log(node.queryselectorall('p').length);
+}
+
+countp(document); // 0
+
+for (let element of document.queryselectorall('div')) {
+  countp(element.shadowroot);
+}
+
+// 1
+// 1
+// 1</code></pre>
+        <p class="calibre1">在浏览器开发者工具中可以更清楚地看到影子DOM。例如，前面的例子在浏览器检查窗口中会显示成这样：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;body&gt;
+&lt;div&gt;
+  #shadow-root (open)
+    &lt;p&gt;make me red!&lt;/p&gt;
+    &lt;style&gt;
+    p {
+      color: red;
+    }
+    &lt;/style&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  #shadow-root (open)
+    &lt;p&gt;make me green!&lt;/p&gt;
+
+    &lt;style&gt;
+    p {
+      color: green;
+    }
+    &lt;/style&gt;
+&lt;/div&gt;
+&lt;div&gt;
+  #shadow-root (open)
+    &lt;p&gt;make me blue!&lt;/p&gt;
+
+    &lt;style&gt;
+    p {
+      color: blue;
+    }
+    &lt;/style&gt;
+&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+        <p class="calibre1">影子DOM并非铁板一块。HTML元素可以在DOM树间无限制移动：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;div&gt;&lt;/div&gt;
+&lt;p id="foo"&gt;move me&lt;/p&gt;
+`;
+
+const divelement = document.queryselector('div');
+const pelement = document.queryselector('p');
+
+const shadowdom = divelement.attachshadow({ mode: 'open' });
+
+// 从父dom中移除元素
+divelement.parentelement.removechild(pelement);
+
+// 把元素添加到影子dom
+shadowdom.appendchild(pelement);
+
+// 检查元素是否移动到了影子dom中
+console.log(shadowdom.innerhtml); // &lt;p id="foo"&gt;move me&lt;/p&gt;</code></pre>
+        <p class="calibre1"></p>
+      </li>
+      <li value="4" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">合成与影子DOM槽位</strong>
+        </p>
+        <p class="calibre1">影子DOM是为自定义Web组件设计的，为此需要支持嵌套DOM片段。从概念上讲，可以这么说：位于影子宿主中的HTML需要一种机制以渲染到影子DOM中去，但这些HTML又不必属于影子DOM树。</p>
+        <p class="calibre1">默认情况下，嵌套内容会隐藏。来看下面的例子，其中的文本在1000毫秒后会被隐藏：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;div&gt;
+  &lt;p&gt;foo&lt;/p&gt;
+&lt;/div&gt;
+`;
+
+settimeout(() =&gt; document.queryselector('div').attachshadow({ mode: 'open' }), 1000);</code></pre>
+        <p class="calibre1">影子DOM一添加到元素中，浏览器就会赋予它最高优先级，优先渲染它的内容而不是原来的文本。在这个例子中，由于影子DOM是空的，因此<code class="calibre11">&lt;div&gt;</code>会在1000毫秒后变成空的。</p>
+        <p class="calibre1">为了显示文本内容，需要使用<code class="calibre11">&lt;slot&gt;</code>标签指示浏览器在哪里放置原来的HTML。下面的代码修改了前面的例子，让影子宿主中的文本出现在了影子DOM中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;div id="foo"&gt;
+  &lt;p&gt;foo&lt;/p&gt;
+&lt;/div&gt;
+`;
+
+document.queryselector('div')
+    .attachshadow({ mode: 'open' })
+    .innerhtml = `&lt;div id="bar"&gt;
+                    &lt;slot&gt;&lt;/slot&gt;
+                  &lt;div&gt;`</code></pre>
+        <p class="calibre1">现在，投射进去的内容就像自己存在于影子DOM中一样。检查页面会发现原来的内容实际上替代了<code class="calibre11">&lt;slot&gt;</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;body&gt;
+&lt;div id="foo"&gt;
+  #shadow-root (open)
+    &lt;div id="bar"&gt;
+      &lt;p&gt;foo&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+        <p class="calibre1">注意，虽然在页面检查窗口中看到内容在影子DOM中，但这实际上只是DOM内容的<strong class="calibre2">投射</strong>（projection）。实际的元素仍然处于外部DOM中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;div id="foo"&gt;
+  &lt;p&gt;foo&lt;/p&gt;
+&lt;/div&gt;
+`;
+
+document.queryselector('div')
+    .attachshadow({ mode: 'open' })
+    .innerhtml = `
+      &lt;div id="bar"&gt;
+        &lt;slot&gt;&lt;/slot&gt;
+      &lt;/div&gt;`
+
+console.log(document.queryselector('p').parentelement);
+// &lt;div id="foo"&gt;&lt;/div&gt;</code></pre>
+        <p class="calibre1">下面是使用槽位（slot）改写的前面红/绿/蓝子树的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">for (let color of ['red', 'green', 'blue']) {
+  const divelement = document.createelement('div');
+  divelement.innertext = `make me ${color}`;
+  document.body.appendchild(divelement)
+
+  divelement
+      .attachshadow({ mode: 'open' })
+      .innerhtml = `
+      &lt;p&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/p&gt;
+
+      &lt;style&gt;
+        p {
+          color: ${color};
+        }
+      &lt;/style&gt;
+      `;
+}</code></pre>
+        <p class="calibre1">除了默认槽位，还可以使用<strong class="calibre2">命名槽位</strong>（named slot）实现多个投射。这是通过匹配的<code class="calibre11">slot/name</code>属性对实现的。带有<code class="calibre11">slot="foo"</code>属性的元素会被投射到带有<code class="calibre11">name="foo"</code>的<code class="calibre11">&lt;slot&gt;</code>上。下面的例子演示了如何改变影子宿主子元素的渲染顺序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;div&gt;
+  &lt;p slot="foo"&gt;foo&lt;/p&gt;
+  &lt;p slot="bar"&gt;bar&lt;/p&gt;
+&lt;/div&gt;
+`;
+
+document.queryselector('div')
+    .attachshadow({ mode: 'open' })
+    .innerhtml = `
+    &lt;slot name="bar"&gt;&lt;/slot&gt;
+    &lt;slot name="foo"&gt;&lt;/slot&gt;
+    `;
+
+// renders:
+// bar
+// foo</code></pre>
+        <p class="calibre1"></p>
+      </li>
+      <li value="5" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">事件重定向</strong>
+        </p>
+        <p class="calibre1">如果影子DOM中发生了浏览器事件（如<code class="calibre11">click</code>），那么浏览器需要一种方式以让父DOM处理事件。不过，实现也必须考虑影子DOM的边界。为此，事件会逃出影子DOM并经过<strong class="calibre2">事件重定向</strong>（event retarget）在外部被处理。逃出后，事件就好像是由影子宿主本身而非真正的包装元素触发的一样。下面的代码演示了这个过程：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 创建一个元素作为影子宿主
+document.body.innerhtml = `
+&lt;div onclick="console.log('handled outside:', event.target)"&gt;&lt;/div&gt;
+`;
+
+// 添加影子dom并向其中插入html
+document.queryselector('div')
+  .attachshadow({ mode: 'open' })
+  .innerhtml = `
+&lt;button onclick="console.log('handled inside:', event.target)"&gt;foo&lt;/button&gt;
+`;
+
+// 点击按钮时：
+// handled inside:  &lt;button onclick="..."&gt;&lt;/button&gt;
+// handled outside: &lt;div onclick="..."&gt;&lt;/div&gt;</code></pre>
+        <p class="calibre1">注意，事件重定向只会发生在影子DOM中实际存在的元素上。使用<code class="calibre11">&lt;slot&gt;</code>标签从外部投射进来的元素不会发生事件重定向，因为从技术上讲，这些元素仍然存在于影子DOM外部。</p>
+      </li>
+    </ol>
+    <h3 id="nav_point_495" class="calibre15">20.11.3 自定义元素</h3>
+    <p class="calibre1">如果你使用JavaScript框架，那么很可能熟悉自定义元素的概念。这是因为所有主流框架都以某种形式提供了这个特性。自定义元素为HTML元素引入了面向对象编程的风格。基于这种风格，可以创建自定义的、复杂的和可重用的元素，而且只要使用简单的HTML标签或属性就可以创建相应的实例。</p>
+    <ol class="calibre16">
+      <li value="1" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">创建自定义元素</strong>
+        </p>
+        <p class="calibre1">浏览器会尝试将无法识别的元素作为通用元素整合进DOM。当然，这些元素默认也不会做任何通用HTML元素不能做的事。来看下面的例子，其中胡乱编的HTML标签会变成一个<code class="calibre11">HTMLElement</code>实例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `
+&lt;x-foo &gt;i'm inside a nonsense element.&lt;/x-foo &gt;
+`;
+
+console.log(document.queryselector('x-foo') instanceof htmlelement); // true</code></pre>
+<p class="calibre1">自定义元素在此基础上更进一步。利用自定义元素，可以在<code class="calibre11">&lt;x-foo&gt;</code>标签出现时为它定义复杂的行为，同样也可以在dom中将其纳入元素生命周期管理。自定义元素要使用全局属性<code class="calibre11">customelements</code>，这个属性会返回<code class="calibre11">customelementregistry</code>对象。</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">console.log(customelements); // customelementregistry {}</code></pre>
+<p class="calibre1">调用<code class="calibre11">customelements.define()</code>方法可以创建自定义元素。下面的代码创建了一个简单的自定义元素，这个元素继承<code class="calibre11">htmlelement</code>：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmlelement {}
+customelements.define('x-foo', fooelement);
+
+document.body.innerhtml = `
+&lt;x-foo &gt;i'm inside a nonsense element.&lt;/x-foo &gt;
+`;
+
+console.log(document.queryselector('x-foo') instanceof fooelement); // true</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            自定义元素名必须至少包含一个不在名称开头和末尾的连字符，而且元素标签不能自关闭。</p>
+        </blockquote>
+        <p class="calibre1">自定义元素的威力源自类定义。例如，可以通过调用自定义元素的构造函数来控制这个类在DOM中每个实例的行为：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmlelement {
+  constructor() {
+    super();
+    console.log('x-foo')
+  }
+}
+customelements.define('x-foo', fooelement);
+
+document.body.innerhtml = `
+&lt;x-foo&gt;&lt;/x-foo&gt;
+&lt;x-foo&gt;&lt;/x-foo&gt;
+&lt;x-foo&gt;&lt;/x-foo&gt;
+`;
+
+// x-foo
+// x-foo
+// x-foo</code></pre>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            在自定义元素的构造函数中必须始终先调用<code class="calibre11">super()</code>。如果元素继承了<code class="calibre11">HTMLElement</code>或相似类型而不会覆盖构造函数，则没有必要调用<code class="calibre11">super()</code>，因为原型构造函数默认会做这件事。很少有创建自定义元素而不继承<code class="calibre11">HTMLElement</code>的。</p>
+        </blockquote>
+        <p class="calibre1">如果自定义元素继承了一个元素类，那么可以使用<code class="calibre11">is</code>属性和<code class="calibre11">extends</code>选项将标签指定为该自定义元素的实例：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmldivelement {
+  constructor() {
+    super();
+    console.log('x-foo')
+  }
+}
+customelements.define('x-foo', fooelement, { extends: 'div' });
+
+document.body.innerhtml = `
+&lt;div is="x-foo"&gt;&lt;/div&gt;
+&lt;div is="x-foo"&gt;&lt;/div&gt;
+&lt;div is="x-foo"&gt;&lt;/div&gt;
+`;
+
+// x-foo
+// x-foo
+// x-foo</code></pre>
+        <p class="calibre1"></p>
+      </li>
+      <li value="2" class="di_1ji_wu_xu_lie_biao">
+        <p class="calibre1">
+          <strong class="calibre2">添加Web组件内容</strong>
+        </p>
+        <p class="calibre1">因为每次将自定义元素添加到DOM中都会调用其类构造函数，所以很容易自动给自定义元素添加子DOM内容。虽然不能在构造函数中添加子DOM（会抛出<code class="calibre11">DOMException</code>），但可以为自定义元素添加影子DOM并将内容添加到这个影子DOM中：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmlelement {
+  constructor() {
+    super();
+
+    // this引用web组件节点
+    this.attachshadow({ mode: 'open' });
+
+    this.shadowroot.innerhtml = `
+      &lt;p&gt;i'm inside a custom element!&lt;/p&gt;
+    `;
+  }
+}
+customelements.define('x-foo', fooelement);
+
+document.body.innerhtml += `&lt;x-foo&gt;&lt;/x-foo`;
+
+// 结果dom：
+// &lt;body&gt;
+// &lt;x-foo&gt;
+//   #shadow-root (open)
+//     &lt;p&gt;i'm inside a custom element!&lt;/p&gt;
+// &lt;x-foo&gt;
+// &lt;/body&gt;</code></pre>
+        <p class="calibre1">为避免字符串模板和<code class="calibre11">innerHTML</code>不干净，可以使用HTML模板和<code class="calibre11">document.createElement()</code>重构这个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">//（初始的html）
+// &lt;template id="x-foo-tpl"&gt;
+//   &lt;p&gt;i'm inside a custom element template!&lt;/p&gt;
+// &lt;/template&gt;
+
+const template = document.queryselector('#x-foo-tpl');
+
+class fooelement extends htmlelement {
+  constructor() {
+    super();
+
+    this.attachshadow({ mode: 'open' });
+
+    this.shadowroot.appendchild(template.content.clonenode(true));
+  }
+}
+customelements.define('x-foo', fooelement);
+
+document.body.innerhtml += `&lt;x-foo&gt;&lt;/x-foo`;
+
+// 结果dom：
+// &lt;body&gt;
+// &lt;template id="x-foo-tpl"&gt;
+//   &lt;p&gt;i'm inside a custom element template!&lt;/p&gt;
+// &lt;/template&gt;
+// &lt;x-foo&gt;
+//   #shadow-root (open)
+//     &lt;p&gt;i'm inside a custom element template!&lt;/p&gt;
+// &lt;x-foo&gt;
+// &lt;/body&gt;</code></pre>
+<p class="calibre1">这样可以在自定义元素中实现高度的html和代码重用，以及dom封装。使用这种模式能够自由创建可重用的组件而不必担心外部css污染组件的样式。<br class="calibre4"/> </p>
+</li>
+<li value="3" class="di_1ji_wu_xu_lie_biao"><p class="calibre1"><strong class="calibre2">使用自定义元素生命周期方法</strong></p>
+<p class="calibre1">可以在自定义元素的不同生命周期执行代码。带有相应名称的自定义元素类的实例方法会在不同生命周期阶段被调用。自定义元素有以下5个生命周期方法。</p>
+<ul class="calibre17">
+<li class="di_1ji_wu_xu_lie_biao"><code class="calibre11">constructor()</code>：在创建元素实例或将已有dom元素升级为自定义元素时调用。</li>
+<li class="di_1ji_wu_xu_lie_biao"><code class="calibre11">connectedcallback()</code>：在每次将这个自定义元素实例添加到dom中时调用。</li>
+<li class="di_1ji_wu_xu_lie_biao"><code class="calibre11">disconnectedcallback()</code>：在每次将这个自定义元素实例从dom中移除时调用。</li>
+<li class="di_1ji_wu_xu_lie_biao"><code class="calibre11">attributechangedcallback()</code>：在每次<strong class="calibre2">可观察属性</strong>的值发生变化时调用。在元素实例初始化时，初始值的定义也算一次变化。</li>
+<li class="di_1ji_wu_xu_lie_biao"><code class="calibre11">adoptedcallback()</code>：在通过<code class="calibre11">document.adoptnode()</code>将这个自定义元素实例移动到新文档对象时调用。</li>
+</ul>
+<p class="calibre1">下面的例子演示了这些构建、连接和断开连接的回调：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmlelement {
+  constructor() {
+    super();
+    console.log('ctor');
+  }
+
+  connectedcallback() {
+    console.log('connected');
+  }
+
+  disconnectedcallback() {
+    console.log('disconnected');
+  }
+}
+customelements.define('x-foo', fooelement);
+
+const fooelement = document.createelement('x-foo');
+// ctor
+
+document.body.appendchild(fooelement);
+// connected
+
+document.body.removechild(fooelement);
+// disconnected</code></pre>
+<p class="calibre1"> </p>
+</li>
+<li value="4" class="di_1ji_wu_xu_lie_biao"><p class="calibre1"><strong class="calibre2">反射自定义元素属性</strong></p>
+<p class="calibre1">自定义元素既是dom实体又是javascript对象，因此两者之间应该同步变化。换句话说，对dom的修改应该反映到javascript对象，反之亦然。要从javascript对象反射到dom，常见的方式是使用获取函数和设置函数。下面的例子演示了在javascript对象和dom之间反射<code class="calibre11">bar</code>属性的过程：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">document.body.innerhtml = `&lt;x-foo&gt;&lt;/x-foo&gt;`;
+
+class fooelement extends htmlelement {
+  constructor() {
+    super();
+
+    this.bar = true;
+  }
+
+  get bar() {
+    return this.getattribute('bar');
+  }
+
+  set bar(value) {
+    this.setattribute('bar', value)
+  }
+}
+customelements.define('x-foo', fooelement);
+
+console.log(document.body.innerhtml);
+// &lt;x-foo bar="true"&gt;&lt;/x-foo&gt;</code></pre>
+<p class="calibre1">另一个方向的反射（从dom到javascript对象）需要给相应的属性添加监听器。为此，可以使用<code class="calibre11">observedattributes()</code>获取函数让自定义元素的属性值每次改变时都调用<code class="calibre11">attributechangedcallback()</code>：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">class fooelement extends htmlelement {
+  static get observedattributes() {
+    // 返回应该触发attributechangedcallback()执行的属性
+    return ['bar'];
+  }
+
+  get bar() {
+    return this.getattribute('bar');
+  }
+
+  set bar(value) {
+    this.setattribute('bar', value)
+  }
+
+  attributechangedcallback(name, oldvalue, newvalue) {
+        if (oldvalue !== newvalue) {
+        console.log(`${oldvalue} -&gt; ${newvalue}`);
+
+        this[name] = newvalue;
+    }
+  }
+}
+customelements.define('x-foo', fooelement);
+
+document.body.innerhtml = `&lt;x-foo bar="false"&gt;&lt;/x-foo&gt;`;
+// null -&gt; false
+
+document.queryselector('x-foo').setattribute('bar', true);
+// false -&gt; true</code></pre>
+<p class="calibre1"> </p>
+</li>
+<li value="5" class="di_1ji_wu_xu_lie_biao"><p class="calibre1"><strong class="calibre2">升级自定义元素</strong></p>
+<p class="calibre1">并非始终可以先定义自定义元素，然后再在dom中使用相应的元素标签。为解决这个先后次序问题，web组件在<code class="calibre11">customelementregistry</code>上额外暴露了一些方法。这些方法可以用来检测自定义元素是否定义完成，然后可以用它来升级已有元素。</p>
+<p class="calibre1">如果自定义元素已经有定义，那么<code class="calibre11">customelementregistry.get()</code>方法会返回相应自定义元素的类。类似地，<code class="calibre11">customelementregistry.whendefined()</code>方法会返回一个期约，当相应自定义元素有定义之后解决：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">customelements.whendefined('x-foo').then(() =&gt; console.log('defined!'));
+
+console.log(customelements.get('x-foo'));
+// undefined
+
+customelements.define('x-foo', class {});
+// defined!
+
+console.log(customelements.get('x-foo'));
+// class fooelement {}</code></pre>
+<p class="calibre1">连接到dom的元素在自定义元素有定义时会<strong class="calibre2">自动升级</strong>。如果想在元素连接到dom之前强制升级，可以使用<code class="calibre11">customelementregistry.upgrade()</code>方法：</p>
+<pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 在自定义元素有定义之前会创建htmlunknownelement对象
+const fooelement = document.createelement('x-foo');
+
+// 创建自定义元素
+class fooelement extends htmlelement {}
+customelements.define('x-foo', fooelement);
+
+console.log(fooelement instanceof fooelement); // false
+
+// 强制升级
+customelements.upgrade(fooelement);
+
+console.log(fooelement instanceof fooelement); // true</code></pre>
+<blockquote class="calibre13">
+<p class="calibre1"><strong class="calibre2">注意</strong>　还有一个html imports web组件，但这个规范目前还是草案，没有主要浏览器支持。浏览器最终是否会支持这个规范目前还是未知数。</p>
+</blockquote>
+</li>
+</ol>
+
+
+
+  </div>
+
+  
+  <div class="calibretoc">
+    <h2><a href="../../54m0dfqx.html">table of contents
+</a></h2>
+    <div>
+  <ul>
+    <li>
+      <a href="part0002.html#nav_point_0">版权声明</a>
+    </li>
+    <li>
+      <a href="part0003.html#nav_point_1">献词</a>
+    </li>
+    <li>
+      <a href="part0004.html#nav_point_2">译者序</a>
+    </li>
+    <li>
+      <a href="part0005.html#nav_point_3">序</a>
+    </li>
+    <li>
+      <a href="part0006.html#nav_point_4">前言</a>
+    </li>
+    <li>
+      <a href="part0012.html#nav_point_10">致谢</a>
+    </li>
+    <li>
+      <a href="part0013.html#nav_point_11">第 1 章 什么是javascript</a>
+    </li>
+    <li>
+      <a href="part0018.html#nav_point_19">第 2 章 html中的javascript</a>
+    </li>
+    <li>
+      <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+    </li>
+    <li>
+      <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+    </li>
+    <li>
+      <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+    </li>
+    <li>
+      <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+    </li>
+    <li>
+      <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+    </li>
+    <li>
+      <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+    </li>
+    <li>
+      <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+    </li>
+    <li>
+      <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+    </li>
+    <li>
+      <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+    </li>
+    <li>
+      <a href="part0093.html#nav_point_273">第 12 章 bom</a>
+    </li>
+    <li>
+      <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+    </li>
+    <li>
+      <a href="part0105.html#nav_point_306">第 14 章 dom</a>
+    </li>
+    <li>
+      <a href="part0110.html#nav_point_328">第 15 章 dom扩展</a>
+    </li>
+    <li>
+      <a href="part0116.html#nav_point_348">第 16 章 dom2和dom3</a>
+    </li>
+    <li>
+      <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+    </li>
+    <li>
+      <a href="part0130.html#nav_point_403">第 18 章 动画与canvas图形</a>
+    </li>
+    <li>
+      <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+    </li>
+    <li>
+      <a href="part0143.html#nav_point_450">第 20 章 javascript api</a>
+    </li>
+    <li>
+      <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+    </li>
+    <li>
+      <a href="part0163.html#nav_point_526">第 22 章 处理xml</a>
+    </li>
+    <li>
+      <a href="part0168.html#nav_point_542">第 23 章 json</a>
+    </li>
+    <li>
+      <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+    </li>
+    <li>
+      <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+    </li>
+    <li>
+      <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+    </li>
+    <li>
+      <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+    </li>
+    <li>
+      <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+    </li>
+    <li>
+      <a href="part0204.html#nav_point_683">附录 a es2018和es2019</a>
+    </li>
+    <li>
+      <a href="part0215.html#nav_point_708">附录 b 严格模式</a>
+    </li>
+    <li>
+      <a href="part0223.html#nav_point_719">附录 c javascript库和框架</a>
+    </li>
+    <li>
+      <a href="part0227.html#nav_point_741">附录 d javascript工具</a>
+    </li>
+    <li>
+      <a href="part0239.html#nav_point_800">作者简介</a>
+    </li>
+  </ul>
+</div>
+
+
+  </div>
+  
+
+  <div class="calibreebnav">
+    
+      <a href="part0153.html" class="calibreaprev">上一页
+</a>
+    
+
+    <a href="../../54m0dfqx.html" class="calibreahome">首页
+</a>
+
+    
+      <a href="part0155.html" class="calibreanext">下一页
+</a>
+    
+  </div>
+
+</div>
+
+</body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<ins class="adsbygoogle"
+     style="display:block; text-align:center;"
+     data-ad-layout="in-article"
+     data-ad-format="fluid"
+     data-ad-client="ca-pub-6487844781006261"
+     data-ad-slot="3432081921"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</html>

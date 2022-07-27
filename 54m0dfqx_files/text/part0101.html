@@ -1,0 +1,336 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0100.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0102.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_295" class="calibre9">13.1 能力检测</h2>
+        <p class="calibre1">能力检测（又称特性检测）即在JavaScript运行时中使用一套简单的检测逻辑，测试浏览器是否支持某种特性。这种方式不要求事先知道特定浏览器的信息，只需检测自己关心的能力是否存在即可。能力检测的基本模式如下：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">if (object.propertyinquestion) {
+  // 使用object.propertyinquestion
+}</code></pre>
+        <p class="calibre1">比如，IE5之前的版本中没有<code class="calibre11">document.getElementById()</code>这个DOM方法，但可以通过<code class="calibre11">document.all</code>属性实现同样的功能。为此，可以进行如下能力检测：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function getelement(id) {
+  if (document.getelementbyid) {
+    return document.getelementbyid(id);
+  } else if (document.all) {
+    return document.all[id];
+  } else {
+    throw new error("no way to retrieve element!");
+  }
+}</code></pre>
+        <p class="calibre1">这个<code class="calibre11">getElement()</code>函数的目的是根据给定的ID获取元素。因为标准的方式是使用<code class="calibre11">document.getElementById()</code>，所以首先测试它。如果这个函数存在（不是<code class="calibre11">undefined</code>），那就使用这个方法；否则检测<code class="calibre11">document.all</code>是否存在，如果存在则使用。如果这两个能力都不存在（基本上不可能），则抛出错误说明功能无法实现。</p>
+        <p class="calibre1">能力检测的关键是理解两个重要概念。首先，如前所述，应该先检测最常用的方式。在前面的例子中就是先检测<code class="calibre11">document.getElementById()</code>再检测<code class="calibre11">document.all</code>。测试最常用的方案可以优化代码执行，这是因为在多数情况下都可以避免无谓检测。</p>
+        <p class="calibre1">其次是必须检测切实需要的特性。某个能力存在并不代表别的能力也存在。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">function getwindowwidth() {
+  if (document.all) { // 假设ie
+    return document.documentelement.clientwidth; // 不正确的用法！
+  } else {
+    return window.innerwidth;
+  }
+}</code></pre>
+        <p class="calibre1">这个例子展示了不正确的能力检测方式。<code class="calibre11">getWindowWidth()</code>函数首先检测<code class="calibre11">document.all</code>是否存在，如果存在则返回<code class="calibre11">document.documentElement.clientWidth</code>，理由是IE8及更低版本不支持<code class="calibre11">window.innerWidth</code>。这个例子的问题在于检测到<code class="calibre11">document.all</code>存在并不意味着浏览器是IE。事实，也可能是某个早期版本的Opera，既支持<code class="calibre11">document.all</code>也支持<code class="calibre11">windown.innerWidth</code>。</p>
+        <h3 id="nav_point_296" class="calibre15">13.1.1 安全能力检测</h3>
+        <p class="calibre1">能力检测最有效的场景是检测能力是否存在的同时，验证其是否能够展现出预期的行为。前一节中的例子依赖将测试对象的成员转换类型，然后再确定它是否存在。虽然这样能够确定检测的对象成员存在，但不能确定它就是你想要的。来看下面的例子，这个函数尝试检测某个对象是否可以排序：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不要这样做！错误的能力检测，只能检测到能力是否存在
+function issortable(object) {
+  return !!object.sort;
+}</code></pre>
+        <p class="calibre1">这个函数尝试通过检测对象上是否有<code class="calibre11">sort()</code>方法来确定它是否支持排序。问题在于，即使这个对象有一个<code class="calibre11">sort</code>属性，这个函数也会返回<code class="calibre11">true</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let result = issortable({ sort: true });</code></pre>
+        <p class="calibre1">简单地测试到一个属性存在并不代表这个对象就可以排序。更好的方式是检测<code class="calibre11">sort</code>是不是函数：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 好一些，检测sort是不是函数
+function issortable(object) {
+  return typeof object.sort == "function";
+}</code></pre>
+        <p class="calibre1">上面的代码中使用的<code class="calibre11">typeof</code>操作符可以确定<code class="calibre11">sort</code>是不是函数，从而确认是否可以调用它对数据进行排序。</p>
+        <p class="calibre1">进行能力检测时应该尽量使用<code class="calibre11">typeof</code>操作符，但光有它还不够。尤其是某些宿主对象并不保证对<code class="calibre11">typeof</code>测试返回合理的值。最有名的例子就是Internet Explorer（IE）。在多数浏览器中，下面的代码都会在<code class="calibre11">document.createElement()</code>存在时返回<code class="calibre11">true</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不适用于ie8及更低版本
+function hascreateelement() {
+  return typeof document.createelement == "function";
+}</code></pre>
+        <p class="calibre1">但在IE8及更低版本中，这个函数会返回<code class="calibre11">false</code>。这是因为<code class="calibre11">typeof document.createElement</code>返回<code class="calibre11">"object"</code>而非<code class="calibre11">"function"</code>。前面提到过，DOM对象是宿主对象，而宿主对象在IE8及更低版本中是通过COM而非JScript实现的。因此，<code class="calibre11">document.createElement()</code>函数被实现为COM对象，<code class="calibre11">typeof</code>返回<code class="calibre11">"object"</code>。IE9对DOM方法会返回<code class="calibre11">"function"</code>。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            要深入了解JavaScript能力检测，推荐阅读Peter Michaux的文章“Feature Detection—State of the Art Browser Scripting”。</p>
+        </blockquote>
+        <h3 id="nav_point_297" class="calibre15">13.1.2 基于能力检测进行浏览器分析</h3>
+        <p class="calibre1">虽然可能有人觉得能力检测类似于黑科技，但恰当地使用能力检测可以精准地分析运行代码的浏览器。使用能力检测而非用户代理检测的优点在于，伪造用户代理字符串很简单，而伪造能够欺骗能力检测的浏览器特性却很难。</p>
+        <ol class="calibre16">
+          <li value="1" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">检测特性</strong>
+            </p>
+            <p class="calibre1">可以按照能力将浏览器归类。如果你的应用程序需要使用特定的浏览器能力，那么最好集中检测所有能力，而不是等到用的时候再重复检测。比如：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 检测浏览器是否支持netscape式的插件
+let hasnsplugins = !!(navigator.plugins &amp;&amp; navigator.plugins.length);
+
+// 检测浏览器是否具有dom level 1能力
+let hasdom1 = !!(document.getelementbyid &amp;&amp; document.createelement &amp;&amp;
+         document.getelementsbytagname);</code></pre>
+            <p class="calibre1">这个例子完成了两项检测：一项是确定浏览器是否支持Netscape式的插件，另一项是检测浏览器是否具有DOM Level 1能力。保存在变量中的布尔值可以用在后面的条件语句中，这样比重复检测省事多了。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="2" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">检测浏览器</strong>
+            </p>
+            <p class="calibre1">可以根据对浏览器特性的检测并与已知特性对比，确认用户使用的是什么浏览器。这样可以获得比用户代码嗅探（稍后讨论）更准确的结果。但未来的浏览器版本可能不适用于这套方案。</p>
+            <p class="calibre1">下面来看一个例子，根据不同浏览器独有的行为推断出浏览器的身份。这里故意没有使用<code class="calibre11">navigator.userAgent</code>属性，后面会讨论它：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">class browserdetector {
+  constructor() {
+    // 测试条件编译
+    // ie6~10支持
+    this.isie_gte6lte10 = /*@cc_on!@*/false;
+
+    // 测试documentmode
+    // ie7~11支持
+    this.isie_gte7lte11 = !!document.documentmode;
+
+    // 测试stylemedia构造函数
+    // edge 20及以上版本支持
+    this.isedge_gte20 = !!window.stylemedia;
+
+    // 测试firefox专有扩展安装api
+    // 所有版本的firefox都支持
+    this.isfirefox_gte1 = typeof installtrigger !== 'undefined';
+
+    // 测试chrome对象及其webstore属性
+    // opera的某些版本有window.chrome，但没有window.chrome.webstore
+    // 所有版本的chrome都支持
+    this.ischrome_gte1 = !!window.chrome &amp;&amp; !!window.chrome.webstore;
+
+    // safari早期版本会给构造函数的标签符追加"constructor"字样，如：
+    // window.element.tostring(); // [object elementconstructor]
+    // safari 3~9.1支持
+    this.issafari_gte3lte9_1 = /constructor/i.test(window.element);
+
+    // 推送通知api暴露在window对象上
+    // 使用默认参数值以避免对undefined调用tostring()
+    // safari 7.1及以上版本支持
+    this.issafari_gte7_1 =
+        (({pushnotification = {}} = {}) =&gt;
+          pushnotification.tostring() == '[object safariremotenotification]'
+        )(window.safari);
+
+    // 测试addons属性
+    // opera 20及以上版本支持
+    this.isopera_gte20 = !!window.opr &amp;&amp; !!window.opr.addons;
+  }
+
+  isie() { return this.isie_gte6lte10 || this.isie_gte7lte11; }
+  isedge() { return this.isedge_gte20 &amp;&amp; !this.isie(); }
+  isfirefox() { return this.isfirefox_gte1; }
+  ischrome() { return this.ischrome_gte1; }
+  issafari() { return this.issafari_gte3lte9_1 || this.issafari_gte7_1; }
+  isopera() { return this.isopera_gte20; }
+}</code></pre>
+            <p class="calibre1">这个类暴露的通用浏览器检测方法使用了检测浏览器范围的能力测试。随着浏览器的变迁及发展，可以不断调整底层检测逻辑，但主要的API可以保持不变。<br class="calibre4"/>
+            </p>
+          </li>
+          <li value="3" class="di_1ji_wu_xu_lie_biao">
+            <p class="calibre1">
+              <strong class="calibre2">能力检测的局限</strong>
+            </p>
+            <p class="calibre1">通过检测一种或一组能力，并不总能确定使用的是哪种浏览器。以下“浏览器检测”代码（或其他类似代码）经常出现在很多网站中，但都没有正确使用能力检测：</p>
+            <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 不要这样做！不够特殊
+let isfirefox = !!(navigator.vendor &amp;&amp; navigator.vendorsub);
+
+// 不要这样做！假设太多
+let isie = !!(document.all &amp;&amp; document.uniqueid);</code></pre>
+            <p class="calibre1">这是错误使用能力检测的典型示例。过去，Firefox可以通过<code class="calibre11">navigator.vendor</code>和<code class="calibre11">navigator.vendorSub</code>来检测，但后来<code class="calibre11">Safari</code>也实现了同样的属性，于是这段代码就会产生误报。为确定IE，这段代码检测了<code class="calibre11">document.all</code>和<code class="calibre11">document.uniqueID</code>。这是假设IE将来的版本中还会继续存在这两个属性，而且其他浏览器也不会实现它们。不过这两个检测都使用双重否定操作符来产生布尔值（这样可以生成便于存储和访问的结果）。</p>
+            <blockquote class="calibre13">
+              <p class="calibre1">
+                <strong class="calibre2">注意</strong>
+                能力检测最适合用于决定下一步该怎么做，而不一定能够作为辨识浏览器的标志。</p>
+            </blockquote>
+          </li>
+        </ol>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0100.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0102.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

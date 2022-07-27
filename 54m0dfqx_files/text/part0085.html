@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0084.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0086.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_252" class="calibre9">10.15 立即调用的函数表达式</h2>
+        <p class="calibre1">立即调用的匿名函数又被称作<strong class="calibre2">立即调用的函数表达式</strong>（IIFE，Immediately Invoked Function Expression）。它类似于函数声明，但由于被包含在括号中，所以会被解释为函数表达式。紧跟在第一组括号后面的第二组括号会立即调用前面的函数表达式。下面是一个简单的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">(function() {
+  // 块级作用域
+})();</code></pre>
+        <p class="calibre1">使用IIFE可以模拟块级作用域，即在一个函数表达式内部声明变量，然后立即调用这个函数。这样位于函数体作用域的变量就像是在块级作用域中一样。ECMAScript 5尚未支持块级作用域，使用IIFE模拟块级作用域是相当普遍的。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// iife
+(function () {
+  for (var i = 0; i &lt; count; i++) {
+    console.log(i);
+  }
+})();
+
+console.log(i);  // 抛出错误</code></pre>
+        <p class="calibre1">前面的代码在执行到IIFE外部的<code class="calibre11">console.log()</code>时会出错，因为它访问的变量是在IIFE内部定义的，在外部访问不到。在ECMAScript 5.1及以前，为了防止变量定义外泄，IIFE是个非常有效的方式。这样也不会导致闭包相关的内存问题，因为不存在对这个匿名函数的引用。为此，只要函数执行完毕，其作用域链就可以被销毁。</p>
+        <p class="calibre1">在ECMAScript 6以后，IIFE就没有那么必要了，因为块级作用域中的变量无须IIFE就可以实现同样的隔离。下面展示了两种不同的块级作用域形式：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 内嵌块级作用域
+{
+  let i;
+  for (i = 0; i &lt; count; i++) {
+    console.log(i);
+  }
+}
+console.log(i); // 抛出错误
+
+// 循环的块级作用域
+for (let i = 0; i &lt; count; i++) {
+  console.log(i);
+}
+
+console.log(i); // 抛出错误</code></pre>
+        <p class="calibre1">说明IIFE用途的一个实际的例子，就是可以用它锁定参数值。比如：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.queryselectorall('div');
+
+// 达不到目的！
+for (var i = 0; i &lt; divs.length; ++i) {
+  divs[i].addeventlistener('click', function() {
+    console.log(i);
+  });
+}</code></pre>
+        <p class="calibre1">这里使用<code class="calibre11">var</code>关键字声明了循环迭代变量<code class="calibre11">i</code>，但这个变量并不会被限制在<code class="calibre11">for</code>循环的块级作用域内。因此，渲染到页面上之后，点击每个<code class="calibre11">&lt;div&gt;</code>都会弹出元素总数。这是因为在执行单击处理程序时，迭代变量的值是循环结束时的最终值，即元素的个数。而且，这个变量<code class="calibre11">i</code>存在于循环体外部，随时可以访问。</p>
+        <p class="calibre1">以前，为了实现点击第几个<code class="calibre11">&lt;div&gt;</code>就显示相应的索引值，需要借助IIFE来执行一个函数表达式，传入每次循环的当前索引，从而“锁定”点击时应该显示的索引值：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.queryselectorall('div');
+
+for (var i = 0; i &lt; divs.length; ++i) {
+  divs[i].addeventlistener('click', (function(frozencounter) {
+    return function() {
+      console.log(frozencounter);
+    };
+  })(i));
+}</code></pre>
+        <p class="calibre1">而使用ECMAScript块级作用域变量，就不用这么大动干戈了：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.queryselectorall('div');
+
+for (let i = 0; i &lt; divs.length; ++i) {
+  divs[i].addeventlistener('click', function() {
+    console.log(i);
+  });
+}</code></pre>
+        <p class="calibre1">这样就可以让每次点击都显示正确的索引了。这里，事件处理程序执行时就会引用<code class="calibre11">for</code>循环块级作用域中的索引值。这是因为在ECMAScript 6中，如果对<code class="calibre11">for</code>循环使用块级作用域变量关键字，在这里就是<code class="calibre11">let</code>，那么循环就会为每个循环创建独立的变量，从而让每个单击处理程序都能引用特定的索引。</p>
+        <p class="calibre1">但要注意，如果把变量声明拿到<code class="calibre11">for</code>循环外部，那就不行了。下面这种写法会碰到跟在循环中使用<code class="calibre11">var i = 0</code>同样的问题：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let divs = document.queryselectorall('div');
+
+// 达不到目的！
+let i;
+for (i = 0; i &lt; divs.length; ++i) {
+  divs[i].addeventlistener('click', function() {
+    console.log(i);
+  });
+}</code></pre>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0084.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0086.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>

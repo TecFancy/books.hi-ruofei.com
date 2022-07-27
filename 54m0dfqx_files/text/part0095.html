@@ -1,0 +1,487 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+
+    <title>JavaScript高级程序设计（第4版）</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="../stylesheet.css"/>
+    <link rel="stylesheet" type="text/css" href="../page_styles.css"/>
+
+    <link href="../calibreHtmlOutBasicCss.css" type="text/css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <div class="calibreMeta">
+      <div class="calibreMetaTitle">
+
+        <h1>
+          <a href="../../54m0dfqx.html">JavaScript高级程序设计（第4版）
+          </a>
+        </h1>
+
+      </div>
+      <div class="calibreMetaAuthor">
+        [美] 马特 • 弗里斯比
+
+      </div>
+    </div>
+
+    <div class="calibreMain">
+
+      <div class="calibreEbookContent">
+
+        <div class="calibreEbNavTop">
+
+          <a href="part0094.html" class="calibreAPrev">上一页
+          </a>
+
+          <a href="part0096.html" class="calibreANext">下一页
+          </a>
+
+        </div>
+
+        <h2 id="nav_point_283" class="calibre9">12.2
+          <code class="calibre26">location</code>对象</h2>
+        <p class="calibre1">
+          <code class="calibre11">location</code>是最有用的BOM对象之一，提供了当前窗口中加载文档的信息，以及通常的导航功能。这个对象独特的地方在于，它既是<code class="calibre11">window</code>的属性，也是<code class="calibre11">document</code>的属性。也就是说，<code class="calibre11">window.location</code>和<code class="calibre11">document.location</code>指向同一个对象。<code class="calibre11">location</code>对象不仅保存着当前加载文档的信息，也保存着把URL解析为离散片段后能够通过属性访问的信息。这些解析后的属性在下表中有详细说明（<code class="calibre11">location</code>前缀是必需的）。</p>
+        <p class="calibre1">假设浏览器当前加载的URL是http://foouser:barpassword@www.wrox.com:80/WileyCDA/?q=javascript#contents，<code class="calibre11">location</code>对象的内容如下表所示。</p>
+        <table width="90%" border="1" class="table">
+          <thead class="calibre22">
+            <tr class="calibre23">
+              <th class="calibre19">
+                <p class="calibre1">属性</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">值</p>
+              </th>
+              <th class="calibre19">
+                <p class="calibre1">说明</p>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="calibre24">
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.hash</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"#contents"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">URL散列值（井号后跟零或多个字符），如果没有则为空字符串</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.host</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"www.wrox.com:80"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">服务器名及端口号</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.hostname</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"www.wrox.com"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">服务器名</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.href</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"http://www.wrox.com:80/WileyCDA/?q=javascript#contents"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">当前加载页面的完整URL。<code class="calibre27">location</code>的<code class="calibre27">toString()</code>方法返回这个值</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.pathname</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"/WileyCDA/"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">URL中的路径和（或）文件名</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.port</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"80"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">请求的端口。如果URL中没有端口，则返回空字符串</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.protocol</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"http:"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">页面使用的协议。通常是<code class="calibre27">"http:"</code>或<code class="calibre27">"https:"</code>
+                </p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.search</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"?q=javascript"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">URL的查询字符串。这个字符串以问号开头</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.username</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"foouser"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">域名前指定的用户名</p>
+              </td>
+            </tr>
+            <tr class="calibre25">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.password</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"barpassword"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">域名前指定的密码</p>
+              </td>
+            </tr>
+            <tr class="calibre23">
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">location.origin</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">
+                  <code class="calibre27">"http://www.wrox.com"</code>
+                </p>
+              </td>
+              <td class="calibre21">
+                <p class="calibre1">URL的源地址。只读</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 id="nav_point_284" class="calibre15">12.2.1 查询字符串</h3>
+        <p class="calibre1">
+          <code class="calibre11">location</code>的多数信息都可以通过上面的属性获取。但是URL中的查询字符串并不容易使用。虽然<code class="calibre11">location.search</code>返回了从问号开始直到URL末尾的所有内容，但没有办法逐个访问每个查询参数。下面的函数解析了查询字符串，并返回一个以每个查询参数为属性的对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let getquerystringargs = function() {
+  // 取得没有开头问号的查询字符串
+  let qs = (location.search.length &gt; 0 ? location.search.substring(1) : ""),
+    // 保存数据的对象
+    args = {};
+
+  // 把每个参数添加到args对象
+  for (let item of qs.split("&amp;").map(kv =&gt; kv.split("="))) {
+    let name = decodeuricomponent(item[0]),
+      value = decodeuricomponent(item[1]);
+    if (name.length) {
+      args[name] = value;
+    }
+  }
+
+  return args;
+}</code></pre>
+        <p class="calibre1">这个函数首先删除了查询字符串开头的问号，当然前提是<code class="calibre11">location.search</code>必须有内容。解析后的参数将被保存到<code class="calibre11">args</code>对象，这个对象以字面量形式创建。接着，先把查询字符串按照<code class="calibre11">&amp;</code>分割成数组，每个元素的形式为<code class="calibre11">name=value</code>。<code class="calibre11">for</code>循环迭代这个数组，将每一个元素按照<code class="calibre11">=</code>分割成数组，这个数组第一项是参数名，第二项是参数值。参数名和参数值在使用<code class="calibre11">decodeURIComponent()</code>解码后（这是因为查询字符串通常是被编码后的格式）分别保存在<code class="calibre11">name</code>和<code class="calibre11">value</code>变量中。最后，<code class="calibre11">name</code>作为属性而<code class="calibre11">value</code>作为该属性的值被添加到<code class="calibre11">args</code>对象。这个函数可以像下面这样使用：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 假设查询字符串为?q=javascript&amp;num=10
+
+let args = getquerystringargs();
+
+alert(args["q"]);    // "javascript"
+alert(args["num"]);  // "10"</code></pre>
+        <p class="calibre1">现在，查询字符串中的每个参数都是返回对象的一个属性，这样使用起来就方便了。</p>
+        <p class="calibre1">
+          <strong class="calibre2">
+            <code class="calibre11">URLSearchParams</code>
+          </strong>
+        </p>
+        <p class="calibre1">
+          <code class="calibre11">URLSearchParams</code>提供了一组标准API方法，通过它们可以检查和修改查询字符串。给<code class="calibre11">URLSearchParams</code>构造函数传入一个查询字符串，就可以创建一个实例。这个实例上暴露了<code class="calibre11">get()</code>、<code class="calibre11">set()</code>和<code class="calibre11">delete()</code>等方法，可以对查询字符串执行相应操作。下面来看一个例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let qs = "?q=javascript&amp;num=10";
+
+let searchparams = new urlsearchparams(qs);
+
+alert(searchparams.tostring());  // " q=javascript&amp;num=10"
+searchparams.has("num");         // true
+searchparams.get("num");         // 10
+
+searchparams.set("page", "3");
+alert(searchparams.tostring());  // " q=javascript&amp;num=10&amp;page=3"
+
+searchparams.delete("q");
+alert(searchparams.tostring());  // " num=10&amp;page=3"</code></pre>
+        <p class="calibre1">大多数支持<code class="calibre11">URLSearchParams</code>的浏览器也支持将<code class="calibre11">URLSearchParams</code>的实例用作可迭代对象：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">let qs = "?q=javascript&amp;num=10";
+
+let searchparams = new urlsearchparams(qs);
+
+for (let param of searchparams) {
+  console.log(param);
+}
+// ["q", "javascript"]
+// ["num", "10"]</code></pre>
+        <h3 id="nav_point_285" class="calibre15">12.2.2 操作地址</h3>
+        <p class="calibre1">可以通过修改<code class="calibre11">location</code>对象修改浏览器的地址。首先，最常见的是使用<code class="calibre11">assign()</code>方法并传入一个URL，如下所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">location.assign("http://www.wrox.com");</code></pre>
+        <p class="calibre1">这行代码会立即启动导航到新URL的操作，同时在浏览器历史记录中增加一条记录。如果给<code class="calibre11">location.href</code>或<code class="calibre11">window.location</code>设置一个URL，也会以同一个URL值调用<code class="calibre11">assign()</code>方法。比如，下面两行代码都会执行与显式调用<code class="calibre11">assign()</code>一样的操作：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">window.location = "http://www.wrox.com";
+location.href = "http://www.wrox.com";</code></pre>
+        <p class="calibre1">在这3种修改浏览器地址的方法中，设置<code class="calibre11">location.href</code>是最常见的。</p>
+        <p class="calibre1">修改<code class="calibre11">location</code>对象的属性也会修改当前加载的页面。其中，<code class="calibre11">hash</code>、<code class="calibre11">search</code>、<code class="calibre11">hostname</code>、<code class="calibre11">pathname</code>和<code class="calibre11">port</code>属性被设置为新值之后都会修改当前URL，如下面的例子所示：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">// 假设当前url为http://www.wrox.com/wileycda/
+
+// 把url修改为http://www.wrox.com/wileycda/#section1
+location.hash = "#section1";
+
+// 把url修改为http://www.wrox.com/wileycda/?q=javascript
+location.search = "?q=javascript";
+
+// 把url修改为http://www.somewhere.com/wileycda/
+location.hostname = "www.somewhere.com";
+
+// 把url修改为http://www.somewhere.com/mydir/
+location.pathname = "mydir";
+
+// 把url修改为http://www.somewhere.com:8080/wileycda/
+location.port = 8080;</code></pre>
+        <p class="calibre1">除了<code class="calibre11">hash</code>之外，只要修改<code class="calibre11">location</code>的一个属性，就会导致页面重新加载新URL。</p>
+        <blockquote class="calibre13">
+          <p class="calibre1">
+            <strong class="calibre2">注意</strong>
+            修改<code class="calibre11">hash</code>的值会在浏览器历史中增加一条新记录。在早期的IE中，点击“后退”和“前进”按钮不会更新<code class="calibre11">hash</code>属性，只有点击包含散列的URL才会更新<code class="calibre11">hash</code>的值。</p>
+        </blockquote>
+        <p class="calibre1">在以前面提到的方式修改URL之后，浏览器历史记录中就会增加相应的记录。当用户单击“后退”按钮时，就会导航到前一个页面。如果不希望增加历史记录，可以使用<code class="calibre11">replace()</code>方法。这个方法接收一个URL参数，但重新加载后不会增加历史记录。调用<code class="calibre11">replace()</code>之后，用户不能回到前一页。比如下面的例子：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;you won't be able to get back here&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;p&gt;enjoy this page for a second, because you won't be coming back here.&lt;/p&gt;
+  &lt;script&gt;
+    settimeout(() =&gt; location.replace("http://www.wrox.com/"), 1000);
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p class="calibre1">浏览器加载这个页面1秒之后会重定向到www.wrox.com。此时，“后退”按钮是禁用状态，即不能返回这个示例页面，除非手动输入完整的URL。</p>
+        <p class="calibre1">最后一个修改地址的方法是<code class="calibre11">reload()</code>，它能重新加载当前显示的页面。调用<code class="calibre11">reload()</code>而不传参数，页面会以最有效的方式重新加载。也就是说，如果页面自上次请求以来没有修改过，浏览器可能会从缓存中加载页面。如果想强制从服务器重新加载，可以像下面这样给<code class="calibre11">reload()</code>传个<code class="calibre11">true</code>：</p>
+        <pre class="dai_ma_wu_xing_hao"><code class="calibre11">location.reload();     // 重新加载，可能是从缓存加载
+location.reload(true); // 重新加载，从服务器加载</code></pre>
+        <p class="calibre1">脚本中位于<code class="calibre11">reload()</code>调用之后的代码可能执行也可能不执行，这取决于网络延迟和系统资源等因素。为此，最好把<code class="calibre11">reload()</code>作为最后一行代码。</p>
+
+      </div>
+
+      <div class="calibreToc">
+        <h2>
+          <a href="../../54m0dfqx.html">Table of contents
+          </a>
+        </h2>
+        <div>
+          <ul>
+            <li>
+              <a href="part0002.html#nav_point_0">版权声明</a>
+            </li>
+            <li>
+              <a href="part0003.html#nav_point_1">献词</a>
+            </li>
+            <li>
+              <a href="part0004.html#nav_point_2">译者序</a>
+            </li>
+            <li>
+              <a href="part0005.html#nav_point_3">序</a>
+            </li>
+            <li>
+              <a href="part0006.html#nav_point_4">前言</a>
+            </li>
+            <li>
+              <a href="part0012.html#nav_point_10">致谢</a>
+            </li>
+            <li>
+              <a href="part0013.html#nav_point_11">第 1 章 什么是JavaScript</a>
+            </li>
+            <li>
+              <a href="part0018.html#nav_point_19">第 2 章 HTML中的JavaScript</a>
+            </li>
+            <li>
+              <a href="part0024.html#nav_point_31">第 3 章 语言基础</a>
+            </li>
+            <li>
+              <a href="part0033.html#nav_point_78">第 4 章 变量、作用域与内存</a>
+            </li>
+            <li>
+              <a href="part0038.html#nav_point_93">第 5 章 基本引用类型</a>
+            </li>
+            <li>
+              <a href="part0044.html#nav_point_111">第 6 章 集合引用类型</a>
+            </li>
+            <li>
+              <a href="part0054.html#nav_point_153">第 7 章 迭代器与生成器</a>
+            </li>
+            <li>
+              <a href="part0059.html#nav_point_166">第 8 章 对象、类与面向对象编程</a>
+            </li>
+            <li>
+              <a href="part0065.html#nav_point_194">第 9 章 代理与反射</a>
+            </li>
+            <li>
+              <a href="part0070.html#nav_point_225">第 10 章 函数</a>
+            </li>
+            <li>
+              <a href="part0088.html#nav_point_258">第 11 章 期约与异步函数</a>
+            </li>
+            <li>
+              <a href="part0093.html#nav_point_273">第 12 章 BOM</a>
+            </li>
+            <li>
+              <a href="part0100.html#nav_point_294">第 13 章 客户端检测</a>
+            </li>
+            <li>
+              <a href="part0105.html#nav_point_306">第 14 章 DOM</a>
+            </li>
+            <li>
+              <a href="part0110.html#nav_point_328">第 15 章 DOM扩展</a>
+            </li>
+            <li>
+              <a href="part0116.html#nav_point_348">第 16 章 DOM2和DOM3</a>
+            </li>
+            <li>
+              <a href="part0122.html#nav_point_370">第 17 章 事件</a>
+            </li>
+            <li>
+              <a href="part0130.html#nav_point_403">第 18 章 动画与Canvas图形</a>
+            </li>
+            <li>
+              <a href="part0136.html#nav_point_428">第 19 章 表单脚本</a>
+            </li>
+            <li>
+              <a href="part0143.html#nav_point_450">第 20 章 JavaScript API</a>
+            </li>
+            <li>
+              <a href="part0157.html#nav_point_500">第 21 章 错误处理与调试</a>
+            </li>
+            <li>
+              <a href="part0163.html#nav_point_526">第 22 章 处理XML</a>
+            </li>
+            <li>
+              <a href="part0168.html#nav_point_542">第 23 章 JSON</a>
+            </li>
+            <li>
+              <a href="part0172.html#nav_point_552">第 24 章 网络请求与远程资源</a>
+            </li>
+            <li>
+              <a href="part0182.html#nav_point_582">第 25 章 客户端存储</a>
+            </li>
+            <li>
+              <a href="part0187.html#nav_point_607">第 26 章 模块</a>
+            </li>
+            <li>
+              <a href="part0193.html#nav_point_633">第 27 章 工作者线程</a>
+            </li>
+            <li>
+              <a href="part0199.html#nav_point_667">第 28 章 最佳实践</a>
+            </li>
+            <li>
+              <a href="part0204.html#nav_point_683">附录 A ES2018和ES2019</a>
+            </li>
+            <li>
+              <a href="part0215.html#nav_point_708">附录 B 严格模式</a>
+            </li>
+            <li>
+              <a href="part0223.html#nav_point_719">附录 C JavaScript库和框架</a>
+            </li>
+            <li>
+              <a href="part0227.html#nav_point_741">附录 D JavaScript工具</a>
+            </li>
+            <li>
+              <a href="part0239.html#nav_point_800">作者简介</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="calibreEbNav">
+
+        <a href="part0094.html" class="calibreAPrev">上一页
+        </a>
+
+        <a href="../../54m0dfqx.html" class="calibreAHome">首页
+        </a>
+
+        <a href="part0096.html" class="calibreANext">下一页
+        </a>
+
+      </div>
+
+    </div>
+
+    <script async="async" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6487844781006261" crossorigin="anonymous"></script>
+  </body>
+</html>
